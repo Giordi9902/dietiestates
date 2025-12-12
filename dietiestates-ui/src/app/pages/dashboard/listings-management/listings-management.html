@@ -1,1 +1,42 @@
-<p>listings-management works!</p>
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h4 class="mb-0">I tuoi annunci</h4>
+    <a class="btn btn-primary" routerLink="/dashboard/listings/new">Nuovo annuncio</a>
+  </div>
+
+  @if (loading) {
+  <div class="d-flex justify-content-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  } @if (error) {
+  <div class="alert alert-danger" role="alert">{{ error }}</div>
+  } @if (!loading && items.length === 0) {
+  <div class="alert alert-info" role="alert">
+    Non hai ancora annunci. Crea il tuo primo annuncio.
+  </div>
+  } @if (!loading && items.length > 0) {
+  <div class="row g-3">
+    @for (item of items; track item.listing_id) {
+    <div class="col-12 col-sm-6 col-lg-4">
+      <app-agent-listing-card [listing]="item" (delete)="onDelete($event)"></app-agent-listing-card>
+    </div>
+    }
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <button class="btn btn-outline-secondary" [disabled]="page <= 0" (click)="load(page - 1)">
+      Precedente
+    </button>
+    <span class="text-muted">Pagina {{ page + 1 }} di {{ totalPages }}</span>
+    <button
+      class="btn btn-outline-secondary"
+      [disabled]="page + 1 >= totalPages"
+      (click)="load(page + 1)"
+    >
+      Successiva
+    </button>
+  </div>
+  }
+</div>
