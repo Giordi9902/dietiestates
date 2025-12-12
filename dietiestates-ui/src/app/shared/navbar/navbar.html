@@ -1,0 +1,50 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+      <span>DietiEstates</span>
+    </a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#dietiNavbar"
+      aria-controls="dietiNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="dietiNavbar">
+      @if (isLoggedIn) {
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        @if (isUser || isAdmin || isAgent) {
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/profile" routerLinkActive="active">Profilo</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/search" routerLinkActive="active">Cerca</a>
+        </li>
+        } @if (isAdmin || isAgent) {
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard" routerLinkActive="active"
+            >Vai alla tua agenzia</a
+          >
+        </li>
+        }
+      </ul>
+
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <span class="text-muted">{{ fullName }}</span>
+        <button class="btn btn-outline-secondary btn-sm" (click)="logout()">Logout</button>
+      </div>
+      } @if (!isLoggedIn) {
+      <div class="ms-auto d-flex gap-2">
+        <a class="btn btn-outline-primary" routerLink="/login">Login</a>
+        <a class="btn btn-primary" routerLink="/register">Register</a>
+      </div>
+      }
+    </div>
+  </div>
+</nav>

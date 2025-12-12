@@ -1,0 +1,18 @@
+package it.unina.ingsw.dietiestates_backend.listings.repository;
+
+import it.unina.ingsw.dietiestates_backend.listings.model.Listing;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import java.util.Optional;
+
+public interface ListingRepository extends JpaRepository<Listing,Integer>{
+	@Query("SELECT l.listedBy.id FROM Listing l WHERE l.id = :listingId")
+	Optional<Integer> findAgentIdByListingId(@Param("listingId") Integer listingId);
+
+
+	@Query(value = "SELECT * FROM get_listings_by_agent(:agentId)", nativeQuery = true)
+	Page<Listing> findListingsByAgentId(@Param("agentId") Integer listed_by_agentId, Pageable pageable);
+}
