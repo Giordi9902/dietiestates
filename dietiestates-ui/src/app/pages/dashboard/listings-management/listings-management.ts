@@ -20,6 +20,7 @@ export class ListingsManagement {
   page = 0;
   size = 12;
   totalPages = 0;
+  confirmId: number | null = null;
 
   constructor() {
     this.load();
@@ -43,11 +44,25 @@ export class ListingsManagement {
     });
   }
 
-  onDelete(id: number): void {
+  openDeleteConfirm(id: number): void {
+    this.confirmId = id;
+  }
+
+  cancelDelete(): void {
+    this.confirmId = null;
+  }
+
+  confirmDelete(): void {
+    if (this.confirmId == null) return;
+    const id = this.confirmId;
     this.listingsService.delete({ id }).subscribe({
-      next: () => this.load(this.page),
+      next: () => {
+        this.confirmId = null;
+        this.load(this.page);
+      },
       error: () => {
         this.error = 'Eliminazione non riuscita.';
+        this.confirmId = null;
       },
     });
   }
