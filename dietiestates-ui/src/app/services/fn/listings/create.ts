@@ -7,17 +7,17 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { CreateSaleListingRequest } from '../../models/create-sale-listing-request';
+import { CreateListingRequest } from '../../models/create-listing-request';
 
-export interface CreateSale$Params {
+export interface Create$Params {
       body?: {
-'request': CreateSaleListingRequest;
+'request': CreateListingRequest;
 'images': Array<Blob>;
 }
 }
 
-export function createSale(http: HttpClient, rootUrl: string, params?: CreateSale$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
-  const rb = new RequestBuilder(rootUrl, createSale.PATH, 'post');
+export function create(http: HttpClient, rootUrl: string, params?: Create$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+  const rb = new RequestBuilder(rootUrl, create.PATH, 'post');
   if (params) {
     rb.body(params.body, 'multipart/form-data');
   }
@@ -32,4 +32,4 @@ export function createSale(http: HttpClient, rootUrl: string, params?: CreateSal
   );
 }
 
-createSale.PATH = '/listings/sale';
+create.PATH = '/listings';

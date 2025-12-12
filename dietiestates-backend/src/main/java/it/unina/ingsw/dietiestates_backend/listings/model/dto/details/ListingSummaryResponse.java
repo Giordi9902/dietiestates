@@ -1,29 +1,25 @@
 package it.unina.ingsw.dietiestates_backend.listings.model.dto.details;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import it.unina.ingsw.dietiestates_backend.listings.model.enums.ListingOperation;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@JsonTypeInfo(
-		use = JsonTypeInfo.Id.NAME,
-		include = JsonTypeInfo.As.PROPERTY,
-		property = "listingOperation"
-)
+import java.math.BigDecimal;
 
-@JsonSubTypes({
-		@JsonSubTypes.Type(value = SaleListingSummaryResponse.class, name = "SALE"),
-		@JsonSubTypes.Type(value = RentListingSummaryResponse.class, name = "RENT")
-})
 @Getter
 @Setter
-public abstract class ListingSummaryResponse {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ListingSummaryResponse {
 	private Integer listing_id;
 	private String title;
-	private String address;
 	private String description;
+	private String address;
 	private Integer rooms;
 	private Integer bathrooms;
+	private BigDecimal price;
 	private String listingOperation;
 	private Double area;
 	private String energyClass;

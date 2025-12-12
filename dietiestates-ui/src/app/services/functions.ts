@@ -3,10 +3,8 @@
 
 export type { ChangeMyPassword$Params as ChangeMyPassword$Params } from './fn/profile/change-my-password';
 export { changeMyPassword as changeMyPassword } from './fn/profile/change-my-password';
-export type { CreateSale$Params as CreateSale$Params } from './fn/listings/create-sale';
-export { createSale as createSale } from './fn/listings/create-sale';
-export type { CreateRent$Params as CreateRent$Params } from './fn/listings/create-rent';
-export { createRent as createRent } from './fn/listings/create-rent';
+export type { Create$Params as Create$Params } from './fn/listings/create';
+export { create as create } from './fn/listings/create';
 export type { GetListingById$Params as GetListingById$Params } from './fn/listings/get-listing-by-id';
 export { getListingById as getListingById } from './fn/listings/get-listing-by-id';
 export type { Delete$Params as Delete$Params } from './fn/listings/delete';

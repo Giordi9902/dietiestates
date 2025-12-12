@@ -10,10 +10,8 @@ import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
 import { StrictHttpResponse } from '../strict-http-response';
 
-import { createRent } from '../fn/listings/create-rent';
-import { CreateRent$Params } from '../fn/listings/create-rent';
-import { createSale } from '../fn/listings/create-sale';
-import { CreateSale$Params } from '../fn/listings/create-sale';
+import { create } from '../fn/listings/create';
+import { Create$Params } from '../fn/listings/create';
 import { delete$ } from '../fn/listings/delete';
 import { Delete$Params } from '../fn/listings/delete';
 import { getAgentsListings } from '../fn/listings/get-agents-listings';
@@ -33,55 +31,28 @@ export class ListingsService extends BaseService {
     super(config, http);
   }
 
-  /** Path part for operation `createSale()` */
-  static readonly CreateSalePath = '/listings/sale';
+  /** Path part for operation `create()` */
+  static readonly CreatePath = '/listings';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `createSale()` instead.
+   * To access only the response body, use `create()` instead.
    *
    * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
    */
-  createSale$Response(params?: CreateSale$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
-    const obs = createSale(this.http, this.rootUrl, params, context);
+  create$Response(params?: Create$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+    const obs = create(this.http, this.rootUrl, params, context);
     return obs;
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `createSale$Response()` instead.
+   * To access the full response (for headers, for example), `create$Response()` instead.
    *
    * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
    */
-  createSale(params?: CreateSale$Params, context?: HttpContext): Observable<string> {
-    const resp = this.createSale$Response(params, context);
-    return resp.pipe(
-      map((r: StrictHttpResponse<string>): string => r.body)
-    );
-  }
-
-  /** Path part for operation `createRent()` */
-  static readonly CreateRentPath = '/listings/rent';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `createRent()` instead.
-   *
-   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
-   */
-  createRent$Response(params?: CreateRent$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
-    const obs = createRent(this.http, this.rootUrl, params, context);
-    return obs;
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `createRent$Response()` instead.
-   *
-   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
-   */
-  createRent(params?: CreateRent$Params, context?: HttpContext): Observable<string> {
-    const resp = this.createRent$Response(params, context);
+  create(params?: Create$Params, context?: HttpContext): Observable<string> {
+    const resp = this.create$Response(params, context);
     return resp.pipe(
       map((r: StrictHttpResponse<string>): string => r.body)
     );

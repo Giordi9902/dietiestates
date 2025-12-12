@@ -13,13 +13,24 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashSet;
 import java.util.Set;
 
-import static it.unina.ingsw.dietiestates_backend.errors.BusinessErrorCodes.ACCOUNT_LOCKED;
-import static it.unina.ingsw.dietiestates_backend.errors.BusinessErrorCodes.BAD_CREDENTIALS;
+import static it.unina.ingsw.dietiestates_backend.errors.BusinessErrorCodes.*;
 import static org.springframework.http.HttpStatus.*;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+	@ExceptionHandler(ListingNotFoundException.class)
+	public ResponseEntity<ExceptionResponse> handleException(ListingNotFoundException exp){
+		return ResponseEntity.status(NOT_FOUND)
+				.body(
+						ExceptionResponse.builder()
+								.businessErrorCode(LISTING_NOT_FOUND.getCode())
+								.businessErrorDescription(LISTING_NOT_FOUND.getDescription())
+								.error(exp.getMessage())
+								.build()
+				);
+	}
 
 	@ExceptionHandler(LockedException.class)
 	public ResponseEntity<ExceptionResponse> handleException(LockedException exp) {

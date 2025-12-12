@@ -1,8 +1,7 @@
 package it.unina.ingsw.dietiestates_backend.listings.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import it.unina.ingsw.dietiestates_backend.listings.model.dto.creational.CreateRentListingRequest;
-import it.unina.ingsw.dietiestates_backend.listings.model.dto.creational.CreateSaleListingRequest;
+import it.unina.ingsw.dietiestates_backend.listings.model.dto.creational.CreateListingRequest;
 import it.unina.ingsw.dietiestates_backend.listings.model.dto.details.ListingDetailsResponse;
 import it.unina.ingsw.dietiestates_backend.listings.model.dto.details.ListingSummaryResponse;
 import it.unina.ingsw.dietiestates_backend.listings.model.dto.searching.ListingSearchRequest;
@@ -40,13 +39,13 @@ public class ListingController {
 	}
 
 	@GetMapping("/agent")
+	@PreAuthorize("hasAnyRole('AGENT','ADMIN')")
 	public ResponseEntity<Page<ListingSummaryResponse>> getAgentsListings(
 			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size,
-			@AuthenticationPrincipal UserDetails userDetails
+			@RequestParam(defaultValue = "10") int size
 	){
 		Pageable pageable = PageRequest.of(page,size);
-		Page<ListingSummaryResponse> results = listingService.getListingsByAgent(userDetails, pageable);
+		Page<ListingSummaryResponse> results = listingService.getListingsByAgent(pageable);
 		return ResponseEntity.ok(results);
 	}
 
@@ -61,24 +60,14 @@ public class ListingController {
 		return ResponseEntity.ok(results);
 	}
 
-	@PostMapping(path="/rent", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@PreAuthorize("hasAnyRole('AGENT','ADMIN')")
-	public ResponseEntity<String> createRent(
-			@Valid @RequestPart CreateRentListingRequest request,
+	public ResponseEntity<String> create(
+			@Valid @RequestPart CreateListingRequest request,
 			@RequestPart(value="images") List<MultipartFile> images
 	){
 		listingService.createListing(request,images);
-		return ResponseEntity.status(CREATED).body("Sale listing created succesfully");
-	}
-
-	@PostMapping(path="/sale",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@PreAuthorize("hasAnyRole('AGENT','ADMIN')")
-	public ResponseEntity<String> createSale(
-			@Valid @RequestPart CreateSaleListingRequest request,
-			@RequestPart(value="images") List<MultipartFile> images
-	){
-		listingService.createListing(request,images);
-		return ResponseEntity.status(CREATED).body("Rent listing created succesfully");
+		return ResponseEntity.status(CREATED).body("Listing created succesfully");
 	}
 
 	@PatchMapping("/{id}")

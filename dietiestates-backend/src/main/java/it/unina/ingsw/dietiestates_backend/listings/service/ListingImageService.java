@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ListingImageService {
@@ -25,7 +27,15 @@ public class ListingImageService {
 		return listingImageRepository.save(image);
 	}
 
+	public void deleteListingImages(Integer listing_id){
+		s3ImageStorageService.deleteAllImagesForListing(listing_id);
+	}
+
 	public String presign(String imageUrl) {
 		return s3ImageStorageService.presignUrl(imageUrl);
+	}
+
+	public List<ListingImage> findListingImages(Integer id) {
+		return listingImageRepository.findByListingId(id);
 	}
 }

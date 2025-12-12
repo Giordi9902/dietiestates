@@ -4,6 +4,7 @@ import it.unina.ingsw.dietiestates_backend.listings.model.enums.EnergyClass;
 import it.unina.ingsw.dietiestates_backend.listings.model.enums.ListingOperation;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class ListingDetailsResponse {
 	private String address;
 	private Double lng;
 	private Double lat;
-	private Double price;
+	private BigDecimal price;
 	private Integer rooms;
 	private Integer bathrooms;
 	private Double area;

@@ -29,6 +29,7 @@ public class SecurityFilterConfig {
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(req->req.requestMatchers(
 								"/auth/**",
+								"/api/v1/listings/search",
 								"/v2/api-docs",
 								"/v3/api-docs",
 								"/v3/api-docs/**",
@@ -40,7 +41,7 @@ public class SecurityFilterConfig {
 								"/webjars/**",
 								"/swagger-ui.html"
 								).permitAll()
-						.requestMatchers(HttpMethod.GET, "/listings/*", "/listings/search").permitAll()
+						.requestMatchers(HttpMethod.GET,"/listings/**").permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
