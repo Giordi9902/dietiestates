@@ -1,1 +1,72 @@
-<p>agency-homepage works!</p>
+<div class="container-fluid">
+  @if (loading) {
+  <div class="d-flex justify-content-center align-items-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  } @if (error) {
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+  } @if (!loading && agency) {
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+              <h4 class="mb-1">{{ agency.name ?? 'La tua agenzia' }}</h4>
+            </div>
+          </div>
+          <hr />
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <div class="d-flex flex-column">
+                <span class="text-muted">Email</span>
+                <span>{{ agency.email || '—' }}</span>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="d-flex flex-column">
+                <span class="text-muted">Telefono</span>
+                <span>{{ agency.phoneNumber || '—' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 border-primary">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">Gestione annunci</h5>
+          <p class="card-text text-muted flex-grow-1">
+            Crea, modifica e gestisci gli annunci della tua agenzia.
+          </p>
+          <a class="btn btn-primary align-self-start" routerLink="/dashboard/listings"
+            >Vai agli annunci</a
+          >
+        </div>
+      </div>
+    </div>
+
+    @if (isAdmin) {
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 border-success">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">Gestione agenti</h5>
+          <p class="card-text text-muted flex-grow-1">
+            Aggiungi nuovi agenti e gestisci i loro permessi.
+          </p>
+          <a class="btn btn-success align-self-start" routerLink="/dashboard/agents"
+            >Vai agli agenti</a
+          >
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>
