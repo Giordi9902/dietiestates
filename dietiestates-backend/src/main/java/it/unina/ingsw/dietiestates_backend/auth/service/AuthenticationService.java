@@ -71,12 +71,7 @@ public class AuthenticationService {
 
 	public AuthenticationResponse authenticate(AuthenticationRequest request) {
 
-			var auth = authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(
-							request.getEmail(),
-							request.getPassword()
-					)
-			);
+		var auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
 		var claims = new HashMap<String, Object>();
 		var user = ((User) auth.getPrincipal());

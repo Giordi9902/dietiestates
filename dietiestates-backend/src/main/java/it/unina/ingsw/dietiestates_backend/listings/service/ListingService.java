@@ -80,6 +80,7 @@ public class ListingService {
 		return listingSearchRepository.searchListingsByFilters(searchRequest,pageable);
 	}
 
+	@Transactional
 	public void updateListingById(UpdateListingRequest request, Integer id) {
 		Listing listing = listingRepository.findById(id)
 				.orElseThrow(() -> new ListingNotFoundException("Listing not found with id:" + id));
@@ -108,6 +109,7 @@ public class ListingService {
 		}
 	}
 
+	@Transactional
 	public void deleteListingById(Integer id) {
 		listingRepository.deleteById(id);
 		listingImageService.deleteListingImages(id);

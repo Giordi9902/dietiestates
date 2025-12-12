@@ -49,7 +49,7 @@ public class ListingController {
 		return ResponseEntity.ok(results);
 	}
 
-	@GetMapping("/search")
+	@PostMapping("/search")
 	public ResponseEntity<Page<ListingSummaryResponse>> search(
 			@RequestBody ListingSearchRequest searchRequest,
 			@RequestParam(defaultValue = "0") int page,
@@ -72,19 +72,19 @@ public class ListingController {
 
 	@PatchMapping("/{id}")
 	@IsAgentOfListing
-	public ResponseEntity<String> update(
+	public ResponseEntity<Void> update(
 			@PathVariable Integer id,
 			@RequestBody UpdateListingRequest request){
 		listingService.updateListingById(request,id);
-		return ResponseEntity.ok().body("Listing updated succesfully");
+		return ResponseEntity.noContent().build();
 	}
 
 	@DeleteMapping("/{id}")
 	@IsAgentOfListing
-	public ResponseEntity<String> delete(
+	public ResponseEntity<Void> delete(
 			@PathVariable Integer id
 	){
 		listingService.deleteListingById(id);
-		return ResponseEntity.ok().body("Listing deleted succesfully");
+		return ResponseEntity.noContent().build();
 	}
 }

@@ -29,7 +29,6 @@ public class SecurityFilterConfig {
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(req->req.requestMatchers(
 								"/auth/**",
-								"/api/v1/listings/search",
 								"/v2/api-docs",
 								"/v3/api-docs",
 								"/v3/api-docs/**",
@@ -42,9 +41,12 @@ public class SecurityFilterConfig {
 								"/swagger-ui.html"
 								).permitAll()
 						.requestMatchers(HttpMethod.GET,"/listings/**").permitAll()
+						.requestMatchers(HttpMethod.POST,"/api/v1/listings/search").permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
+				.exceptionHandling(e->e.authenticationEntryPoint(new JsonAuthenticationEntryPoint())
+						.accessDeniedHandler(new JsonAccessDeniedHandler()))
 				.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}

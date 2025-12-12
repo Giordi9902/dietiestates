@@ -2,6 +2,7 @@ package it.unina.ingsw.dietiestates_backend.listings.model.dto.update;
 
 import it.unina.ingsw.dietiestates_backend.listings.model.enums.EnergyClass;
 import it.unina.ingsw.dietiestates_backend.listings.model.enums.ListingOperation;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ public class UpdateListingRequest {
 	private Double lng;
 	private Double lat;
 	private Integer floor;
+	@Positive(message = "Il prezzo non può essere negativo")
     private BigDecimal price;
 	private Integer rooms;
 	private Integer bathrooms;
