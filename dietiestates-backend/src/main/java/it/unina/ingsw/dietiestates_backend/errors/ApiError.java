@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiError {
-	Instant timestamp;
+	String timestamp;
 	int status;
 	String error;
 	String code;

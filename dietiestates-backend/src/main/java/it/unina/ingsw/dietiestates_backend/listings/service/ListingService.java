@@ -15,6 +15,7 @@ import it.unina.ingsw.dietiestates_backend.listings.repository.ListingSearchRepo
 import it.unina.ingsw.dietiestates_backend.listings.service.mapper.ListingMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -31,6 +32,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ListingService {
 	private final ListingRepository listingRepository;
 	private final ListingImageService listingImageService;
@@ -45,11 +47,14 @@ public class ListingService {
 			CreateListingRequest request,
 			List<MultipartFile> images)
 	{
+		log.info("Persisting listing: title='{}', price={}, area={}, lat={}, lng={}, imagesCount={}",
+			request.getTitle(), request.getPrice(), request.getArea(), request.getLat(), request.getLng(), images != null ? images.size() : 0);
 		User agent = getAgent();
 		Listing listing = listingMapper.toEntity(request);
 		listing.setListedBy(agent);
 		Integer id = listingRepository.save(listing).getId();
 		listing.setId(id);
+		log.info("Listing persisted with id={}", id);
 		uploadImages(listing,images);
 	}
 
@@ -129,8 +134,11 @@ public class ListingService {
 
 	private void uploadImages(Listing listing, List<MultipartFile> images){
 		if (images == null || images.isEmpty()) throw new IllegalArgumentException("images cannot be null or empty");
+		log.info("Uploading {} images for listing id={}", images.size(), listing.getId());
 		for (MultipartFile image : images) {
+			log.debug("Uploading image name='{}', size={}", image.getOriginalFilename(), image.getSize());
 			listingImageService.saveImage(image, listing);
 		}
+		log.info("Images upload completed for listing id={}", listing.getId());
 	}
 }

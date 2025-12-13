@@ -26,6 +26,10 @@ public class ListingDetailsResponse {
 	private Double area;
 	private EnergyClass energyClass;
 	private ListingOperation listingOperation;
+	private Boolean hasElevator;
+	private Boolean hasParking;
+	private Boolean hasGarden;
+	private Boolean hasBalcony;
 	@Builder.Default
 	private List<String> imageUrls = new ArrayList<>();
 }

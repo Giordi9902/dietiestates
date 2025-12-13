@@ -5,14 +5,14 @@ export type { ChangeMyPassword$Params as ChangeMyPassword$Params } from './fn/pr
 export { changeMyPassword as changeMyPassword } from './fn/profile/change-my-password';
 export type { Create$Params as Create$Params } from './fn/listings/create';
 export { create as create } from './fn/listings/create';
+export type { Search$Params as Search$Params } from './fn/listings/search';
+export { search as search } from './fn/listings/search';
 export type { GetListingById$Params as GetListingById$Params } from './fn/listings/get-listing-by-id';
 export { getListingById as getListingById } from './fn/listings/get-listing-by-id';
 export type { Delete$Params as Delete$Params } from './fn/listings/delete';
 export { delete$ as delete$ } from './fn/listings/delete';
 export type { Update$Params as Update$Params } from './fn/listings/update';
 export { update as update } from './fn/listings/update';
-export type { Search$Params as Search$Params } from './fn/listings/search';
-export { search as search } from './fn/listings/search';
 export type { GetAgentsListings$Params as GetAgentsListings$Params } from './fn/listings/get-agents-listings';
 export { getAgentsListings as getAgentsListings } from './fn/listings/get-agents-listings';
 export type { Register$Params as Register$Params } from './fn/authentication/register';

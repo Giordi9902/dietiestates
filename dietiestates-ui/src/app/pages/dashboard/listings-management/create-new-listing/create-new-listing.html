@@ -1,1 +1,263 @@
-<p>create-new-listing works!</p>
+<div class="container py-3">
+  <h4 class="mb-3">Crea nuovo annuncio immobiliare</h4>
+
+  <form (ngSubmit)="submit()" #formRef="ngForm" novalidate>
+    <div class="row g-3">
+      <div class="col-12 col-lg-8">
+        <div class="card">
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Titolo</label>
+              <input
+                [(ngModel)]="model.title"
+                name="title"
+                type="text"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Descrizione</label>
+              <textarea
+                [(ngModel)]="model.description"
+                name="description"
+                class="form-control"
+                rows="4"
+                required
+              ></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Tipologia annuncio</label>
+              <select
+                [(ngModel)]="model.listingOperation"
+                name="listingOperation"
+                class="form-select"
+                required
+              >
+                <option [ngValue]="'SALE'">Vendita</option>
+                <option [ngValue]="'RENT'">Affitto</option>
+              </select>
+            </div>
+
+            @if (model.listingOperation === 'SALE') {
+            <div class="mb-3">
+              <label class="form-label">Prezzo</label>
+              <input
+                [(ngModel)]="model.price"
+                name="price"
+                type="number"
+                min="0"
+                step="0.01"
+                class="form-control"
+                required
+              />
+            </div>
+            } @else if (model.listingOperation === 'RENT') {
+            <div class="mb-3">
+              <label class="form-label">Canone mensile</label>
+              <input
+                [(ngModel)]="model.price"
+                name="monthlyPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                class="form-control"
+                required
+              />
+            </div>
+            }
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">Superficie (m²)</label>
+                <input
+                  [(ngModel)]="model.area"
+                  name="area"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label">Stanze</label>
+                <input
+                  [(ngModel)]="model.rooms"
+                  name="rooms"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="form-control"
+                />
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label">Bagni</label>
+                <input
+                  [(ngModel)]="model.bathrooms"
+                  name="bathrooms"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="row g-3 mt-0">
+              <div class="col-6 col-md-3">
+                <label class="form-label">Piano</label>
+                <input
+                  [(ngModel)]="model.floor"
+                  name="floor"
+                  type="number"
+                  min="0"
+                  step="1"
+                  class="form-control"
+                />
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label">Classe energetica</label>
+                <select
+                  [(ngModel)]="model.energyClass"
+                  name="energyClass"
+                  class="form-select"
+                  required
+                >
+                  <option [ngValue]="'A4'">A4</option>
+                  <option [ngValue]="'A3'">A3</option>
+                  <option [ngValue]="'A2'">A2</option>
+                  <option [ngValue]="'A1'">A1</option>
+                  <option [ngValue]="'B'">B</option>
+                  <option [ngValue]="'C'">C</option>
+                  <option [ngValue]="'D'">D</option>
+                  <option [ngValue]="'E'">E</option>
+                  <option [ngValue]="'F'">F</option>
+                  <option [ngValue]="'G'">G</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-6 d-flex flex-wrap align-items-center gap-3">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [(ngModel)]="model.hasElevator"
+                    name="hasElevator"
+                  />
+                  <label class="form-check-label">Ascensore</label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [(ngModel)]="model.hasParking"
+                    name="hasParking"
+                  />
+                  <label class="form-check-label">Parcheggio</label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [(ngModel)]="model.hasBalcony"
+                    name="hasBalcony"
+                  />
+                  <label class="form-check-label">Balcone</label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [(ngModel)]="model.hasGarden"
+                    name="hasGarden"
+                  />
+                  <label class="form-check-label">Giardino</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-4">
+        <div class="card mb-3">
+          <div class="card-body">
+            <label class="form-label">Foto dell'immobile (almeno una)</label>
+            <input
+              (change)="onFilesSelected($event)"
+              type="file"
+              class="form-control"
+              multiple
+              accept="image/*"
+            />
+            @if (images.length > 0) {
+            <div class="mt-3 d-flex flex-wrap gap-2 preview-grid">
+              @for (img of imagePreviews; track $index) {
+              <img [src]="img" alt="preview" class="rounded border" />
+              }
+            </div>
+            }
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="mb-2 d-flex gap-2">
+              <input
+                [(ngModel)]="addressInput"
+                name="address"
+                type="text"
+                class="form-control"
+                placeholder="Indirizzo (opzionale)"
+              />
+              <button class="btn btn-outline-secondary" type="button" (click)="geocodeAddress()">
+                Cerca
+              </button>
+            </div>
+            <div id="map" class="rounded border"></div>
+            <div class="form-text mt-2">
+              Clicca sulla mappa per selezionare il punto, oppure inserisci l'indirizzo.
+            </div>
+            <div class="row mt-2 g-2">
+              <div class="col-6">
+                <label class="form-label">Latitudine</label>
+                <input
+                  [(ngModel)]="model.lat"
+                  name="lat"
+                  type="number"
+                  step="0.000001"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="col-6">
+                <label class="form-label">Longitudine</label>
+                <input
+                  [(ngModel)]="model.lng"
+                  name="lng"
+                  type="number"
+                  step="0.000001"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-grid d-md-flex justify-content-md-end gap-2 mt-3">
+      <button type="button" class="btn btn-outline-secondary" (click)="reset()">Reset</button>
+      <button type="submit" class="btn btn-primary ms-md-2" [disabled]="submitting">
+        Crea annuncio
+      </button>
+    </div>
+
+    @if (error) {
+    <div class="alert alert-danger mt-3">{{ error }}</div>
+    }
+  </form>
+</div>

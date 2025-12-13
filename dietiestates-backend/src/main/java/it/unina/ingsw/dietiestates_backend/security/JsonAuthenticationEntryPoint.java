@@ -9,7 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class JsonAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	private final ObjectMapper mapper = new ObjectMapper();
@@ -18,7 +18,7 @@ public class JsonAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
 		var status = HttpStatus.UNAUTHORIZED;
 		var body = ApiError.builder()
-				.timestamp(Instant.now())
+				.timestamp(LocalDateTime.now().toString())
 				.status(status.value())
 				.error(status.getReasonPhrase())
 				.code("UNAUTHORIZED")

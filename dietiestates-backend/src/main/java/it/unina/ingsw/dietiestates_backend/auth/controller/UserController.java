@@ -21,12 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 	private final UserService userService;
 
-    @PutMapping("/me/password")
+    @PutMapping(value = "/me/password", produces = "application/json")
     public ResponseEntity<String> changeMyPassword(
             @AuthenticationPrincipal User currentUser,
             @RequestBody ChangePasswordRequest request
     ) throws BadRequestException, MessagingException {
         userService.updatePassword(currentUser, request);
-		return ResponseEntity.ok().body("Password updated");
+        return ResponseEntity.ok().body("\"Password updated\"");
     }
 }

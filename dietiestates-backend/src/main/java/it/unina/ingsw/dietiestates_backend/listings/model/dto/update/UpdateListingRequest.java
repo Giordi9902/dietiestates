@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateListingRequest {
+	private Integer id;
     private String title;
     private String description;
 	private Double lng;

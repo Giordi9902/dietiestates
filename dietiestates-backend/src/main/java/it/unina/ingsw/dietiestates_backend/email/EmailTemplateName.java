@@ -8,7 +8,8 @@ public enum EmailTemplateName {
 	ACTIVATE_ACCOUNT("activate_account"),
 	AGENT_CREATED("agent_created"),
 	AGENT_PROMOTED("agent_promoted"),
-	PASSWORD_CHANGED("password_changed");
+	PASSWORD_CHANGED("password_changed"),
+	AGENT_ROLE_ADDED("agent_role_added");
 
 
 	private final String templateName;

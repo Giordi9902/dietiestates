@@ -15,6 +15,9 @@ import { roleGuard } from './services/guards/role-guard';
 import { AgentsManagement } from './pages/dashboard/agents-management/agents-management';
 import { CreateNewAgent } from './pages/dashboard/agents-management/create-new-agent/create-new-agent';
 import { ListingsManagement } from './pages/dashboard/listings-management/listings-management';
+import { CreateNewListing } from './pages/dashboard/listings-management/create-new-listing/create-new-listing';
+import { Forbidden } from './pages/forbidden/forbidden';
+import { NotFound } from './pages/not-found/not-found';
 
 export const routes: Routes = [
   {
@@ -31,6 +34,11 @@ export const routes: Routes = [
     path: 'about',
     component: About,
     title: 'About Us',
+  },
+  {
+    path: 'forbidden',
+    component: Forbidden,
+    title: 'Access Denied',
   },
   {
     path: 'login',
@@ -74,14 +82,12 @@ export const routes: Routes = [
         component: AgentsManagement,
         canMatch: [roleGuard(['ROLE_ADMIN'])],
         title: 'Manage your agents',
-        children: [
-          {
-            path: 'new',
-            component: CreateNewAgent,
-            canMatch: [roleGuard(['ROLE_ADMIN'])],
-            title: 'Create a new agent profile',
-          },
-        ],
+      },
+      {
+        path: 'agents-new',
+        component: CreateNewAgent,
+        canMatch: [roleGuard(['ROLE_ADMIN'])],
+        title: 'Create a new agent profile',
       },
       {
         path: 'listings',
@@ -89,6 +95,14 @@ export const routes: Routes = [
         canMatch: [roleGuard(['ROLE_ADMIN', 'ROLE_AGENT'])],
         title: 'Manage your listings',
       },
+      {
+        path: 'listings-new',
+        component: CreateNewListing,
+        title: 'Add a new listing',
+        canMatch: [roleGuard(['ROLE_ADMIN', 'ROLE_AGENT'])],
+      },
     ],
   },
+  // Wildcard route for 404
+  { path: '**', component: NotFound, title: 'Page Not Found' },
 ];

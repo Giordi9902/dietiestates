@@ -41,7 +41,7 @@ public class SecurityFilterConfig {
 								"/swagger-ui.html"
 								).permitAll()
 						.requestMatchers(HttpMethod.GET,"/listings/**").permitAll()
-						.requestMatchers(HttpMethod.POST,"/api/v1/listings/search").permitAll()
+						.requestMatchers(HttpMethod.POST,"/listings/search").permitAll()
 						.anyRequest().authenticated())
 				.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)

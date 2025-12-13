@@ -17,7 +17,7 @@ export interface Search$Params {
 }
 
 export function search(http: HttpClient, rootUrl: string, params: Search$Params, context?: HttpContext): Observable<StrictHttpResponse<PageListingSummaryResponse>> {
-  const rb = new RequestBuilder(rootUrl, search.PATH, 'get');
+  const rb = new RequestBuilder(rootUrl, search.PATH, 'post');
   if (params) {
     rb.query('page', params.page, {});
     rb.query('size', params.size, {});

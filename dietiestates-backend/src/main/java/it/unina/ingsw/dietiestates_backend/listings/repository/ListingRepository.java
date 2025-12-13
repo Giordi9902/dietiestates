@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ListingRepository extends JpaRepository<Listing,Integer>{
-	@Query("SELECT l.listedBy.id FROM Listing l WHERE l.id = :listingId")
+	@Query(value="select l.listed_by_agent_id from listing l where l.listing_id=:listingId",nativeQuery = true)
 	Optional<Integer> findAgentIdByListingId(@Param("listingId") Integer listingId);
 
 

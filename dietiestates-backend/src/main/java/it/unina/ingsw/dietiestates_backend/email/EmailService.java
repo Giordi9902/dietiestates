@@ -70,12 +70,22 @@ public class EmailService {
 		Map<String,Object> properties = new HashMap<>();
 		properties.put("username", user.getUsername());
 		properties.put("loginUrl",loginUrl);
-		sendUsingTemplate(user.getEmail(), "You have been promoted to Agent", EmailTemplateName.AGENT_PROMOTED.getTemplateName(), properties);
+		sendUsingTemplate(user.getEmail(), "You have been promoted to Admin",
+				EmailTemplateName.AGENT_PROMOTED.getTemplateName(), properties);
 	}
 
 	public void sendPasswordChangedNotification(User user) throws MessagingException {
 		Map<String,Object> properties = new HashMap<>();
 		properties.put("username", user.getUsername());
 		sendUsingTemplate(user.getEmail(), "Your Password Has Been Changed", EmailTemplateName.PASSWORD_CHANGED.getTemplateName(), properties);
+	}
+
+	public void sendAgentRoleAdded(User newAgent) throws MessagingException {
+		Map<String,Object> properties = new HashMap<>();
+		properties.put("username",newAgent.getUsername());
+		properties.put("agency", newAgent.getAgency() != null ? newAgent.getAgency().getName() : "your agency");
+		properties.put("loginUrl", loginUrl);
+		sendUsingTemplate(newAgent.getEmail(), "You have been granted Agent permissions",
+				EmailTemplateName.AGENT_ROLE_ADDED.getTemplateName(),properties);
 	}
 }

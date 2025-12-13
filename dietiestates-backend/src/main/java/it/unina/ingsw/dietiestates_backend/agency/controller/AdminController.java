@@ -33,22 +33,22 @@ public class AdminController {
 	}
 
 	@PostMapping("/agents")
-	public ResponseEntity<String> createAgent(@Valid @RequestBody CreateAgentRequest request) throws MessagingException {
+	public ResponseEntity<Void> createAgent(@Valid @RequestBody CreateAgentRequest request) throws MessagingException {
 		adminService.createAgent(request);
-		return ResponseEntity.status(HttpStatus.CREATED).body("Agent correctly created");
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
 	@PatchMapping("/agents/{agentId}/promote")
 	@AdminOfAgency
-	public ResponseEntity<String> promoteToAdmin(@PathVariable Integer agentId) throws MessagingException {
+	public ResponseEntity<Void> promoteToAdmin(@PathVariable Integer agentId) throws MessagingException {
 		adminService.promote(agentId);
-		return ResponseEntity.status(HttpStatus.OK).body("Agent updated correctly");
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 
 	@DeleteMapping("/agents/{agentId}/delete")
 	@AdminOfAgency
-	public ResponseEntity<String> deleteAgent(@PathVariable Integer agentId){
+	public ResponseEntity<Void> deleteAgent(@PathVariable Integer agentId){
 		adminService.deleteAgent(agentId);
-		return ResponseEntity.status(HttpStatus.OK).body("Agent deleted correctly");
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 }

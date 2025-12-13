@@ -1,1 +1,81 @@
-<p>agents-management works!</p>
+<!-- Modal conferma promozione agente -->
+@if (isPromoteModalVisible) {
+<div class="modal fade show" tabindex="-1" aria-modal="true" role="dialog" style="display: block">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Conferma promozione</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="cancelPromote()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>
+          Vuoi davvero promuovere questo agente a ruolo amministratore? L'operazione non può essere
+          annullata.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelPromote()">Annulla</button>
+        <button type="button" class="btn btn-primary" (click)="confirmPromote()">Promuovi</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">Agenti dell'agenzia</h5>
+  <button class="btn btn-primary" (click)="goToCreate()">Nuovo agente</button>
+</div>
+
+@if (error) {
+<div class="alert alert-danger">{{ error }}</div>
+} @if (loading) {
+<div class="text-muted">Caricamento agenti...</div>
+} @else { @if (agents.length === 0) {
+<div class="text-muted">Nessun agente presente.</div>
+} @else {
+<div class="row g-3">
+  @for (a of agents; track a.id) {
+  <div class="col-12 col-sm-6 col-lg-4">
+    <app-agent-card
+      [agent]="a"
+      [currentUserEmail]="currentUserEmail!"
+      (promote)="onPromote($event)"
+      (remove)="onRemove($event)"
+    ></app-agent-card>
+  </div>
+  }
+</div>
+} }
+
+<!-- Modal conferma eliminazione agente -->
+@if (isModalVisible) {
+<div class="modal fade show" tabindex="-1" aria-modal="true" role="dialog" style="display: block">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Conferma eliminazione</h5>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          (click)="cancelRemove()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>Sei sicuro di voler eliminare questo agente? L'operazione non può essere annullata.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelRemove()">Annulla</button>
+        <button type="button" class="btn btn-danger" (click)="confirmRemove()">Elimina</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>
+}

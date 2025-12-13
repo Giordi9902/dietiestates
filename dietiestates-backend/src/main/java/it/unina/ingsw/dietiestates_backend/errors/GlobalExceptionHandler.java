@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.security.SignatureException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ import static org.springframework.http.HttpStatus.*;
 
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler({ BadCredentialsException.class, InvalidCredentialsException.class })
@@ -82,18 +84,20 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
 	public ResponseEntity<ApiError> handleNotReadable(Exception ex, HttpServletRequest req) {
+		log.error("Payload non leggibile on {}: {}", req.getRequestURI(), ex.getMessage(), ex);
 		return build(BAD_REQUEST, "MALFORMED_JSON", "Payload non leggibile.", req, null);
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiError> handleGeneric(Exception ex, HttpServletRequest req) {
+		log.error("Unhandled exception on {}: {}", req.getRequestURI(), ex.getMessage(), ex);
 		return build(INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", "Errore interno inatteso.", req, null);
 	}
 
 	private ResponseEntity<ApiError> build(HttpStatus status, String code, String message,
 										   HttpServletRequest req, List<ApiError.Violation> violations) {
 		ApiError body = ApiError.builder()
-				.timestamp(Instant.now())
+				.timestamp(LocalDateTime.now().toString())
 				.status(status.value())
 				.error(status.getReasonPhrase())
 				.code(code)

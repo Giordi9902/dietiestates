@@ -46,6 +46,10 @@ public class ListingMapper {
 				.energyClass(listing.getEnergyClass())
 				.bathrooms(listing.getBathrooms())
 				.listingOperation(listing.getListingOperation())
+				.hasBalcony(listing.getHasBalcony())
+				.hasElevator(listing.getHasElevator())
+				.hasGarden(listing.getHasGarden())
+				.hasParking(listing.getHasParking())
 				.imageUrls(
 						listing.getImages().stream()
 								.map(i -> listingImageService.presign(i.getUrl()))

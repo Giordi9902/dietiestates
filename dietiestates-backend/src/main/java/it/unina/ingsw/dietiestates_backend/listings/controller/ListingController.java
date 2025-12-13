@@ -10,6 +10,7 @@ import it.unina.ingsw.dietiestates_backend.listings.service.security.IsAgentOfLi
 import it.unina.ingsw.dietiestates_backend.listings.service.ListingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping("listings")
 @RequiredArgsConstructor
 @Tag(name="listings")
+@Slf4j
 public class ListingController {
 	private final ListingService listingService;
 
@@ -60,14 +62,18 @@ public class ListingController {
 		return ResponseEntity.ok(results);
 	}
 
-	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@PreAuthorize("hasAnyRole('AGENT','ADMIN')")
-	public ResponseEntity<String> create(
+	    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	    @PreAuthorize("hasAnyRole('AGENT','ADMIN')")
+	    public ResponseEntity<String> create(
 			@Valid @RequestPart CreateListingRequest request,
 			@RequestPart(value="images") List<MultipartFile> images
 	){
+		log.info("Create listing request received: title='{}', operation={}, price={}, area={}, lat={}, lng={}, energyClass={}, imagesCount={}",
+			request.getTitle(), request.getListingOperation(), request.getPrice(), request.getArea(), request.getLat(), request.getLng(), request.getEnergyClass(), images != null ? images.size() : 0);
 		listingService.createListing(request,images);
-		return ResponseEntity.status(CREATED).body("Listing created succesfully");
+		log.info("Listing created successfully");
+		// Return a valid JSON string (so the Angular client expecting JSON can parse it as a string)
+		return ResponseEntity.status(CREATED).body("\"Listing created successfully\"");
 	}
 
 	@PatchMapping("/{id}")

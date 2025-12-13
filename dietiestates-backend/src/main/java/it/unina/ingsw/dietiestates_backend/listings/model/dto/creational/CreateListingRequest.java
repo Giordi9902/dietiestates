@@ -25,7 +25,6 @@ public class CreateListingRequest {
 	@NotNull
 	private Double lat;
 	private String address;
-	@NotEmpty
 	@NotNull(message="Il prezzo è obbligatorio")
 	@Positive(message= "Il prezzo deve essere un valore positivo")
 	@Digits(integer = 8, fraction = 2, message = "Formato prezzo non valido")

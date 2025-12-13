@@ -8,6 +8,7 @@ import lombok.*;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @Table(name="listing")
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -47,19 +49,30 @@ public class Listing {
 	private Boolean hasGarden;
 	private Boolean hasBalcony;
 
-	@OneToOne
-	@JoinColumn(name = "listed_by_agentId", referencedColumnName = "id")
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "listed_by_agent_id", referencedColumnName = "id")
 	private User listedBy;
 
 	@OneToMany(mappedBy = "listing", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ListingImage> images;
 
 	@CreatedDate
-	@Column(nullable = false, updatable = false)
+	@Column(name = "created_date", nullable = false, updatable = false)
 	private LocalDateTime createdDate;
 	@LastModifiedDate
-	@Column(insertable = false)
+	@Column(name = "last_modified_date", insertable = false)
 	private LocalDateTime lastModifiedDate;
+
+	@PrePersist
+	void onCreate() {
+		this.createdDate = LocalDateTime.now();
+		this.lastModifiedDate = this.createdDate;
+	}
+
+	@PreUpdate
+	void onUpdate() {
+		this.lastModifiedDate = LocalDateTime.now();
+	}
 
 	public List<ListingImage> getImages() {
 		if (images == null) {

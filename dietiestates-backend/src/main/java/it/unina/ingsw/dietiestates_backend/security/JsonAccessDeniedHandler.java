@@ -9,6 +9,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 public class JsonAccessDeniedHandler implements AccessDeniedHandler {
 	private final ObjectMapper mapper = new ObjectMapper();
@@ -17,7 +18,7 @@ public class JsonAccessDeniedHandler implements AccessDeniedHandler {
 	public void handle(HttpServletRequest request, HttpServletResponse response, org.springframework.security.access.AccessDeniedException accessDeniedException) throws IOException {
 		var status = HttpStatus.FORBIDDEN;
 		var body = ApiError.builder()
-				.timestamp(Instant.now())
+				.timestamp(LocalDateTime.now().toString())
 				.status(status.value())
 				.error(status.getReasonPhrase())
 				.code("ACCESS_DENIED")

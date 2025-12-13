@@ -1,7 +1,13 @@
 <div class="container-fluid">
+  <!-- Pagina gestione annunci -->
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h4 class="mb-0">I tuoi annunci</h4>
-    <a class="btn btn-primary" routerLink="/dashboard/listings/new">Nuovo annuncio</a>
+    <a class="btn btn-primary" routerLink="/dashboard/listings-new">Nuovo annuncio</a>
+  </div>
+  <div class="d-flex justify-content-center py-5" *ngIf="loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
   </div>
 
   @if (loading) {
@@ -10,13 +16,13 @@
       <span class="visually-hidden">Loading...</span>
     </div>
   </div>
-  } @if (error) {
+  } @if (!loading && error) {
   <div class="alert alert-danger" role="alert">{{ error }}</div>
-  } @if (!loading && items.length === 0) {
+  } @if (!loading && !error && items.length === 0) {
   <div class="alert alert-info" role="alert">
     Non hai ancora annunci. Crea il tuo primo annuncio.
   </div>
-  } @if (!loading && items.length > 0) {
+  } @if (!loading && !error && items.length > 0) {
   <div class="row g-3">
     @for (item of items; track item.listing_id) {
     <div class="col-12 col-sm-6 col-lg-4">
@@ -27,7 +33,41 @@
     </div>
     }
   </div>
+  }
   <!-- Modal conferma eliminazione -->
+  <div
+    class="modal fade show"
+    *ngIf="confirmId !== null"
+    tabindex="-1"
+    aria-modal="true"
+    role="dialog"
+    style="display: block"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Conferma eliminazione</h5>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Close"
+            (click)="cancelDelete()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Sei sicuro di voler eliminare questo annuncio? L'operazione non può essere annullata.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Annulla</button>
+          <button type="button" class="btn btn-danger" (click)="confirmDelete()">Elimina</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop fade show" *ngIf="confirmId !== null"></div>
+
   @if (confirmId !== null) {
   <div class="modal fade show" tabindex="-1" aria-modal="true" role="dialog" style="display: block">
     <div class="modal-dialog modal-dialog-centered">
@@ -69,5 +109,4 @@
       Successiva
     </button>
   </div>
-  }
 </div>

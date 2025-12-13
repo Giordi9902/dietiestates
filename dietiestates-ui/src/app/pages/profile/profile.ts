@@ -56,7 +56,7 @@ export class Profile {
         next: () => {
           this.loading = false;
           form.resetForm();
-          this.successMessage = 'Password aggiornata con successo';
+          this.successMessage = 'Password aggiornata correttamente';
           this.model = { currentPassword: '', newPassword: '', confirmPassword: '' };
         },
         error: (err) => {

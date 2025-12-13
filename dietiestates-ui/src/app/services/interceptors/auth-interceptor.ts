@@ -7,8 +7,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const access = tokenService.access_token;
   const isAuthEndpoint = req.url.includes('/auth/');
   const isListingsSearch = req.url.includes('/api/v1/listings/search');
-  const isListingById = /\/api\/v1\/listings\/[0-9]+$/.test(req.url);
-  const isPublic = isAuthEndpoint || isListingsSearch || isListingById;
+  const isPublicListingGetById =
+    req.method === 'GET' && /\/api\/v1\/listings\/[0-9]+$/.test(req.url);
+  const isPublic = isAuthEndpoint || isListingsSearch || isPublicListingGetById;
 
   if (access && !isPublic) {
     const authReq = req.clone({

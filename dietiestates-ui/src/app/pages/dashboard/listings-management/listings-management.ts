@@ -3,10 +3,11 @@ import { ListingsService } from '../../../services/services/listings.service';
 import { ListingSummaryResponse } from '../../../services/models/listing-summary-response';
 import { AgentListingCard } from './agent-listing-card/agent-listing-card';
 import { RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-listings-management',
-  imports: [AgentListingCard, RouterLink],
+  imports: [AgentListingCard, RouterLink, CommonModule],
   templateUrl: './listings-management.html',
   styleUrl: './listings-management.css',
 })
