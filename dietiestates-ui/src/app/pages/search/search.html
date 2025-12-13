@@ -1,1 +1,109 @@
-<p>search works!</p>
+<div class="container mt-4">
+  <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+    <div class="row">
+      <!-- Filters -->
+      <div class="col-lg-3">
+        <h4>Filtri di Ricerca</h4>
+        <div class="mb-3">
+          <label class="form-label">Operazione</label>
+          <select formControlName="operation" class="form-select">
+            <option value="SALE">Vendita</option>
+            <option value="RENT">Affitto</option>
+          </select>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-6">
+            <label class="form-label">Prezzo Min</label>
+            <input type="number" formControlName="minPrice" class="form-control" />
+          </div>
+          <div class="col-6">
+            <label class="form-label">Prezzo Max</label>
+            <input type="number" formControlName="maxPrice" class="form-control" />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-6">
+            <label class="form-label">Superficie Min (m²)</label>
+            <input type="number" formControlName="minArea" class="form-control" />
+          </div>
+          <div class="col-6">
+            <label class="form-label">Superficie Max (m²)</label>
+            <input type="number" formControlName="maxArea" class="form-control" />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-6">
+            <label class="form-label">Locali Min</label>
+            <input type="number" formControlName="minRooms" class="form-control" />
+          </div>
+          <div class="col-6">
+            <label class="form-label">Locali Max</label>
+            <input type="number" formControlName="maxRooms" class="form-control" />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Classe Energetica</label>
+          <select formControlName="energyClass" class="form-select">
+            <option [ngValue]="null">Qualsiasi</option>
+            @for (c of energyClasses; track c) {
+            <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="radius" class="form-label"
+            >Raggio di ricerca: {{ searchForm.value.radiusKm }} km</label
+          >
+          <input
+            type="range"
+            class="form-range"
+            min="1"
+            max="50"
+            id="radius"
+            formControlName="radiusKm"
+            (input)="onRadiusChange()"
+          />
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Cerca</button>
+        </div>
+      </div>
+
+      <!-- Map -->
+      <div class="col-lg-9">
+        <p class="text-muted">Clicca sulla mappa per selezionare un punto di ricerca.</p>
+        <div id="map" style="height: 500px; width: 100%"></div>
+      </div>
+    </div>
+  </form>
+
+  <hr class="my-4" />
+
+  <!-- Results -->
+  <h4>Risultati della Ricerca</h4>
+  @if (loading) {
+  <div class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  } @if (error) {
+  <div class="alert alert-danger">{{ error }}</div>
+  } @if (!loading && listings.length === 0) {
+  <div class="text-muted">Nessun annuncio trovato. Prova a modificare i filtri.</div>
+  } @else {
+  <div class="row g-3">
+    @for (listing of listings; track listing.listing_id) {
+    <div class="col-12">
+      <app-listing-card [listing]="listing"></app-listing-card>
+    </div>
+    }
+  </div>
+  }
+</div>

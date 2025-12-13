@@ -26,13 +26,13 @@ public class ListingSearchRepositoryImpl implements ListingSearchRepository {
         sql.append("select l.listing_id, l.title, l.description, l.address, l.rooms, l.bathrooms, ");
         sql.append(" l.price, l.area, l.energy_class, ST_X(l.coordinate) as lng, ST_Y(l.coordinate) as lat, ");
         sql.append(" (select li.url from listing_image li where li.listing_id=l.listing_id order by coalesce(li.sort_order,0) asc limit 1) as thumbnail_url, ");
-        sql.append(" l.listing_type ");
+        sql.append(" l.listing_operation ");
         sql.append(" from listing l where 1=1 ");
 
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         if (searchRequest.getOperation() != null) {
-            sql.append(" and l.listing_type = :op ");
+            sql.append(" and l.listing_operation = :op ");
             params.addValue("op", searchRequest.getOperation().name());
         }
 
@@ -100,7 +100,7 @@ public class ListingSearchRepositoryImpl implements ListingSearchRepository {
             if (thumb != null && !thumb.isBlank()) {
                 dto.setThumbnailUrl(listingImageService.presign(thumb));
             }
-            dto.setListingOperation(rs.getString("listing_type"));
+            dto.setListingOperation(rs.getString("listing_operation"));
             return dto;
         };
 
