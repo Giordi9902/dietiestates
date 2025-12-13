@@ -13,6 +13,9 @@ public class GeometryService {
 	private final GeometryFactory geometryFactory;
 
 	public Point createPoint(double lng, double lat) {
+		if (Double.isNaN(lng) || Double.isInfinite(lng) || Double.isNaN(lat) || Double.isInfinite(lat)) {
+			throw new IllegalArgumentException("Le coordinate di longitudine e latitudine devono essere valori numerici validi (non NaN o Infinity).");
+		}
 		Point point = geometryFactory.createPoint(new Coordinate(lng, lat));
 		point.setSRID(4326);
 		return point;

@@ -18,12 +18,11 @@ public class AgencyService {
 		Agency agency =
 				agencyRepository.findById(user.getAgency().getId()).orElseThrow(()->new IllegalStateException("Agency" +
 						" not found"));
-		AgencyDetailsResponse dto = AgencyDetailsResponse.builder()
+		return AgencyDetailsResponse.builder()
 				.id(agency.getId())
 				.name(agency.getName())
 				.phoneNumber(agency.getPhoneNumber())
 				.email(agency.getEmail())
 				.build();
-		return dto;
 	}
 }

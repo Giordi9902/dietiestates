@@ -59,10 +59,12 @@ public class EmailService {
 		sendUsingTemplate(user.getEmail(), "Activate your DietiEstates account", EmailTemplateName.ACTIVATE_ACCOUNT.getTemplateName(), properties);
 	}
 
-	public void sendAgentCreatedEmail(User user, String randomPassword) throws MessagingException {
+	public void sendAgentCreatedEmail(User user, String randomPassword, String otp) throws MessagingException {
 		Map<String,Object> properties = new HashMap<>();
 		properties.put("username", user.getUsername());
 		properties.put("password", randomPassword);
+		properties.put("activationCode",otp);
+		properties.put("confirmationUrl",activationUrl);
 		sendUsingTemplate(user.getEmail(), "Your Agent Account has been Created", EmailTemplateName.AGENT_CREATED.getTemplateName(), properties);
 	}
 

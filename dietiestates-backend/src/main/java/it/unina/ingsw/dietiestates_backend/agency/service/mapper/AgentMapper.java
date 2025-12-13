@@ -1,4 +1,4 @@
-package it.unina.ingsw.dietiestates_backend.agency.service;
+package it.unina.ingsw.dietiestates_backend.agency.service.mapper;
 
 import it.unina.ingsw.dietiestates_backend.agency.model.CreateAgentRequest;
 import it.unina.ingsw.dietiestates_backend.agency.model.AgentResponse;

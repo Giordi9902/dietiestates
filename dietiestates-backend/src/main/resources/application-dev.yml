@@ -1,8 +1,8 @@
 spring:
     datasource:
         url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/dietiestates}
-        username: ${POSTGRES_USER:postgres}
-        password: ${POSTGRES_PASSWORD:postgres}
+        username: ${POSTGRES_USER:dietiestates}
+        password: ${POSTGRES_PASSWORD:dietiestates}
     jpa:
         hibernate:
             dialect: org.hibernate.spatial.dialect.postgis.PostgisDialect

@@ -1,4 +1,4 @@
-package it.unina.ingsw.dietiestates_backend.agency.service;
+package it.unina.ingsw.dietiestates_backend.agency.service.security;
 
 import it.unina.ingsw.dietiestates_backend.agency.model.Agency;
 import it.unina.ingsw.dietiestates_backend.auth.model.User;

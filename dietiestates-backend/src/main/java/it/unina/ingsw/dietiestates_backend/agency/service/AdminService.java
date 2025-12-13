@@ -4,11 +4,15 @@ import it.unina.ingsw.dietiestates_backend.agency.model.CreateAgentRequest;
 import it.unina.ingsw.dietiestates_backend.agency.model.Agency;
 import it.unina.ingsw.dietiestates_backend.agency.model.AgentResponse;
 import it.unina.ingsw.dietiestates_backend.agency.repository.AgencyRepository;
+import it.unina.ingsw.dietiestates_backend.agency.service.mapper.AgentMapper;
+import it.unina.ingsw.dietiestates_backend.auth.model.OtpToken;
 import it.unina.ingsw.dietiestates_backend.auth.model.Role;
 import it.unina.ingsw.dietiestates_backend.auth.model.User;
 import it.unina.ingsw.dietiestates_backend.auth.repository.RoleRepository;
 import it.unina.ingsw.dietiestates_backend.auth.repository.UserRepository;
+import it.unina.ingsw.dietiestates_backend.auth.service.AuthenticationService;
 import it.unina.ingsw.dietiestates_backend.email.EmailService;
+import it.unina.ingsw.dietiestates_backend.errors.AgentWithAdminRoleException;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +37,7 @@ public class AdminService {
 	private final PasswordEncoder passwordEncoder;
 	private final AgencyRepository agencyRepository;
 	private final EmailService emailService;
+	private final AuthenticationService authenticationService;
 
 	public void createAgent(@Valid CreateAgentRequest request) throws MessagingException {
 		Agency agency = findAdminAgency();
@@ -51,14 +56,15 @@ public class AdminService {
 	private void createAgentFromScratch(CreateAgentRequest request, Role userRole, Role agentRole, Agency agency) throws MessagingException {
 		User agent = createAgentEntity(request);
 		initializeRolesIfNeeded(agent);
-		String raw = generateRandomPasswordFor(agent);
+		String raw = generateRandomPassword();
 		agent.setPassword(passwordEncoder.encode(raw));
 		assignRoles(agent, List.of(userRole, agentRole));
 		User savedAgent = userRepository.save(agent);
 		savedAgent.setAgency(agency);
-		savedAgent.setEnabled(true);
+		savedAgent.setEnabled(false);
+		String otpToken = authenticationService.generateAndSaveActivationToken(savedAgent);
 		userRepository.save(savedAgent);
-		notifyAgentCreated(savedAgent, raw);
+		emailService.sendAgentCreatedEmail(savedAgent, raw,otpToken);
 	}
 
 	private void addAgentRoleToUser(User newAgent, Role agentRole, Agency agency) throws MessagingException {
@@ -88,16 +94,8 @@ public class AdminService {
 		return AgentMapper.toEntity(request);
 	}
 
-	private String generateRandomPasswordFor(User agent) {
-		return generateRandomPassword();
-	}
-
 	private void notifyAgentRoleAdded(User newAgent) throws MessagingException {
 		emailService.sendAgentRoleAdded(newAgent);
-	}
-
-	private void notifyAgentCreated(User savedAgent, String rawPassword) throws MessagingException {
-		emailService.sendAgentCreatedEmail(savedAgent, rawPassword);
 	}
 
 	private Agency findAdminAgency() {
@@ -121,6 +119,10 @@ public class AdminService {
 	public void promote(Integer agentId) throws MessagingException {
 		User agent = userRepository.findById(agentId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 		var adminRole = getRoleByName("ROLE_ADMIN");
+
+		if(agent.getRoles().contains(adminRole)){
+			throw new AgentWithAdminRoleException("L'agente possiede già il ruolo di amministratore");
+		}
 		initializeRolesIfNeeded(agent);
 		assignRoles(agent, List.of(adminRole));
 		userRepository.save(agent);

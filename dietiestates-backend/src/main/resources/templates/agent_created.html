@@ -59,7 +59,10 @@
         <li><strong>Username:</strong> <span th:text="${username}">Username</span></li>
         <li><strong>Password:</strong> <span th:text="${password}">Password</span></li>
     </ul>
-    <p>Please log in to your account and change your password as soon as possible for security reasons.</p>
+    <p>Please activate your account and change your password as soon as possible for security reasons.</p>
+    To activate your account, please click the link below or enter the activation code on the website.</p>
+    <p><a th:href="${confirmationUrl}" class="button">Activate Account</a></p>
+    <p><strong>Activation Code:</strong> <span th:text="${activationCode}">Code</span></p>
     <p>If you have any questions or need assistance, feel free to contact our support team.</p>
     <p>Best regards,<br>DietiEstates Team</p>
 </div>

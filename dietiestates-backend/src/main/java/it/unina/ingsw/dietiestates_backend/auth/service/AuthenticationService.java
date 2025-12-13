@@ -130,7 +130,7 @@ public class AuthenticationService {
 		otpTokenRepository.save(savedToken);
 	}
 
-	private String generateAndSaveActivationToken(User user){
+	public String generateAndSaveActivationToken(User user){
 		String generatedToken = generateActivationToken(6);
 		var token = OtpToken.builder()
 				.token(generatedToken)

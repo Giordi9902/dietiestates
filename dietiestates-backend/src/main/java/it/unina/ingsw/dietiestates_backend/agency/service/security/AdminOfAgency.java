@@ -1,4 +1,4 @@
-package it.unina.ingsw.dietiestates_backend.agency.service;
+package it.unina.ingsw.dietiestates_backend.agency.service.security;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
