@@ -23,7 +23,6 @@ public class ListingImageService {
 	public ListingImage saveImage(MultipartFile file, Listing listing) {
 		String url = s3ImageStorageService.storeImage(file, listing.getId());
 
-		// Find the max sort order and add 1
 		Integer maxSortOrder = listingImageRepository.findMaxSortOrderByListingId(listing.getId());
 		int newSortOrder = (maxSortOrder != null) ? maxSortOrder + 1 : 1;
 
@@ -46,10 +45,8 @@ public class ListingImageService {
 			return;
 		}
 
-		// Prima elimina l'oggetto da S3
 		s3ImageStorageService.deleteImage(presignedUrl);
 
-		// Poi, recupera l'URL originale e usalo per eliminare dal DB
 		String key = s3ImageStorageService.extractKeyFromUrl(presignedUrl);
 		if (key != null && !key.isBlank()) {
 			String originalUrl = s3ImageStorageService.getOriginalUrl(key);

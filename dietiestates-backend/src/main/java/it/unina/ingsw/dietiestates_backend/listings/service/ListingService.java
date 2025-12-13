@@ -90,7 +90,6 @@ public class ListingService {
 		Listing listing = listingRepository.findById(id)
 				.orElseThrow(() -> new ListingNotFoundException("Listing not found with id:" + id));
 
-		// Rimuovi le immagini specificate
 		if (request.getImagesToRemove() != null && !request.getImagesToRemove().isEmpty()) {
 			log.info("Removing {} images for listing id={}", request.getImagesToRemove().size(), id);
 			for (String imageUrl : request.getImagesToRemove()) {
@@ -99,7 +98,6 @@ public class ListingService {
 			log.info("Images removal completed for listing id={}", id);
 		}
 
-		// Aggiungi nuove immagini
 		if (newImages != null && !newImages.isEmpty()) {
 			uploadImages(listing, newImages);
 		}
