@@ -1,1 +1,206 @@
-<p>update-listing works!</p>
+<div class="container mt-4">
+  <h3>Modifica Annuncio</h3>
+
+  @if (loading) {
+  <div class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  } @if (error) {
+  <div class="alert alert-danger">{{ error }}</div>
+  } @if (!loading) {
+  <form [formGroup]="listingForm" (ngSubmit)="onSubmit()">
+    <!-- Textual details -->
+    <div class="mb-3">
+      <label class="form-label">Titolo</label>
+      <input formControlName="title" class="form-control" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Descrizione</label>
+      <textarea formControlName="description" class="form-control" rows="5"></textarea>
+    </div>
+
+    <!-- Location Management -->
+    <hr />
+    <h4>Localizzazione</h4>
+    <div class="mb-3">
+      <label class="form-label">Indirizzo</label>
+      <div class="input-group">
+        <input
+          formControlName="address"
+          class="form-control"
+          placeholder="Es. Via Toledo, Napoli"
+          (keydown.enter)="$event.preventDefault(); searchAddress()"
+        />
+        <button type="button" class="btn btn-outline-secondary" (click)="searchAddress()">
+          Cerca
+        </button>
+      </div>
+      <div class="form-text">
+        Cerca un indirizzo o clicca sulla mappa per aggiornare la posizione.
+      </div>
+    </div>
+    <div class="mb-3">
+      <div id="map-update" class="leaflet-container"></div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Prezzo (€)</label>
+        <input type="number" formControlName="price" class="form-control" />
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Superficie (m²)</label>
+        <input type="number" formControlName="area" class="form-control" />
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Locali</label>
+        <input type="number" formControlName="rooms" class="form-control" />
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Bagni</label>
+        <input type="number" formControlName="bathrooms" class="form-control" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Operazione</label>
+        <select formControlName="listingOperation" class="form-select">
+          <option value="SALE">Vendita</option>
+          <option value="RENT">Affitto</option>
+        </select>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Classe Energetica</label>
+        <select formControlName="energyClass" class="form-select">
+          @for (c of energyClasses; track c) {
+          <option [value]="c">{{ c }}</option>
+          }
+        </select>
+      </div>
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Piano</label>
+        <input type="number" formControlName="floor" class="form-control" />
+      </div>
+    </div>
+    <div class="mb-3">
+      <div class="form-check">
+        <input type="checkbox" formControlName="hasElevator" class="form-check-input" />
+        <label class="form-check-label">Ascensore</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" formControlName="hasParking" class="form-check-input" />
+        <label class="form-check-label">Parcheggio</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" formControlName="hasGarden" class="form-check-input" />
+        <label class="form-check-label">Giardino</label>
+      </div>
+      <div class="form-check">
+        <input type="checkbox" formControlName="hasBalcony" class="form-check-input" />
+        <label class="form-check-label">Balcone</label>
+      </div>
+    </div>
+
+    <hr />
+
+    <!-- Image Management -->
+    <h4>Immagini</h4>
+    <div class="mb-3">
+      <h5>Immagini Attuali</h5>
+      @if(currentImages.length > 0) {
+      <div class="d-flex flex-wrap gap-2">
+        @for(imageUrl of currentImages; track $index) {
+        <div class="position-relative">
+          <img [src]="imageUrl" class="img-thumbnail" width="150" />
+          <button
+            type="button"
+            class="btn btn-danger btn-sm position-absolute top-0 end-0"
+            (click)="removeCurrentImage(imageUrl)"
+          >
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+        }
+      </div>
+      } @else {
+      <p class="text-muted">Nessuna immagine presente.</p>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label for="newImages" class="form-label"><h5>Aggiungi Nuove Immagini</h5></label>
+      <input
+        type="file"
+        multiple
+        class="form-control"
+        id="newImages"
+        (change)="onFileChange($event)"
+      />
+    </div>
+
+    @if(newImagePreviews.length > 0) {
+    <h5>Anteprima Nuove Immagini</h5>
+    <div class="d-flex flex-wrap gap-2">
+      @for(preview of newImagePreviews; track $index) {
+      <div class="position-relative">
+        <img [src]="preview" class="img-thumbnail" width="150" />
+        <button
+          type="button"
+          class="btn btn-danger btn-sm position-absolute top-0 end-0"
+          (click)="removeNewImage($index)"
+        >
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      }
+    </div>
+    }
+
+    <hr />
+
+    <div class="d-flex justify-content-end gap-2">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="loading">
+        Annulla
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading">
+        @if (loading) {
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        } Salva Modifiche
+      </button>
+    </div>
+  </form>
+  }
+
+  <!-- Modal -->
+  @if (showModal) {
+  <div
+    class="modal fade show d-block"
+    tabindex="-1"
+    role="dialog"
+    style="background-color: rgba(0, 0, 0, 0.5)"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modalTitle }}</h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeModal()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ modalMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Annulla</button>
+          <button type="button" class="btn btn-primary" (click)="confirmAction()">Conferma</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

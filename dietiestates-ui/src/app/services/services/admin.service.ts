@@ -62,7 +62,7 @@ export class AdminService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  createAgent$Response(params: CreateAgent$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+  createAgent$Response(params: CreateAgent$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = createAgent(this.http, this.rootUrl, params, context);
     return obs;
   }
@@ -73,10 +73,10 @@ export class AdminService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  createAgent(params: CreateAgent$Params, context?: HttpContext): Observable<string> {
+  createAgent(params: CreateAgent$Params, context?: HttpContext): Observable<void> {
     const resp = this.createAgent$Response(params, context);
     return resp.pipe(
-      map((r: StrictHttpResponse<string>): string => r.body)
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 
@@ -89,7 +89,7 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  promoteToAdmin$Response(params: PromoteToAdmin$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+  promoteToAdmin$Response(params: PromoteToAdmin$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = promoteToAdmin(this.http, this.rootUrl, params, context);
     return obs;
   }
@@ -100,10 +100,10 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  promoteToAdmin(params: PromoteToAdmin$Params, context?: HttpContext): Observable<string> {
+  promoteToAdmin(params: PromoteToAdmin$Params, context?: HttpContext): Observable<void> {
     const resp = this.promoteToAdmin$Response(params, context);
     return resp.pipe(
-      map((r: StrictHttpResponse<string>): string => r.body)
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 
@@ -116,7 +116,7 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  deleteAgent$Response(params: DeleteAgent$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+  deleteAgent$Response(params: DeleteAgent$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = deleteAgent(this.http, this.rootUrl, params, context);
     return obs;
   }
@@ -127,10 +127,10 @@ export class AdminService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  deleteAgent(params: DeleteAgent$Params, context?: HttpContext): Observable<string> {
+  deleteAgent(params: DeleteAgent$Params, context?: HttpContext): Observable<void> {
     const resp = this.deleteAgent$Response(params, context);
     return resp.pipe(
-      map((r: StrictHttpResponse<string>): string => r.body)
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 

@@ -86,7 +86,24 @@
   <hr class="my-4" />
 
   <!-- Results -->
-  <h4>Risultati della Ricerca</h4>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Risultati della Ricerca @if(totalElements > 0){({{ totalElements }})}</h4>
+    <div class="d-flex align-items-center gap-2">
+      <label>Righe per pagina:</label>
+      <select
+        class="form-select form-select-sm"
+        style="width: auto"
+        [(ngModel)]="pageSize"
+        (change)="onSearch()"
+      >
+        <option [ngValue]="5">5</option>
+        <option [ngValue]="10">10</option>
+        <option [ngValue]="20">20</option>
+        <option [ngValue]="50">50</option>
+      </select>
+    </div>
+  </div>
+
   @if (loading) {
   <div class="text-center">
     <div class="spinner-border" role="status">
@@ -105,5 +122,23 @@
     </div>
     }
   </div>
-  }
+
+  <!-- Pagination -->
+  @if (totalPages > 1) {
+  <nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 0">
+        <button class="page-link" (click)="changePage(currentPage - 1)">Precedente</button>
+      </li>
+      @for (page of pages; track page) {
+      <li class="page-item" [class.active]="currentPage === page">
+        <button class="page-link" (click)="changePage(page)">{{ page + 1 }}</button>
+      </li>
+      }
+      <li class="page-item" [class.disabled]="currentPage === totalPages - 1">
+        <button class="page-link" (click)="changePage(currentPage + 1)">Successiva</button>
+      </li>
+    </ul>
+  </nav>
+  } }
 </div>

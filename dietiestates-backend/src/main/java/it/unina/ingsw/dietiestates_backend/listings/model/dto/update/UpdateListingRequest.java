@@ -6,12 +6,15 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@ToString
 public class UpdateListingRequest {
 	private Integer id;
     private String title;
@@ -31,6 +34,5 @@ public class UpdateListingRequest {
     private Boolean hasParking;
     private Boolean hasGarden;
     private Boolean hasBalcony;
-
-
+    private List<String> imagesToRemove;
 }

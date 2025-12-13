@@ -58,33 +58,6 @@ export class ListingsService extends BaseService {
     );
   }
 
-  /** Path part for operation `search()` */
-  static readonly SearchPath = '/listings/search';
-
-  /**
-   * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `search()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  search$Response(params: Search$Params, context?: HttpContext): Observable<StrictHttpResponse<PageListingSummaryResponse>> {
-    const obs = search(this.http, this.rootUrl, params, context);
-    return obs;
-  }
-
-  /**
-   * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `search$Response()` instead.
-   *
-   * This method sends `application/json` and handles request body of type `application/json`.
-   */
-  search(params: Search$Params, context?: HttpContext): Observable<PageListingSummaryResponse> {
-    const resp = this.search$Response(params, context);
-    return resp.pipe(
-      map((r: StrictHttpResponse<PageListingSummaryResponse>): PageListingSummaryResponse => r.body)
-    );
-  }
-
   /** Path part for operation `getListingById()` */
   static readonly GetListingByIdPath = '/listings/{id}';
 
@@ -109,6 +82,33 @@ export class ListingsService extends BaseService {
     const resp = this.getListingById$Response(params, context);
     return resp.pipe(
       map((r: StrictHttpResponse<ListingDetailsResponse>): ListingDetailsResponse => r.body)
+    );
+  }
+
+  /** Path part for operation `update()` */
+  static readonly UpdatePath = '/listings/{id}';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `update()` instead.
+   *
+   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
+   */
+  update$Response(params: Update$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    const obs = update(this.http, this.rootUrl, params, context);
+    return obs;
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `update$Response()` instead.
+   *
+   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
+   */
+  update(params: Update$Params, context?: HttpContext): Observable<void> {
+    const resp = this.update$Response(params, context);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
 
@@ -139,30 +139,30 @@ export class ListingsService extends BaseService {
     );
   }
 
-  /** Path part for operation `update()` */
-  static readonly UpdatePath = '/listings/{id}';
+  /** Path part for operation `search()` */
+  static readonly SearchPath = '/listings/search';
 
   /**
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
-   * To access only the response body, use `update()` instead.
+   * To access only the response body, use `search()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  update$Response(params: Update$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-    const obs = update(this.http, this.rootUrl, params, context);
+  search$Response(params: Search$Params, context?: HttpContext): Observable<StrictHttpResponse<PageListingSummaryResponse>> {
+    const obs = search(this.http, this.rootUrl, params, context);
     return obs;
   }
 
   /**
    * This method provides access only to the response body.
-   * To access the full response (for headers, for example), `update$Response()` instead.
+   * To access the full response (for headers, for example), `search$Response()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  update(params: Update$Params, context?: HttpContext): Observable<void> {
-    const resp = this.update$Response(params, context);
+  search(params: Search$Params, context?: HttpContext): Observable<PageListingSummaryResponse> {
+    const resp = this.search$Response(params, context);
     return resp.pipe(
-      map((r: StrictHttpResponse<void>): void => r.body)
+      map((r: StrictHttpResponse<PageListingSummaryResponse>): PageListingSummaryResponse => r.body)
     );
   }
 

@@ -8,6 +8,10 @@ export interface ListingDetailsResponse {
   bathrooms?: number;
   description?: string;
   energyClass?: 'A4' | 'A3' | 'A2' | 'A1' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  hasBalcony?: boolean;
+  hasElevator?: boolean;
+  hasGarden?: boolean;
+  hasParking?: boolean;
   id?: number;
   imageUrls?: Array<string>;
   lat?: number;

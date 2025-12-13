@@ -25,7 +25,7 @@
                 <span>Gestione annunci</span>
               </a>
             </li>
-            <!-- Solo amministratori: la rotta è già protetta dal roleGuard -->
+            @if(isAdmin()){
             <li class="list-group-item">
               <a
                 class="d-flex align-items-center gap-2 text-decoration-none"
@@ -36,6 +36,7 @@
                 <span>Gestione agenti</span>
               </a>
             </li>
+            }
           </ul>
         </div>
       </div>

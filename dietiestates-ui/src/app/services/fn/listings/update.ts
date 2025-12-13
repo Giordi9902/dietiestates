@@ -11,14 +11,17 @@ import { UpdateListingRequest } from '../../models/update-listing-request';
 
 export interface Update$Params {
   id: number;
-      body: UpdateListingRequest
+      body?: {
+'request': UpdateListingRequest;
+'newImages'?: Array<Blob>;
+}
 }
 
 export function update(http: HttpClient, rootUrl: string, params: Update$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
-  const rb = new RequestBuilder(rootUrl, update.PATH, 'patch');
+  const rb = new RequestBuilder(rootUrl, update.PATH, 'post');
   if (params) {
     rb.path('id', params.id, {});
-    rb.body(params.body, 'application/json');
+    rb.body(params.body, 'multipart/form-data');
   }
 
   return http.request(

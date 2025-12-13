@@ -12,18 +12,18 @@ export interface PromoteToAdmin$Params {
   agentId: number;
 }
 
-export function promoteToAdmin(http: HttpClient, rootUrl: string, params: PromoteToAdmin$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+export function promoteToAdmin(http: HttpClient, rootUrl: string, params: PromoteToAdmin$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, promoteToAdmin.PATH, 'patch');
   if (params) {
     rb.path('agentId', params.agentId, {});
   }
 
   return http.request(
-    rb.build({ responseType: 'json', accept: 'application/json', context })
+    rb.build({ responseType: 'text', accept: '*/*', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<string>;
+      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
     })
   );
 }

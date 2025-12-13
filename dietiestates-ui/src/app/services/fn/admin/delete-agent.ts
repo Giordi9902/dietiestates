@@ -12,18 +12,18 @@ export interface DeleteAgent$Params {
   agentId: number;
 }
 
-export function deleteAgent(http: HttpClient, rootUrl: string, params: DeleteAgent$Params, context?: HttpContext): Observable<StrictHttpResponse<string>> {
+export function deleteAgent(http: HttpClient, rootUrl: string, params: DeleteAgent$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, deleteAgent.PATH, 'delete');
   if (params) {
     rb.path('agentId', params.agentId, {});
   }
 
   return http.request(
-    rb.build({ responseType: 'json', accept: 'application/json', context })
+    rb.build({ responseType: 'text', accept: '*/*', context })
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<string>;
+      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
     })
   );
 }

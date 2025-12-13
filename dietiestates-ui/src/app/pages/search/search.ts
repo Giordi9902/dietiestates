@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ListingsService } from '../../services/services/listings.service';
@@ -11,7 +11,7 @@ import * as L from 'leaflet';
 @Component({
   selector: 'app-search',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ListingCard],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, ListingCard],
   templateUrl: './search.html',
   styleUrl: './search.css',
 })
@@ -27,6 +27,11 @@ export class Search implements OnInit, AfterViewInit {
   map: L.Map | null = null;
   marker: L.Marker | null = null;
   circle: L.Circle | null = null;
+
+  currentPage = 0;
+  pageSize = 10;
+  totalPages = 0;
+  totalElements = 0;
 
   private defaultIcon!: L.Icon;
 
@@ -102,7 +107,10 @@ export class Search implements OnInit, AfterViewInit {
     this.map?.fitBounds(this.circle.getBounds());
   }
 
-  onSearch(): void {
+  onSearch(resetPage = true): void {
+    if (resetPage) {
+      this.currentPage = 0;
+    }
     this.loading = true;
     this.error = null;
     const searchParams: ListingSearchRequest = this.searchForm.value;
@@ -112,17 +120,36 @@ export class Search implements OnInit, AfterViewInit {
       (key) => (searchParams as any)[key] == null && delete (searchParams as any)[key]
     );
 
-    this.listingsService.search({ body: searchParams }).subscribe({
-      next: (response) => {
-        this.listings = response.content ?? [];
-        this.updateResultMarkers();
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = err.error?.message || err.message || 'Ricerca non riuscita.';
-        this.loading = false;
-      },
-    });
+    this.listingsService
+      .search({
+        body: searchParams,
+        page: this.currentPage,
+        size: this.pageSize,
+      })
+      .subscribe({
+        next: (response) => {
+          this.listings = response.content ?? [];
+          this.totalPages = response.totalPages ?? 0;
+          this.totalElements = response.totalElements ?? 0;
+          this.updateResultMarkers();
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = err.error?.message || err.message || 'Ricerca non riuscita.';
+          this.loading = false;
+        },
+      });
+  }
+
+  changePage(page: number): void {
+    if (page >= 0 && page < this.totalPages) {
+      this.currentPage = page;
+      this.onSearch(false);
+    }
+  }
+
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
   }
 
   private resultMarkers: L.Marker[] = [];

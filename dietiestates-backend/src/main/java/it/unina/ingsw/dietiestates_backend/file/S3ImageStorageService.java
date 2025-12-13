@@ -122,7 +122,7 @@ public class S3ImageStorageService implements ImageStorageService {
 		return ext.toLowerCase();
 	}
 
-	private String extractKeyFromUrl(String imageUrl) {
+	public String extractKeyFromUrl(String imageUrl) {
 		try {
 			URI uri = URI.create(imageUrl);
 			String path = uri.getPath();
@@ -135,6 +135,10 @@ public class S3ImageStorageService implements ImageStorageService {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+
+	public String getOriginalUrl(String key) {
+		return amazonS3.getUrl(bucketName, key).toString();
 	}
 
 	public URL generatePresignedUrl(String key) {

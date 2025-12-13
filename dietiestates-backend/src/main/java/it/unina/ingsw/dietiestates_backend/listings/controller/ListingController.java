@@ -6,8 +6,8 @@ import it.unina.ingsw.dietiestates_backend.listings.model.dto.details.ListingDet
 import it.unina.ingsw.dietiestates_backend.listings.model.dto.details.ListingSummaryResponse;
 import it.unina.ingsw.dietiestates_backend.listings.model.dto.searching.ListingSearchRequest;
 import it.unina.ingsw.dietiestates_backend.listings.model.dto.update.UpdateListingRequest;
-import it.unina.ingsw.dietiestates_backend.listings.service.security.IsAgentOfListing;
 import it.unina.ingsw.dietiestates_backend.listings.service.ListingService;
+import it.unina.ingsw.dietiestates_backend.listings.service.security.IsAgentOfListing;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -72,16 +70,17 @@ public class ListingController {
 			request.getTitle(), request.getListingOperation(), request.getPrice(), request.getArea(), request.getLat(), request.getLng(), request.getEnergyClass(), images != null ? images.size() : 0);
 		listingService.createListing(request,images);
 		log.info("Listing created successfully");
-		// Return a valid JSON string (so the Angular client expecting JSON can parse it as a string)
 		return ResponseEntity.status(CREATED).body("\"Listing created successfully\"");
 	}
 
-	@PatchMapping("/{id}")
+	@PostMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@IsAgentOfListing
 	public ResponseEntity<Void> update(
 			@PathVariable Integer id,
-			@RequestBody UpdateListingRequest request){
-		listingService.updateListingById(request,id);
+			@RequestPart UpdateListingRequest request,
+			@RequestPart(required = false) List<MultipartFile> newImages
+	){
+		listingService.updateListingById(request, id, newImages);
 		return ResponseEntity.noContent().build();
 	}
 

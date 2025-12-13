@@ -86,9 +86,24 @@ public class ListingService {
 	}
 
 	@Transactional
-	public void updateListingById(UpdateListingRequest request, Integer id) {
+	public void updateListingById(UpdateListingRequest request, Integer id, List<MultipartFile> newImages) {
 		Listing listing = listingRepository.findById(id)
 				.orElseThrow(() -> new ListingNotFoundException("Listing not found with id:" + id));
+
+		// Rimuovi le immagini specificate
+		if (request.getImagesToRemove() != null && !request.getImagesToRemove().isEmpty()) {
+			log.info("Removing {} images for listing id={}", request.getImagesToRemove().size(), id);
+			for (String imageUrl : request.getImagesToRemove()) {
+				listingImageService.deleteImageByUrl(imageUrl);
+			}
+			log.info("Images removal completed for listing id={}", id);
+		}
+
+		// Aggiungi nuove immagini
+		if (newImages != null && !newImages.isEmpty()) {
+			uploadImages(listing, newImages);
+		}
+
 		applyUpdateFields(listing, request);
 		listingRepository.save(listing);
 	}

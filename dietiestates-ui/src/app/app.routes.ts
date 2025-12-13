@@ -19,6 +19,7 @@ import { CreateNewListing } from './pages/dashboard/listings-management/create-n
 import { Forbidden } from './pages/forbidden/forbidden';
 import { NotFound } from './pages/not-found/not-found';
 import { Listing } from './pages/listing/listing';
+import { UpdateListing } from './pages/dashboard/listings-management/update-listing/update-listing';
 
 export const routes: Routes = [
   {
@@ -107,8 +108,13 @@ export const routes: Routes = [
         title: 'Add a new listing',
         canMatch: [roleGuard(['ROLE_ADMIN', 'ROLE_AGENT'])],
       },
+      {
+        path: 'listings/:id/edit',
+        component: UpdateListing,
+        title: 'Edit listing',
+        canMatch: [roleGuard(['ROLE_ADMIN', 'ROLE_AGENT'])],
+      },
     ],
   },
-  // Wildcard route for 404
   { path: '**', component: NotFound, title: 'Page Not Found' },
 ];

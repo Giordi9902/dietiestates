@@ -12,6 +12,8 @@ export interface UpdateListingRequest {
   hasElevator?: boolean;
   hasGarden?: boolean;
   hasParking?: boolean;
+  id?: number;
+  imagesToRemove?: Array<string>;
   lat?: number;
   lng?: number;
   operation?: 'SALE' | 'RENT';

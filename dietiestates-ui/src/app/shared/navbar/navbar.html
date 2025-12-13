@@ -19,6 +19,9 @@
     <div class="collapse navbar-collapse" id="dietiNavbar">
       @if (isLoggedIn) {
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item me-auto">
+          <a class="nav-link" routerLink="/search" routerLinkActive="active">Cerca</a>
+        </li>
         @if (isUser || isAdmin || isAgent) {
         <li class="nav-item">
           <a class="nav-link" routerLink="/profile" routerLinkActive="active">Profilo</a>
