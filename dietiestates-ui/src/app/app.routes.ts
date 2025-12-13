@@ -18,12 +18,18 @@ import { ListingsManagement } from './pages/dashboard/listings-management/listin
 import { CreateNewListing } from './pages/dashboard/listings-management/create-new-listing/create-new-listing';
 import { Forbidden } from './pages/forbidden/forbidden';
 import { NotFound } from './pages/not-found/not-found';
+import { Listing } from './pages/listing/listing';
 
 export const routes: Routes = [
   {
     path: '',
     component: Hero,
     title: 'DietiEstates25-Home',
+  },
+  {
+    path: 'listings/:id',
+    component: Listing,
+    title: 'Listing details',
   },
   {
     path: 'privacy',

@@ -24,6 +24,7 @@ public class ListingDetailsResponse {
 	private Integer rooms;
 	private Integer bathrooms;
 	private Double area;
+	private Integer floor;
 	private EnergyClass energyClass;
 	private ListingOperation listingOperation;
 	private Boolean hasElevator;

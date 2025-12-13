@@ -1,1 +1,114 @@
-<p>listing works!</p>
+<div class="container-lg py-4">
+  @if (loading) {
+  <div class="text-center py-5">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  } @if (error) {
+  <div class="alert alert-danger">{{ error }}</div>
+  } @if (listing) {
+  <div class="row g-4 align-items-start">
+    <!-- Galleria immagini e info principali -->
+    <div class="col-12 col-lg-7">
+      <div class="card mb-3">
+        <div class="card-body">
+          <h2 class="card-title mb-1">{{ listing.title }}</h2>
+          <div class="d-flex flex-wrap align-items-center mb-2 gap-2">
+            <h3 class="text-primary mb-0">{{ listing.price | number : '1.0-0' }} €</h3>
+            <span class="badge bg-secondary">{{
+              listing.listingOperation === 'RENT' ? 'Affitto' : 'Vendita'
+            }}</span>
+            <span class="badge bg-light text-dark border">Classe {{ listing.energyClass }}</span>
+          </div>
+          <div class="text-muted mb-2"><i class="bi bi-geo-alt me-1"></i>{{ listing.address }}</div>
+          <div class="d-flex gap-3 mb-2">
+            <div><i class="bi bi-rulers"></i> {{ listing.area }} m²</div>
+            <div><i class="bi bi-door-open"></i> {{ listing.rooms }} locali</div>
+            <div><i class="bi bi-droplet"></i> {{ listing.bathrooms }} bagni</div>
+          </div>
+        </div>
+      </div>
+      @if (selectedImageUrl) {
+      <div class="mb-2 text-center">
+        <img
+          [src]="selectedImageUrl"
+          class="img-fluid rounded shadow-sm"
+          alt="Immagine selezionata"
+          style="max-height: 420px; object-fit: contain"
+        />
+      </div>
+      } @if (listing.imageUrls && listing.imageUrls.length > 1) {
+      <div class="d-flex overflow-auto pb-2">
+        @for (url of listing.imageUrls; track $index) {
+        <div class="me-2" (click)="selectImage(url)" style="cursor: pointer">
+          <img
+            [src]="url"
+            class="img-thumbnail border"
+            width="90"
+            [class.border-primary]="url === selectedImageUrl"
+            alt="Thumbnail"
+            style="object-fit: cover; height: 70px"
+          />
+        </div>
+        }
+      </div>
+      }
+    </div>
+    <!-- Mappa posizione -->
+    <div class="col-12 col-lg-5">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Posizione</h5>
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dettagli immobile -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="mb-3">Dettagli immobile</h5>
+          <ul class="list-group list-group-flush mb-3">
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span><i class="bi bi-rulers me-2"></i>Superficie</span
+              ><span>{{ listing.area }} m²</span>
+            </li>
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span><i class="bi bi-door-open me-2"></i>Stanze</span
+              ><span>{{ listing.rooms }}</span>
+            </li>
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span><i class="bi bi-droplet me-2"></i>Bagni</span
+              ><span>{{ listing.bathrooms }}</span>
+            </li>
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span><i class="bi bi-building me-2"></i>Piano</span
+              ><span>{{ listing.floor ?? '-' }}</span>
+            </li>
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span><i class="bi bi-lightning me-2"></i>Classe energetica</span
+              ><span>{{ listing.energyClass }}</span>
+            </li>
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span><i class="bi bi-house me-2"></i>Tipo operazione</span
+              ><span>{{ listing.listingOperation === 'RENT' ? 'Affitto' : 'Vendita' }}</span>
+            </li>
+            <li class="list-group-item px-0 d-flex justify-content-between">
+              <span><i class="bi bi-geo-alt me-2"></i>Indirizzo</span
+              ><span>{{ listing.address }}</span>
+            </li>
+          </ul>
+          <h6 class="mb-2">Descrizione</h6>
+          <div class="flex-grow-1">
+            <p class="mb-0">{{ listing.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

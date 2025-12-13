@@ -37,6 +37,7 @@ public class ListingMapper {
 				.id(listing.getId())
 				.title(listing.getTitle())
 				.description(listing.getDescription())
+				.floor(listing.getFloor())
 				.address(listing.getAddress())
 				.lng(listing.getCoordinate().getX())
 				.lat(listing.getCoordinate().getY())
