@@ -20,6 +20,7 @@ import { Forbidden } from './pages/forbidden/forbidden';
 import { NotFound } from './pages/not-found/not-found';
 import { Listing } from './pages/listing/listing';
 import { UpdateListing } from './pages/dashboard/listings-management/update-listing/update-listing';
+import { Oauth2Success } from './pages/oauth2-success/oauth2-success';
 
 export const routes: Routes = [
   {
@@ -77,6 +78,10 @@ export const routes: Routes = [
     title: 'Search listings',
   },
   {
+    path: 'oauth2-success',
+    component: Oauth2Success,
+  },
+  {
     path: 'dashboard',
     component: DashboardLayout,
     canActivate: [authGuard],
@@ -90,6 +95,7 @@ export const routes: Routes = [
         canMatch: [roleGuard(['ROLE_ADMIN'])],
         title: 'Manage your agents',
       },
+
       {
         path: 'agents-new',
         component: CreateNewAgent,

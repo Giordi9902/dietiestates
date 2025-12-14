@@ -52,6 +52,27 @@
             </div>
           </form>
 
+          <div class="d-flex align-items-center my-3">
+            <hr class="flex-grow-1" />
+            <span class="px-3 text-muted">oppure</span>
+            <hr class="flex-grow-1" />
+          </div>
+
+          <div class="d-grid gap-2">
+            <a
+              href="http://localhost:8080/api/v1/oauth2/authorization/google"
+              class="btn btn-outline-danger"
+            >
+              <i class="fab fa-google me-2"></i> Accedi con Google
+            </a>
+            <a
+              href="http://localhost:8080/api/v1/oauth2/authorization/github"
+              class="btn btn-outline-dark"
+            >
+              <i class="fab fa-github me-2"></i> Accedi con GitHub
+            </a>
+          </div>
+
           <div class="text-center mt-3">
             <small class="text-muted">Non hai un account?</small>
             <button (click)="register()" type="button" class="btn btn-link">Registrati</button>

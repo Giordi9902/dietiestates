@@ -47,6 +47,9 @@ public class User implements UserDetails, Principal {
 	@JoinColumn(name = "agency_id")
 	private Agency agency;
 
+	@Enumerated(EnumType.STRING)
+	private AuthProvider provider;
+
 	@ManyToMany(fetch = FetchType.EAGER)
 	private List<Role> roles;
 
@@ -65,8 +68,13 @@ public class User implements UserDetails, Principal {
 	}
 
 	@Override
+	public boolean isAccountNonLocked() {
+		return !accountLocked;
+	}
+
+	@Override
 	public boolean isEnabled(){
-		return true;
+		return enabled;
 	}
 
 	@Override

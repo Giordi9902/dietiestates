@@ -1,41 +1,60 @@
 spring:
-    datasource:
-        url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/dietiestates}
-        username: ${POSTGRES_USER:dietiestates}
-        password: ${POSTGRES_PASSWORD:dietiestates}
-    jpa:
-        hibernate:
-            dialect: org.hibernate.spatial.dialect.postgis.PostgisDialect
-            ddl-auto: update
-        show-sql: false
-        properties:
-            hibernate:
-                format_sql: false
-        database: POSTGRESQL
-        database-platform: org.hibernate.dialect.PostgreSQLDialect
-    mail:
-        host: ${MAIL_HOST:localhost}
-        port: ${MAIL_PORT:1025}
-        username: ${MAIL_USERNAME:}
-        password: ${MAIL_PASSWORD:}
-        properties:
-            mail:
-                smtp:
-                    trust: "*"
-                auth: true
-                starttls:
-                    enable: true
-                connectiontimeout: 5000
-                timeout: 5000
-                writetimeout: 5000
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/dietiestates}
+    username: ${POSTGRES_USER:dietiestates}
+    password: ${POSTGRES_PASSWORD:dietiestates}
+  jpa:
+    hibernate:
+      dialect: org.hibernate.spatial.dialect.postgis.PostgisDialect
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enable: true
+        connectiontimeout: 5000
+        timeout: 5000
+        writetimeout: 5000
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - read:user
+              - user:email
 
 application:
-    security:
-        jwt:
-            secret-key: ${JWT_SECRET_KEY:XApjPlbTpOq+Pt7ANlYILkeAuZlzzt0hbPiT3Wny6Mg=}
-            expiration: 8640000
-            refresh-expiration: 2592000000
-    mailing:
-        frontend:
-            login-url: http://localhost:4200/login
-            activation-url: http://localhost:4200/activate
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY:XApjPlbTpOq+Pt7ANlYILkeAuZlzzt0hbPiT3Wny6Mg=}
+      expiration: 8640000
+      refresh-expiration: 2592000000
+  mailing:
+    frontend:
+      login-url: http://localhost:4200/login
+      activation-url: http://localhost:4200/activate
+
+app:
+  oauth2:
+    redirect-uri: http://localhost:4200/oauth2-success
