@@ -3,9 +3,11 @@
     <h6 class="card-title mb-1">{{ agent.firstName }} {{ agent.lastName }}</h6>
     <div class="text-muted small mb-2">{{ agent.email }}</div>
     <div class="small mb-3">
-      @for (r of agent.roles; track $index) {
-      <span class="badge bg-secondary me-1">{{ r.name }}</span>
-      }
+      @for (r of agent.roles; track $index) { @switch (r.name) { @case ('ROLE_ADMIN') {
+      <span class="badge bg-primary me-1">Administrator</span>
+      } @case ('ROLE_ADMIN_ASSISTANT') {
+      <span class="badge bg-info me-1">Admin Assistant</span>
+      } } }
     </div>
     <div class="mt-auto d-flex gap-2">
       @if (!hasRoleAdmin() && agent.email !== currentUserEmail) {

@@ -19,7 +19,7 @@ export class AgentsManagement {
 
   agents: AgentResponse[] = [];
   loading = false;
-  error: string | null = null;
+  errorMsg: string[] = [];
   currentUserEmail: string | null = null;
 
   isModalVisible = false;
@@ -35,14 +35,21 @@ export class AgentsManagement {
 
   loadAgents() {
     this.loading = true;
-    this.error = null;
+    this.errorMsg = [];
     this.adminService.getAgentsByAgency({ pageable: { page: 0, size: 20 } as any }).subscribe({
       next: (page) => {
         this.agents = page.content ?? [];
         this.loading = false;
       },
       error: (err) => {
-        this.error = err.error?.message || err.message || 'Caricamento agenti non riuscito.';
+        this.errorMsg = [];
+        if (err.error?.violations) {
+          this.errorMsg = err.error.violations.map((v: any) => v.message);
+        } else if (err.error?.message) {
+          this.errorMsg.push(err.error.message);
+        } else {
+          this.errorMsg.push('Caricamento agenti non riuscito.');
+        }
         this.loading = false;
       },
     });
@@ -55,13 +62,21 @@ export class AgentsManagement {
 
   confirmPromote() {
     if (this.agentIdToPromote === null) return;
+    this.errorMsg = [];
     this.adminService.promoteToAdmin({ agentId: this.agentIdToPromote }).subscribe({
       next: () => {
         this.loadAgents();
         this.cancelPromote();
       },
       error: (err) => {
-        this.error = err.error?.message || err.message || 'Promozione non riuscita.';
+        this.errorMsg = [];
+        if (err.error?.violations) {
+          this.errorMsg = err.error.violations.map((v: any) => v.message);
+        } else if (err.error?.message) {
+          this.errorMsg.push(err.error.message);
+        } else {
+          this.errorMsg.push('Promozione non riuscita.');
+        }
         this.cancelPromote();
       },
     });
@@ -79,14 +94,21 @@ export class AgentsManagement {
 
   confirmRemove() {
     if (this.agentIdToDelete === null) return;
-
+    this.errorMsg = [];
     this.adminService.deleteAgent({ agentId: this.agentIdToDelete }).subscribe({
       next: () => {
         this.loadAgents();
         this.cancelRemove();
       },
       error: (err) => {
-        this.error = err.error?.message || err.message || 'Eliminazione non riuscita.';
+        this.errorMsg = [];
+        if (err.error?.violations) {
+          this.errorMsg = err.error.violations.map((v: any) => v.message);
+        } else if (err.error?.message) {
+          this.errorMsg.push(err.error.message);
+        } else {
+          this.errorMsg.push('Eliminazione non riuscita.');
+        }
         this.cancelRemove();
       },
     });

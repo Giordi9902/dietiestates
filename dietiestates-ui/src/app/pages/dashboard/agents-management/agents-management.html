@@ -31,8 +31,14 @@
   <button class="btn btn-primary" (click)="goToCreate()">Nuovo agente</button>
 </div>
 
-@if (error) {
-<div class="alert alert-danger">{{ error }}</div>
+@if (errorMsg.length > 0) {
+<div class="alert alert-danger">
+  <ul>
+    @for (error of errorMsg; track $index) {
+    <li>{{ error }}</li>
+    }
+  </ul>
+</div>
 } @if (loading) {
 <div class="text-muted">Caricamento agenti...</div>
 } @else { @if (agents.length === 0) {
