@@ -65,8 +65,6 @@ public class SecurityFilterConfig {
 				))
 				.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
-				.exceptionHandling(e->e.authenticationEntryPoint(new JsonAuthenticationEntryPoint())
-						.accessDeniedHandler(new JsonAccessDeniedHandler()))
 				.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}

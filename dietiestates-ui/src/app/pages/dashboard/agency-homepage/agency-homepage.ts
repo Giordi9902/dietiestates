@@ -23,7 +23,7 @@ export class AgencyHomepage {
   }
 
   get isAdmin(): boolean {
-    return this.userService.hasRole('ROLE_ADMIN');
+    return this.userService.hasAnyRole(['ROLE_ADMIN', 'ROLE_ADMIN_ASSISTANT']);
   }
 
   private loadAgency(): void {

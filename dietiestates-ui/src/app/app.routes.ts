@@ -92,14 +92,14 @@ export const routes: Routes = [
       {
         path: 'agents',
         component: AgentsManagement,
-        canMatch: [roleGuard(['ROLE_ADMIN'])],
+        canMatch: [roleGuard(['ROLE_ADMIN', 'ROLE_ADMIN_ASSISTANT'])],
         title: 'Manage your agents',
       },
 
       {
         path: 'agents-new',
         component: CreateNewAgent,
-        canMatch: [roleGuard(['ROLE_ADMIN'])],
+        canMatch: [roleGuard(['ROLE_ADMIN', 'ROLE_ADMIN_ASSISTANT'])],
         title: 'Create a new agent profile',
       },
       {

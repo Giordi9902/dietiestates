@@ -14,8 +14,7 @@ export class AgentCard {
   @Output() remove = new EventEmitter<number>();
 
   hasRoleAdmin(): boolean {
-    if (this.agent.roles?.some((r) => r.name === 'ROLE_ADMIN')) return true;
-    else return false;
+    return this.agent.roles?.some((r) => r.name === 'ROLE_ADMIN') ?? false;
   }
 
   onPromote() {

@@ -3,7 +3,7 @@ logging:
     root: INFO
     it.unina.ingsw.dietiestates_backend: INFO
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%t]){faint} %clr(%5p){yellow} %clr(%logger{36}){cyan} - %msg%n%wEx"
 spring:
   application:
     name: dietiestates-backend
@@ -17,6 +17,12 @@ springdoc:
 server:
   servlet:
     context-path: /api/v1/
+
+management:
+    endpoints:
+        web:
+            exposure:
+              include: health,env,metrics, beans,loggers
 
 aws:
   s3:

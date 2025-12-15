@@ -5,14 +5,14 @@ import it.unina.ingsw.dietiestates_backend.agency.model.Agency;
 import it.unina.ingsw.dietiestates_backend.agency.model.AgentResponse;
 import it.unina.ingsw.dietiestates_backend.agency.repository.AgencyRepository;
 import it.unina.ingsw.dietiestates_backend.agency.service.mapper.AgentMapper;
-import it.unina.ingsw.dietiestates_backend.auth.model.OtpToken;
 import it.unina.ingsw.dietiestates_backend.auth.model.Role;
 import it.unina.ingsw.dietiestates_backend.auth.model.User;
 import it.unina.ingsw.dietiestates_backend.auth.repository.RoleRepository;
 import it.unina.ingsw.dietiestates_backend.auth.repository.UserRepository;
 import it.unina.ingsw.dietiestates_backend.auth.service.AuthenticationService;
 import it.unina.ingsw.dietiestates_backend.email.EmailService;
-import it.unina.ingsw.dietiestates_backend.errors.AgentWithAdminRoleException;
+import it.unina.ingsw.dietiestates_backend.errors.exception.AgentWithAdminRoleException;
+import it.unina.ingsw.dietiestates_backend.errors.exception.CannotRevokeAdminException;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +47,7 @@ public class AdminService {
 		Optional<User> existing = userRepository.findByEmail(request.getEmail());
 		if (existing.isPresent()) {
 			User agent = existing.get();
-			addAgentRoleToUser(agent, agentRole, agency);
+			addAgentRoleToExistingUser(agent, agentRole, agency);
 		}else {
 			createAgentFromScratch(request, userRole, agentRole, agency);
 		}
@@ -67,9 +67,10 @@ public class AdminService {
 		emailService.sendAgentCreatedEmail(savedAgent, raw,otpToken);
 	}
 
-	private void addAgentRoleToUser(User newAgent, Role agentRole, Agency agency) throws MessagingException {
+	private void addAgentRoleToExistingUser(User newAgent, Role agentRole, Agency agency) throws MessagingException {
 		initializeRolesIfNeeded(newAgent);
-		assignRoles(newAgent, List.of(agentRole));
+		newAgent.getRoles().add(agentRole);
+		userRepository.save(newAgent);
 		newAgent.setAgency(agency);
 		userRepository.save(newAgent);
 		notifyAgentRoleAdded(newAgent);
@@ -118,18 +119,23 @@ public class AdminService {
 
 	public void promote(Integer agentId) throws MessagingException {
 		User agent = userRepository.findById(agentId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-		var adminRole = getRoleByName("ROLE_ADMIN");
+		var adminAssistantRole = getRoleByName("ROLE_ADMIN_ASSISTANT");
 
-		if(agent.getRoles().contains(adminRole)){
-			throw new AgentWithAdminRoleException("L'agente possiede già il ruolo di amministratore");
+		if(agent.getRoles().contains(adminAssistantRole)){
+			throw new AgentWithAdminRoleException("L'agente possiede già il ruolo di assistente amministratore");
 		}
 		initializeRolesIfNeeded(agent);
-		assignRoles(agent, List.of(adminRole));
+		assignRoles(agent, List.of(adminAssistantRole));
 		userRepository.save(agent);
 		emailService.sendAgentPromotedEmail(agent);
 	}
 
 	public void deleteAgent(Integer agentId) {
-		userRepository.deleteById(agentId);
+		User agent = userRepository.findById(agentId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+		var adminRole = getRoleByName("ROLE_ADMIN");
+		if(agent.getRoles().contains(adminRole)){
+			throw new CannotRevokeAdminException("You cannot revoke admin privileges to another administrator!");
+		}
+		userRepository.revokeAgent(agentId);
 	}
 }

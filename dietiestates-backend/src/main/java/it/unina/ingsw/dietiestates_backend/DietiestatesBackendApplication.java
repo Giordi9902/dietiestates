@@ -29,6 +29,11 @@ public class DietiestatesBackendApplication {
 						Role.builder().name("ROLE_AGENT").build()
 				);
 			}
+			if (roleRepository.findByName("ROLE_ADMIN_ASSISTANT").isEmpty()) {
+				roleRepository.save(
+						Role.builder().name("ROLE_ADMIN_ASSISTANT").build()
+				);
+			}
 		};
 	}
 

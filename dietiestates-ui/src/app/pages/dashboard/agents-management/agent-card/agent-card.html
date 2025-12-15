@@ -8,9 +8,9 @@
       }
     </div>
     <div class="mt-auto d-flex gap-2">
-      @if (!hasRoleAdmin()) {
+      @if (!hasRoleAdmin() && agent.email !== currentUserEmail) {
       <button class="btn btn-outline-primary btn-sm" (click)="onPromote()">Promuovi</button>
-      } @if (agent.email !== currentUserEmail) {
+      } @if (agent.email !== currentUserEmail && !hasRoleAdmin()) {
       <button class="btn btn-outline-danger btn-sm" (click)="onRemove()">Elimina</button>
       }
     </div>

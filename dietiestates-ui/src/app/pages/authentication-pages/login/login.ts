@@ -31,7 +31,16 @@ export class Login {
           this.tokenService.refresh_token = res.refresh_token as string;
           this.router.navigate(['']);
         },
-        error: (err) => {},
+        error: (err) => {
+          this.errorMsg = [];
+          if (err.error?.violations) {
+            this.errorMsg = err.error.violations.map((v: any) => v.message);
+          } else if (err.error?.message) {
+            this.errorMsg.push(err.error.message);
+          } else {
+            this.errorMsg.push('Credenziali non valide o si è verificato un errore.');
+          }
+        },
       });
   }
 

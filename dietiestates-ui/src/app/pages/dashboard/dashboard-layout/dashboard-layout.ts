@@ -13,6 +13,6 @@ export class DashboardLayout {
   userService = inject(UserService);
 
   isAdmin(): boolean {
-    return this.userService.hasRole('ROLE_ADMIN');
+    return this.userService.hasAnyRole(['ROLE_ADMIN', 'ROLE_ADMIN_ASSISTANT']);
   }
 }

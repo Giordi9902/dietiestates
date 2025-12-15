@@ -2,7 +2,7 @@ package it.unina.ingsw.dietiestates_backend.listings.service;
 
 import it.unina.ingsw.dietiestates_backend.auth.model.User;
 import it.unina.ingsw.dietiestates_backend.auth.repository.UserRepository;
-import it.unina.ingsw.dietiestates_backend.errors.ListingNotFoundException;
+import it.unina.ingsw.dietiestates_backend.errors.exception.ListingNotFoundException;
 import it.unina.ingsw.dietiestates_backend.listings.model.Listing;
 import it.unina.ingsw.dietiestates_backend.listings.model.ListingImage;
 import it.unina.ingsw.dietiestates_backend.listings.model.dto.creational.CreateListingRequest;
@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
