@@ -1,8 +1,8 @@
 package it.unina.ingsw.dietiestates_backend.agency.service;
 
-import it.unina.ingsw.dietiestates_backend.agency.model.CreateAgentRequest;
+import it.unina.ingsw.dietiestates_backend.agency.model.dto.CreateAgentRequest;
 import it.unina.ingsw.dietiestates_backend.agency.model.Agency;
-import it.unina.ingsw.dietiestates_backend.agency.model.AgentResponse;
+import it.unina.ingsw.dietiestates_backend.agency.model.dto.AgentResponse;
 import it.unina.ingsw.dietiestates_backend.agency.repository.AgencyRepository;
 import it.unina.ingsw.dietiestates_backend.agency.service.mapper.AgentMapper;
 import it.unina.ingsw.dietiestates_backend.auth.model.Role;

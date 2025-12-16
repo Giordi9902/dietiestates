@@ -1,7 +1,7 @@
 package it.unina.ingsw.dietiestates_backend.agency.service.mapper;
 
-import it.unina.ingsw.dietiestates_backend.agency.model.CreateAgentRequest;
-import it.unina.ingsw.dietiestates_backend.agency.model.AgentResponse;
+import it.unina.ingsw.dietiestates_backend.agency.model.dto.CreateAgentRequest;
+import it.unina.ingsw.dietiestates_backend.agency.model.dto.AgentResponse;
 import it.unina.ingsw.dietiestates_backend.auth.model.User;
 
 public class AgentMapper {

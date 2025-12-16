@@ -1,4 +1,4 @@
-package it.unina.ingsw.dietiestates_backend.agency.model;
+package it.unina.ingsw.dietiestates_backend.agency.model.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

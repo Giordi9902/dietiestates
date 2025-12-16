@@ -1,7 +1,7 @@
 package it.unina.ingsw.dietiestates_backend.agency.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import it.unina.ingsw.dietiestates_backend.agency.model.AgencyDetailsResponse;
+import it.unina.ingsw.dietiestates_backend.agency.model.dto.AgencyDetailsResponse;
 import it.unina.ingsw.dietiestates_backend.agency.service.AgencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

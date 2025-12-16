@@ -1,8 +1,8 @@
 package it.unina.ingsw.dietiestates_backend.agency.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import it.unina.ingsw.dietiestates_backend.agency.model.AgentResponse;
-import it.unina.ingsw.dietiestates_backend.agency.model.CreateAgentRequest;
+import it.unina.ingsw.dietiestates_backend.agency.model.dto.AgentResponse;
+import it.unina.ingsw.dietiestates_backend.agency.model.dto.CreateAgentRequest;
 import it.unina.ingsw.dietiestates_backend.agency.service.security.AdminOfAgency;
 import it.unina.ingsw.dietiestates_backend.agency.service.AdminService;
 import jakarta.mail.MessagingException;

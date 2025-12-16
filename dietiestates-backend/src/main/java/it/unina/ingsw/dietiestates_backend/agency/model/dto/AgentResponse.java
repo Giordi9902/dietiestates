@@ -1,4 +1,4 @@
-package it.unina.ingsw.dietiestates_backend.agency.model;
+package it.unina.ingsw.dietiestates_backend.agency.model.dto;
 
 import it.unina.ingsw.dietiestates_backend.auth.model.Role;
 import lombok.*;
