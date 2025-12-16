@@ -17,6 +17,10 @@ export class AgentCard {
     return this.agent.roles?.some((r) => r.name === 'ROLE_ADMIN') ?? false;
   }
 
+  hasRoleAdminAssistant(): boolean {
+    return this.agent.roles?.some((r) => r.name === 'ROLE_ADMIN_ASSISTANT') ?? false;
+  }
+
   onPromote() {
     if (this.agent?.id != null) this.promote.emit(this.agent.id);
   }

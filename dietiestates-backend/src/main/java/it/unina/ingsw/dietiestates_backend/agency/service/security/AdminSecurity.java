@@ -25,13 +25,11 @@ public class AdminSecurity {
         boolean isAdmin = hasRole(admin,"ROLE_ADMIN");
         boolean isAdminAssistant = hasRole(admin,"ROLE_ADMIN_ASSISTANT");
 
-        // require at least one of the admin roles
         if(!(isAdmin || isAdminAssistant)) return false;
 
         User agent = userRepository.findById(agentId).orElseThrow(()->new RuntimeException("Agent not found"));
         Agency admin_agency = admin.getAgency();
 
-        // protect against null agent.getAgency()
         boolean isAdminOfAgentAgency = admin_agency != null && agent.getAgency() != null
                 && admin_agency.getId().equals(agent.getAgency().getId());
 
