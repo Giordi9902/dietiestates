@@ -7,6 +7,8 @@ import { ListingSummaryResponse } from '../../services/models/listing-summary-re
 import { ListingSearchRequest } from '../../services/models/listing-search-request';
 import { ListingCard } from '../../shared/listing-card/listing-card';
 import * as L from 'leaflet';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { catchError, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-search',
@@ -19,6 +21,7 @@ export class Search implements OnInit, AfterViewInit {
   private fb = inject(FormBuilder);
   private listingsService = inject(ListingsService);
   private router = inject(Router);
+  private http = inject(HttpClient);
 
   searchForm!: FormGroup;
   listings: ListingSummaryResponse[] = [];
@@ -34,14 +37,24 @@ export class Search implements OnInit, AfterViewInit {
   totalElements = 0;
 
   private defaultIcon!: L.Icon;
+  private highlightIcon!: L.Icon;
 
   energyClasses = ['A4', 'A3', 'A2', 'A1', 'B', 'C', 'D', 'E', 'F', 'G'];
 
   ngOnInit(): void {
     this.defaultIcon = new L.Icon({
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
       shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+    });
+
+    this.highlightIcon = new L.Icon({
+      iconUrl:
+        'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34],
@@ -76,15 +89,15 @@ export class Search implements OnInit, AfterViewInit {
     }).addTo(this.map);
 
     this.map.on('click', (e: L.LeafletMouseEvent) => {
-      this.updateMarkerAndCircle(e.latlng, this.defaultIcon);
+      this.updateMarkerAndCircle(e.latlng);
     });
   }
 
-  updateMarkerAndCircle(latlng: L.LatLng, icon: L.Icon): void {
+  updateMarkerAndCircle(latlng: L.LatLng): void {
     this.searchForm.patchValue({ lat: latlng.lat, lng: latlng.lng });
 
     if (!this.marker) {
-      this.marker = L.marker(latlng, { icon }).addTo(this.map!);
+      this.marker = L.marker(latlng, { icon: this.defaultIcon }).addTo(this.map!);
     } else {
       this.marker.setLatLng(latlng);
     }
@@ -115,7 +128,6 @@ export class Search implements OnInit, AfterViewInit {
     this.error = null;
     const searchParams: ListingSearchRequest = this.searchForm.value;
 
-    // Remove null and empty values
     Object.keys(searchParams).forEach(
       (key) => (searchParams as any)[key] == null && delete (searchParams as any)[key]
     );
@@ -152,24 +164,65 @@ export class Search implements OnInit, AfterViewInit {
     return Array.from({ length: this.totalPages }, (_, i) => i);
   }
 
-  private resultMarkers: L.Marker[] = [];
+  private resultMarkers = new Map<number, L.Marker>();
 
   private updateResultMarkers(): void {
-    // Clear previous markers
     this.resultMarkers.forEach((marker) => marker.removeFrom(this.map!));
-    this.resultMarkers = [];
+    this.resultMarkers.clear();
 
     this.listings.forEach((listing) => {
-      if (listing.latitude && listing.longitude) {
-        const marker = L.marker([listing.latitude, listing.longitude], { icon: this.defaultIcon })
+      if (listing.latitude && listing.longitude && listing.listing_id) {
+        const marker = L.marker([listing.latitude, listing.longitude], {
+          icon: this.defaultIcon,
+        })
           .addTo(this.map!)
           .bindPopup(`<b>${listing.title}</b><br>${listing.price} €`);
-        this.resultMarkers.push(marker);
+        this.resultMarkers.set(listing.listing_id, marker);
       }
     });
   }
 
   onRadiusChange(): void {
     this.updateCircle();
+  }
+
+  searchByAddress(): void {
+    const address = this.searchForm.value.address;
+    if (!address) {
+      return;
+    }
+
+    this.http
+      .get<any[]>(`https://nominatim.openstreetmap.org/search?q=${address}&format=json&limit=1`)
+      .pipe(
+        catchError((err) => {
+          this.error = 'Could not geocode address. Please try again.';
+          return throwError(() => err);
+        })
+      )
+      .subscribe((data) => {
+        if (data.length > 0) {
+          const latlng = new L.LatLng(data[0].lat, data[0].lon);
+          this.updateMarkerAndCircle(latlng);
+          this.map?.setView(latlng, 15);
+        } else {
+          this.error = 'Address not found.';
+        }
+      });
+  }
+
+  highlightMarker(listing: ListingSummaryResponse, isHighlighted: boolean): void {
+    if (!listing.listing_id) return;
+    const marker = this.resultMarkers.get(listing.listing_id);
+    if (marker) {
+      marker.setIcon(isHighlighted ? this.highlightIcon : this.defaultIcon);
+      if (isHighlighted) {
+        marker.setZIndexOffset(1000);
+        marker.openPopup();
+      } else {
+        marker.setZIndexOffset(0);
+        marker.closePopup();
+      }
+    }
   }
 }

@@ -19,7 +19,8 @@ public enum BusinessErrorCodes {
 	EMAIL_ALREADY_EXISTS(308, CONFLICT, "L'email è già in uso"),
 	INVALID_ACTIVATION_CODE(309, BAD_REQUEST, "Codice di attivazione non valido"),
 	INVALID_REFRESH_TOKEN(310, UNAUTHORIZED, "Refresh token non valido"),
-	OPERATION_NOT_PERMITTED(311, FORBIDDEN, "Operazione non permessa");
+	OPERATION_NOT_PERMITTED(311, FORBIDDEN, "Operazione non permessa"),
+	USER_IS_ALREADY_AGENT(312, CONFLICT, "L'utente è già un agente per un'altra agenzia");
 
 	@Getter
 	private final int code;

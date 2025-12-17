@@ -9,6 +9,7 @@ import it.unina.ingsw.dietiestates_backend.auth.repository.RoleRepository;
 import it.unina.ingsw.dietiestates_backend.auth.repository.UserRepository;
 import it.unina.ingsw.dietiestates_backend.auth.service.OtpService;
 import it.unina.ingsw.dietiestates_backend.email.EmailService;
+import it.unina.ingsw.dietiestates_backend.errors.exception.UserIsAlreadyAgentException;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,11 +59,20 @@ public class AgentCreationService {
 
     private void addAgentRoleToExistingUser(User newAgent, Agency agency) throws MessagingException {
         Role agentRole = getRoleByName("ROLE_AGENT");
-        initializeRolesIfNeeded(newAgent);
-        newAgent.getRoles().add(agentRole);
-        newAgent.setAgency(agency);
-        userRepository.save(newAgent);
-        notifyAgentRoleAdded(newAgent);
+
+        boolean isAlreadyAgent = newAgent.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_AGENT"));
+
+        if (isAlreadyAgent) {
+            if (newAgent.getAgency() != null && !newAgent.getAgency().getId().equals(agency.getId())) {
+                throw new UserIsAlreadyAgentException("L'utente è già un agente per un'altra agenzia.");
+            }
+        } else {
+            initializeRolesIfNeeded(newAgent);
+            newAgent.getRoles().add(agentRole);
+            newAgent.setAgency(agency);
+            userRepository.save(newAgent);
+            notifyAgentRoleAdded(newAgent);
+        }
     }
 
     private Role getRoleByName(String roleName) {

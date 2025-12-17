@@ -1,0 +1,28 @@
+\babel@toc {italian}{}\relax 
+\babel@toc {italian}{}\relax 
+\contentsline {chapter}{\numberline {1}Documento dei Requisiti Software}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Glossario}{3}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Modellazione target utenti}{3}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Utente}{4}{subsection.1.2.1}%
+\contentsline {paragraph}{Biografia}{4}{subsection.1.2.1}%
+\contentsline {paragraph}{Obiettivi}{4}{subsection.1.2.1}%
+\contentsline {paragraph}{Interessi}{4}{subsection.1.2.1}%
+\contentsline {paragraph}{Frustrazioni e difficoltà}{4}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Agente immobiliare}{4}{subsection.1.2.2}%
+\contentsline {paragraph}{Biografia}{4}{subsection.1.2.2}%
+\contentsline {paragraph}{Obiettivi }{4}{subsection.1.2.2}%
+\contentsline {paragraph}{Frustrazioni/Difficoltà}{4}{subsection.1.2.2}%
+\contentsline {paragraph}{Interessi}{5}{subsection.1.2.2}%
+\contentsline {subsection}{\numberline {1.2.3}Gestore di una agenzia immobiliare}{5}{subsection.1.2.3}%
+\contentsline {paragraph}{Biografia}{5}{subsection.1.2.3}%
+\contentsline {paragraph}{Interessi}{5}{subsection.1.2.3}%
+\contentsline {paragraph}{Obiettivi}{5}{subsection.1.2.3}%
+\contentsline {paragraph}{Frustrazioni/difficoltà}{5}{subsection.1.2.3}%
+\contentsline {section}{\numberline {1.3}Casi d'Uso e descrizione dei requisiti}{5}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Descrizione dei requisiti}{6}{subsection.1.3.1}%
+\contentsline {section}{\numberline {1.4}Fully dressed use case diagrams}{7}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Ricerca di un immobile}{7}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Caricamento di un annuncio immobiliare}{8}{subsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.4.3}Aggiunta di un agente immobiliare}{9}{subsection.1.4.3}%
+\contentsline {subsection}{\numberline {1.4.4}Promozione di un agente immobiliare}{9}{subsection.1.4.4}%
+\contentsfinish 

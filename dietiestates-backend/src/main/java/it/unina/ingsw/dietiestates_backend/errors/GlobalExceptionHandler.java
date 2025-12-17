@@ -114,6 +114,11 @@ public class GlobalExceptionHandler {
 		return build(OPERATION_NOT_PERMITTED.getHttpStatus(), OPERATION_NOT_PERMITTED.name(), ex.getMessage(), req, null);
 	}
 
+	@ExceptionHandler(UserIsAlreadyAgentException.class)
+	public ResponseEntity<ApiError> handleUserIsAlreadyAgent(UserIsAlreadyAgentException ex, HttpServletRequest req) {
+		return build(USER_IS_ALREADY_AGENT.getHttpStatus(), USER_IS_ALREADY_AGENT.name(), ex.getMessage(), req, null);
+	}
+
 	@ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
 	public ResponseEntity<ApiError> handleAccessDenied(org.springframework.security.access.AccessDeniedException ex, HttpServletRequest req) {
 		return build(FORBIDDEN, "ACCESS_DENIED", "Permesso negato.", req, null);

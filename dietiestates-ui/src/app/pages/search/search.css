@@ -1,1 +1,16 @@
 @import 'leaflet/dist/leaflet.css';
+
+#map {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+}
+
+.listing-card {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.listing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
