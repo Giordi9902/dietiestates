@@ -65,8 +65,11 @@ La sicurezza dell'applicazione backend è gestita da Spring Security attraverso 
 La configurazione, definita nella classe \texttt{SecurityFilterConfig}, stabilisce l'ordine e il comportamento di questi filtri. Le principali responsabilità configurate includono:
 \begin{itemize}
     \item \textbf{Autorizzazione degli Endpoint:} Viene definita una politica di accesso granulare per i diversi percorsi dell'API. Ad esempio, gli endpoint relativi all'autenticazione (es. \texttt{/api/auth/**}) sono resi pubblici, mentre altre aree richiedono ruoli specifici (es. \texttt{/api/admin/**} richiede il ruolo di \texttt{ADMIN}).
+
     \item \textbf{Gestione delle Sessioni:} L'applicazione è configurata per essere \textit{stateless}, ovvero non viene creata alcuna sessione utente sul server. Questa è una scelta fondamentale per le API RESTful, in quanto garantisce la scalabilità e semplifica il bilanciamento del carico. L'autenticazione di ogni richiesta è affidata a un token.
+
     \item \textbf{Integrazione OIDC e OAuth2:} La catena è configurata per intercettare e gestire i flussi di login con provider esterni, delegando il processo ai servizi specifici come \texttt{CustomOidcUserService}.
+
     \item \textbf{Filtri Personalizzati:} È stato inserito un filtro custom, \texttt{AuthFilter}, posizionato strategicamente all'interno della catena. Questo filtro ha il compito di ispezionare l'header \texttt{Authorization} di ogni richiesta, estrarre e validare il JSON Web Token (JWT) e, in caso di successo, popolare il \texttt{SecurityContext} di Spring. Questo passaggio è ciò che permette al resto dell'applicazione di identificare l'utente autenticato e i suoi ruoli per le successive richieste API.
 \end{itemize}
 
@@ -82,8 +85,11 @@ Accanto agli access token, il sistema implementa anche l'uso di refresh token. I
 \subsection{Frontend}
 \begin{itemize}
     \item \textbf{Angular:} Framework client-side basato su TypeScript, sviluppato da Google. È stato scelto per la sua architettura a componenti, che promuove la riusabilità del codice, e per il suo potente sistema di dependency injection, che facilita la scrittura di codice modulare e testabile.
+
     \item \textbf{TypeScript:} Superset di JavaScript che introduce la tipizzazione statica. Il suo utilizzo migliora la robustezza del codice, previene errori comuni in fase di sviluppo e aumenta la manutenibilità a lungo termine del progetto.
+
     \item \textbf{OpenAPI Generator:} Strumento fondamentale per l'integrazione tra frontend e backend. A partire dalla specifica OpenAPI (precedentemente nota come Swagger) esposta dal backend, questo strumento genera automaticamente un client API TypeScript completo e type-safe. Questo approccio riduce drasticamente il rischio di disallineamenti e è un pilastro per lo sviluppo contract-first.
+
     \item \textbf{HTML5 e CSS3:} Standard web utilizzati per la strutturazione semantica delle pagine e per la loro stilizzazione, garantendo compatibilità con i browser moderni e la possibilità di implementare design responsive.
 \end{itemize}
 
@@ -93,8 +99,249 @@ Il design dell'interfaccia utente è stato concepito per essere pulito, intuitiv
 
 \begin{itemize}
     \item \textbf{Approccio User-Centric:} Ogni elemento dell'interfaccia è stato pensato mettendo al centro le esigenze dell'utente. La navigazione è stata strutturata in modo logico e coerente, permettendo un facile accesso alle funzionalità principali come la ricerca di immobili, la gestione del proprio profilo e, per gli utenti privilegiati, la gestione degli annunci e degli agenti.
+
     \item \textbf{Coerenza Visiva e Riusabilità:} L'adozione di un'architettura a componenti, nativa in Angular, ha permesso di creare elementi riutilizzabili (es. le card degli annunci, i campi dei form, la navbar). Questo non solo accelera lo sviluppo, ma garantisce anche una forte coerenza visiva e comportamentale in tutta l'applicazione, rendendo l'esperienza utente più prevedibile e confortevole.
+
     \item \textbf{Responsive Design:} L'interfaccia è stata progettata con un approccio "mobile-first", garantendo che l'applicazione sia perfettamente fruibile su un'ampia gamma di dispositivi, dai desktop agli smartphone. L'utilizzo di tecniche CSS moderne come Flexbox e Grid consente al layout di adattarsi fluidamente alle diverse dimensioni dello schermo.
+
     \item \textbf{Feedback all'Utente:} Il sistema fornisce un feedback visivo costante per ogni azione intrapresa dall'utente. Indicatori di caricamento (spinner) durante le chiamate asincrone, messaggi di successo o di errore chiari e validazione contestuale dei form sono tutti elementi implementati per migliorare la comunicazione tra il sistema e l'utente, riducendo l'incertezza e migliorando la percezione di reattività dell'applicazione.
 \end{itemize}
 L'ispirazione per il layout e l'esperienza utente è tratta dai principali portali immobiliari moderni, cercando di adottare convenzioni già familiari agli utenti per ridurre la curva di apprendimento.
+
+\section{Descrizione dello schema per la persistenza dei dati}
+
+\subsection{Panoramica e vincoli generali}
+Lo schema utilizza PostgreSQL come motore relazionale e sfrutta estensioni quali \texttt{postgis} per la gestione dei dati geografici. Le entità principali sono modellate tramite tabelle normalizzate con vincoli di integrità (PK, FK e UNIQUE) e check constraint per valori enumerati (es. classe energetica, tipo di operazione).
+
+Sequenze dedicate gestiscono gli identificatori delle tabelle principali (users, role, listing, listing\_image, ecc.) per garantire integrità e comportamento prevedibile nelle operazioni di insert.
+
+\subsection{Tabelle principali}
+\begin{itemize}
+	\item  \textbf{agencies}: rappresenta le agenzie immobiliari (id, nome, email, telefono).
+\item  \textbf{users}: anagrafica utenti con campi di stato (enabled, account\_locked), riferimento opzionale a \texttt{agency\_id} e controlli sul provider di autenticazione. Le associazioni many-to-many verso \textbf{role} sono gestite tramite la tabella di join \textbf{users\_roles}.
+\item \textbf{role}: definisce i ruoli applicativi (es. ROLE\_AGENT, ROLE\_ADMIN, ROLE\_ADMIN\_ASSISTANT) con vincolo di unicità sul nome.
+\item  \textbf{listing}: entità principale per gli annunci immobilari. Oltre agli attributi descrittivi (title, description, address, price, rooms, bathrooms, area, energy\_class, listing\_operation) include un campo spaziale \texttt{coordinate} di tipo \texttt{geometry(Point,4326)} per memorizzare la posizione geografica del bene.
+\item  \textbf{listing\_image}: immagini associate ad un annuncio (url, sort\_order, created\_at, listing\_id FK), utilizzata per gestire gallerie e miniature.
+\item  \textbf{refresh\_tokens} e \textbf{otp\_token}: tabelle per la gestione di token di autenticazione e OTP.
+\end{itemize}
+
+Gli indici e i vincoli sono definiti per garantire performance e coerenza (es. UNIQUE su email degli utenti, UNIQUE su nome agenzia).
+
+\subsection{Funzioni e logica lato database}
+Nel file di schema sono presenti stored procedures/functions utili a incapsulare logiche di business che devono essere eseguite atomically lato DB:
+
+\begin{itemize}
+	\item \texttt{revoke\_agent(user\_id INTEGER)}: funzione PL/pgSQL che rimuove ruoli associati a un utente (es. \texttt{ROLE\_AGENT}, \texttt{ROLE\_ADMIN\_ASSISTANT}) e azzera il campo \texttt{agency\_id} dell'utente. Questo tipo di funzione è utile per eseguire operazioni di revoca in modo trasparente e coerente, mantenendo la storia delle modifiche tramite l'aggiornamento del campo \texttt{last\_modified\_date}.
+
+\item  \texttt{get\_listings\_by\_agent(p\_agent\_id INT)}: funzione che restituisce gli annunci associati a un agente, estraendo anche coordinate (lon/lat) e la URL della prima immagine come \texttt{thumbnail\_url}. Fornisce un'interfaccia semplice e performante per le API che devono elencare gli annunci di un agente.
+\end{itemize}
+
+Queste funzioni permettono di centralizzare controlli e operazioni ripetute, riducendo la complessità delle transazioni lato applicazione e favorendo coerenza dei dati.
+
+\subsection{Motivazione per l'adozione di PostGIS}
+PostGIS estende PostgreSQL con tipi spaziali (\texttt{geometry}, \texttt{geography}) e una ricca collezione di funzioni spaziali per operazioni geometriche e geografiche (intersezioni, distanze, buffer, ecc.). Le motivazioni principali della scelta sono:
+
+\begin{itemize}
+	\item \textbf{Ricchezza funzionale}: PostGIS fornisce operatori come \texttt{ST\_DWithin}, \texttt{ST\_Distance}, \texttt{ST\_Transform} e funzioni per estrarre coordinate (\texttt{ST\_X}, \texttt{ST\_Y}), fondamentali per query di ricerca per prossimità e per visualizzazione su mappe.
+
+\item  \textbf{Performance e indicizzazione}: gli indici spaziali GIST consentono ricerche molto efficienti su grandi insiemi di punti; l'uso di un indice GIST su \texttt{listing(coordinate)} permette di limitare rapidamente il numero di geometrie candidate prima di calcolare distanze precise.
+
+\item  \textbf{Precisione geografica}: PostGIS supporta SRID standard (es. 4326) e tipi \texttt{geography} per calcoli sulla superficie terrestre che considerano la curvatura della Terra, utile quando le ricerche devono essere espresse in metri.
+\end{itemize}
+
+Per questi motivi PostGIS offre il miglior compromesso tra semplicità d'uso, portata funzionale e performance per le operazioni geospaziali richieste dal prodotto.
+
+\subsection{Uso di PostGIS nelle query di ricerca per raggio}
+Le ricerche ``vicino a una posizione'' sono implementate con le funzioni spaziali come mostrato nel seguente listato:
+
+\begin{lstlisting}[language=SQL]
+-- Punto di ricerca: lon/lat in WGS84
+SELECT l.*, ST_X(l.coordinate) AS longitude, ST_Y(l.coordinate) AS latitude
+FROM listing l
+WHERE ST_DWithin(
+    l.coordinate::geography,
+    ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography,
+    :radius_meters
+);
+\end{lstlisting}
+
+Descrizione:
+\begin{itemize}
+	\item La conversione a \texttt{geography} consente di esprimere il raggio in metri con precisione geodetica.
+\item \texttt{ST\_DWithin} è efficiente quando è supportato da un indice spaziale; PostgreSQL usa l'indice GIST per escludere rapidamente le geometrie lontane.
+\end{itemize}
+
+Per ottenere distanza ordinata si può usare:
+
+\begin{lstlisting}[language=SQL]
+SELECT l.*, ST_Distance(
+    l.coordinate::geography,
+    ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography
+) AS distance_m
+FROM listing l
+WHERE ST_DWithin(l.coordinate::geography, ST_SetSRID(ST_MakePoint(:lon,:lat),4326)::geography, :radius_meters)
+ORDER BY distance_m ASC
+LIMIT :limit OFFSET :offset;
+\end{lstlisting}
+
+
+\subsection{La gestione delle immagini}
+La gestione delle immagini nel sistema segue il principio di separazione delle responsabilità: i contenuti binari (file immagine) sono memorizzati in uno storage oggetto scalabile (Amazon S3), mentre PostgreSQL conserva i metadati relazionali necessari per la gestione delle gallerie, l'ordinamento e i riferimenti agli annunci.
+
+\paragraph{Schema e metadati}
+La tabella dedicata \texttt{listing\_image} contiene i campi principali necessari:
+\begin{itemize}
+    \item \texttt{image\_id} (PK)
+    \item \texttt{created\_at} (timestamp)
+    \item \texttt{sort\_order} (int) per stabilire l'ordine nella galleria
+    \item \texttt{url} (varchar) che punta all'oggetto S3
+    \item \texttt{listing\_id} (FK verso \texttt{listing})
+\end{itemize}
+Questa separazione consente operazioni transazionali sui metadati e sfrutta S3 per la consegna efficiente dei contenuti.
+
+\paragraph{Servizi e configurazione}
+La connettività con S3 è incapsulata in una classe di configurazione (vedi \texttt{S3Config.java}) e in un servizio applicativo che implementa l'interfaccia \texttt{ImageStorageService} (implementazione fornita da \texttt{S3ImageStorageService}). Il servizio si occupa di:
+\begin{itemize}
+    \item Validare il file (MIME type, dimensione, magic bytes) tramite \texttt{isValidImage}.
+    \item Generare chiavi oggetto sicure e prevedibili (es. \texttt{listings/{listingId}/{uuid}.{ext}}) con \texttt{buildObjectKey}.
+    \item Caricare oggetti su S3 (\texttt{putObject}) e restituire URL/chiave.
+    \item Eliminare singoli oggetti o tutti gli oggetti di un listing (prefisso), usando \texttt{listObjectsV2} + \texttt{deleteObjects} per cancellazioni bulk.
+    \item Generare URL pre-firmati per accesso temporaneo (\texttt{generatePresignedUrl}) e fornire helper \texttt{presignUrl} per servire immagini private.
+\end{itemize}
+
+Questa integrazione fornisce un modello scalabile, sicuro e robusto per la gestione delle immagini, capace di mantenere la coerenza tra storage e metadati relazionali.
+
+\newpage
+
+\section{Diagramma delle classi di design}
+In questa sezione si documenta la struttura delle classi e dei moduli del backend. Il sistema è organizzato come un monolite modulare strutturato secondo principi DDD (\textbf{Domain-Driven Design}): ciascun package rappresenta un bounded context con responsabilità chiare ed è composto da:
+
+\begin{itemize}
+    \item \textbf{Domain model}: le classi che codificano le entità di dominio (DAO/Entity).
+    \item \textbf{Repository/DAO}: astrazioni per la persistenza (Spring Data Repository o implementazioni custom).
+    \item \textbf{Service/Application}: logica applicativa, orchestrazione di repository ed integrazione esterna.
+    \item \textbf{Controller / API layer}: punti di ingresso HTTP/REST.
+    \item \textbf{DTO / Mapper}: oggetti di trasferimento e trasformazioni tra API e classi di dominio.
+\end{itemize}
+
+Questa separazione facilita testabilità, responsabilità chiare e limiti per l'evoluzione del sistema.
+
+\subsection{Package diagram (panoramica)}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Package_Diagram.png}
+	\captionof{figure}{Package Diagram}
+\end{center}
+
+\subsection{Sommario dei package e classi principali}
+Di seguito le descrizioni per package presenti nel backend. Per ciascun package c'è un breve elenco delle classi di interesse (Controller, Service, Model, DTO, Repository).
+
+\subsubsection{Package \texttt{auth}}
+\begin{itemize}
+\item  Controller: \texttt{AuthenticationController}, \texttt{UserController} — espongono endpoint per login, registrazione, profilo, refresh token.
+\item  Service: \texttt{AuthenticationService}, \texttt{UserService}, \texttt{RefreshTokenService}, \texttt{OtpService} — orchestrano autenticazione, gestione token e operazioni utente.
+\item  Model: \texttt{User}, \texttt{Role}, \texttt{RefreshToken}, \texttt{OtpToken}.
+\item  DTO: \begin{itemize}
+	\item \texttt{AuthenticationRequest}, 
+	\item \texttt{AuthenticationResponse}, 
+	\item \texttt{RegistrationRequest}, 
+	\item \texttt{UpdateProfileRequest}, 
+	\item \texttt{UserDetailsResponse}.
+\end{itemize}
+\item  Repository: \texttt{UserRepository}, \texttt{RoleRepository}, \texttt{RefreshTokenRepository}, \texttt{OtpTokenRepository}.
+\end{itemize}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Packages/Authentication/Authentication.png}
+\end{center}
+
+
+\subsubsection{Package \texttt{listings}}
+\begin{itemize}
+\item  Controller: \texttt{ListingController} — CRUD e ricerca annuncio.
+\item  Service: \texttt{ListingService}, \texttt{GeometryService}, \texttt{ListingImageService} — logica di business, ricerche geospaziali (PostGIS) e gestione immagini metadata.
+\item  Model: \texttt{Listing}, \texttt{ListingImage} — coordinate memorizzate come \texttt{geometry(Point,4326)}.
+\item DTO: request/response per create/update/list.
+\item  Repository: \texttt{ListingRepository}, \texttt{ListingImageRepository}, \texttt{ListingSearchRepository} (implementazione custom per ricerche geospaziali ottimizzate).
+\end{itemize}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Packages/Listings/Listings.png}
+\end{center}
+
+\subsubsection{Package \texttt{file}}
+\begin{itemize}
+\item Interfaccia: \texttt{ImageStorageService} — contratto per storage oggetti.
+\item Implementazione: \texttt{S3ImageStorageService} — upload, delete, presign, bulk delete.
+\item Config: \texttt{S3Config} — creazione client AmazonS3 tramite credenziali/region.
+\end{itemize}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Packages/File/File.png}
+\end{center}
+
+\subsubsection{Package \texttt{agency}}
+\begin{itemize}
+\item  Controller: \texttt{AgencyController}, \texttt{AdminController} — gestione agenzie e operazioni amministrative sugli agenti.
+\item Service: \texttt{AgencyService}, \texttt{AdminService}, \texttt{AgentCreationService} — logiche di promozione agente e assegnazione agency.
+\item Model: \texttt{Agency}.
+\item Repository: \texttt{AgencyRepository}.
+\end{itemize}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Packages/Agency/Agency_CD.png}
+\end{center}
+
+\subsubsection{Package \texttt{email}}
+\begin{itemize}
+\item Service: \texttt{EmailService} — invio email di notifica (account activation, promozione agente, ecc.).
+\item Templates: risorse HTML in \texttt{resources/templates}.
+\end{itemize}
+
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Packages/Email/Email.png}
+\end{center}
+
+\subsubsection{Package \texttt{security}}
+\begin{itemize}
+\item Componenti: \begin{itemize}
+	\item \texttt{AuthFilter}, 
+	\item \texttt{JwtService}, 
+	\item \texttt{CustomUserDetailsService}, 
+	\item \texttt{SecurityFilterConfig}, 
+	\item \texttt{JsonAuthenticationEntryPoint},
+	\item \texttt{JsonAccessDeniedHandler}.
+\end{itemize}
+\end{itemize}
+
+
+\section{Diagrammi di sequenza}
+
+\subsection{Creazione annuncio immobiliare}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Sequence_Diagrams/Create_Listing.png}
+	\captionof{figure}{Sequence Diagram: \texttt{createListing}}
+\end{center}
+
+\subsection{Ricerca annuncio immobiliare}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Sequence_Diagrams/Search_Listing.png}
+	\captionof{figure}{Sequence Diagram: \texttt{searchListing}}
+\end{center}
+
+\subsection{Creazione agente immobiliare}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Sequence_Diagrams/Create_Agent.png}
+	\captionof{figure}{Sequence Diagram: \texttt{createAgent}}
+\end{center}
+
+\subsection{Promozione agente immobiliare}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Sequence_Diagrams/Promote_Agent.png}
+	\captionof{figure}{Sequence Diagram: \texttt{promoteAgent}}
+\end{center}

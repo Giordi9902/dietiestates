@@ -1,6 +1,7 @@
 # Ignora file generati da LaTeX
 # File temporanei e ausiliari
 *.aux
+*.idx
 *.bbl
 *.blg
 *.brf
