@@ -81,6 +81,9 @@ public class ListingService {
 
 	public Page<ListingSummaryResponse> searchListingsByFilters(ListingSearchRequest searchRequest,
 																Pageable pageable) {
+		if (searchRequest.getRadiusKm() == null) {
+			searchRequest.setRadiusKm(5.0);
+		}
 		return listingSearchRepository.searchListingsByFilters(searchRequest,pageable);
 	}
 

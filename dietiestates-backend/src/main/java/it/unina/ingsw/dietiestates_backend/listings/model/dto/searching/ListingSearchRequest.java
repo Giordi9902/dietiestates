@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 public class ListingSearchRequest {
-	@NotNull
+	@NotNull(message = "Il tipo di operazione è obbligatorio")
 	private ListingOperation operation;
 	private EnergyClass energyClass;
 	private Double minPrice;
@@ -16,7 +16,9 @@ public class ListingSearchRequest {
 	private Integer maxRooms;
 	private Double minArea;
 	private Double maxArea;
+    @NotNull(message = "La longitudine è obbligatoria")
 	private Double lng;
+    @NotNull(message = "La latitudine è obbligatoria")
 	private Double lat;
 	private Double radiusKm;
 }

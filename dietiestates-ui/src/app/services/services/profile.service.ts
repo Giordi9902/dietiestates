@@ -12,11 +12,43 @@ import { StrictHttpResponse } from '../strict-http-response';
 
 import { changeMyPassword } from '../fn/profile/change-my-password';
 import { ChangeMyPassword$Params } from '../fn/profile/change-my-password';
+import { profileDetails } from '../fn/profile/profile-details';
+import { ProfileDetails$Params } from '../fn/profile/profile-details';
+import { updateProfile } from '../fn/profile/update-profile';
+import { UpdateProfile$Params } from '../fn/profile/update-profile';
+import { UserDetailsResponse } from '../models/user-details-response';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService extends BaseService {
   constructor(config: ApiConfiguration, http: HttpClient) {
     super(config, http);
+  }
+
+  /** Path part for operation `updateProfile()` */
+  static readonly UpdateProfilePath = '/users/me/update';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `updateProfile()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  updateProfile$Response(params: UpdateProfile$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    const obs = updateProfile(this.http, this.rootUrl, params, context);
+    return obs;
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `updateProfile$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  updateProfile(params: UpdateProfile$Params, context?: HttpContext): Observable<void> {
+    const resp = this.updateProfile$Response(params, context);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `changeMyPassword()` */
@@ -43,6 +75,33 @@ export class ProfileService extends BaseService {
     const resp = this.changeMyPassword$Response(params, context);
     return resp.pipe(
       map((r: StrictHttpResponse<string>): string => r.body)
+    );
+  }
+
+  /** Path part for operation `profileDetails()` */
+  static readonly ProfileDetailsPath = '/users/me';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `profileDetails()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  profileDetails$Response(params?: ProfileDetails$Params, context?: HttpContext): Observable<StrictHttpResponse<UserDetailsResponse>> {
+    const obs = profileDetails(this.http, this.rootUrl, params, context);
+    return obs;
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `profileDetails$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  profileDetails(params?: ProfileDetails$Params, context?: HttpContext): Observable<UserDetailsResponse> {
+    const resp = this.profileDetails$Response(params, context);
+    return resp.pipe(
+      map((r: StrictHttpResponse<UserDetailsResponse>): UserDetailsResponse => r.body)
     );
   }
 

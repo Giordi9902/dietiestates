@@ -6,7 +6,7 @@ spring:
   jpa:
     hibernate:
       dialect: org.hibernate.spatial.dialect.postgis.PostgisDialect
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:

@@ -20,3 +20,5 @@ export type { RegistrationRequest } from './models/registration-request';
 export type { Role } from './models/role';
 export type { SortObject } from './models/sort-object';
 export type { UpdateListingRequest } from './models/update-listing-request';
+export type { UpdateProfileRequest } from './models/update-profile-request';
+export type { UserDetailsResponse } from './models/user-details-response';

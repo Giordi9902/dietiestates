@@ -4,10 +4,10 @@
 export interface ListingDetailsResponse {
   address?: string;
   area?: number;
-  floor?: number;
   bathrooms?: number;
   description?: string;
   energyClass?: 'A4' | 'A3' | 'A2' | 'A1' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G';
+  floor?: number;
   hasBalcony?: boolean;
   hasElevator?: boolean;
   hasGarden?: boolean;

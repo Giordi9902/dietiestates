@@ -272,18 +272,64 @@ I requisiti identificati sono stati analizzati e formalizzati tenendo conto dell
 	
 	\textbf{Primary Actor} & \SetCell[c=3]{l} Utente &  &  \\
 	
-	\textbf{Trigger} & \SetCell[c=3]{j,m,0.7\linewidth} L'utente apre la pagina ``Search'' presente sulla navbar della pagina. \\
+	\textbf{Trigger} & \SetCell[c=3]{j,m,0.7\linewidth} L'utente apre la pagina ``Search'' presente sulla navbar della pagina \ref{fig:homepage_v1}. \\
 	
 	\textbf{Main Scenario} & \textbf{Step n°} & \textbf{Utente} & \textbf{Sistema} \\
-	\SetCell[r=5]{}\cline{2-4} & 1 & L'utente seleziona la modalità di operazione ("Vendita" o "Affitto"), compila i campi filtro opzionali, inserisce un punto sulla mappa ed indica un raggio. & \\
-	\cline{2-4} & 2 & Preme ``Cerca''. &   \\
-	\cline{2-4} & 2 & La pagina viene caricata con tutti gli immobili che corrispondono ai parametri di ricerca. &   \\
-	\cline{2-4} & 3 & Visualizza i dettagli della ricerca &   \\
-	\cline{2-4} & 4 & Seleziona un immobile per poterne visualizzare la pagina contenente i dettagli completi. &   \\
-	\cline{2-4} & 5 & & Mostra la pagina dell'immobile. Fine del caso d'uso.   \\
-	\textbf{Extension \# 1: La ricerca non produce risultati} & \textbf{Step n°} & \textbf{Utente} & \textbf{Sistema} \\
-	\cline{2-4} & 1.1 & & Carica la pagina senza risultati. L'utente può decidere di ripetere la ricerca oppure concludere il caso d'uso\\
+	
+	\SetCell[r=5]{} & 1 & L'utente apre la pagina ``Search'' presente sulla navbar della pagina \ref{fig:homepage_v1}. & \\
+	
+	\cline{2-4} & 2 & & Carica la pagina \ref{fig:search_v1} \\
+	
+	\cline{2-4} & 3 & L'utente seleziona un punto dalla mappa o cerca un indirizzo dalla barra di ricerca. & \\
+	
+	\cline{2-4} & 4 & & Il sistema mostra un marker sulla mappa interattiva per mostrare il punto a partire dal quale avverrà la ricerca \\
+	
+	\cline{2-4} & 5 & L'utente seleziona tipologia di annuncio dal dropdown menu che presenta le opzioni AFFITTO e VENDITA. & \\
+	
+	\cline{2-4} & 6 & Preme ``Cerca''. &   \\
+	
+	\cline{2-4} & 7 & & La pagina viene caricata con tutti gli immobili che corrispondono ai parametri di ricerca. \\
+	
+	\cline{2-4} & 8 & Seleziona un immobile per poterne visualizzare la pagina contenente i dettagli completi. &   \\
+	
+	\cline{2-4} & 9 & & Mostra la pagina dell'immobile. Fine del caso d'uso.   \\
+	
+	\textbf{Extension \# 1: Ricerca con parametri avanzati} & \textbf{Step n°} & \textbf{Utente} & \textbf{Sistema} \\
+	
+	\cline{2-4} & 1.6 & L'utente clicca su ``Mostra filtri avanzati''. &   \\
+	
+	\cline{2-4} & 1.7 &  &  Viene mostrato un form di ricerca con filtri avanzati come in \ref{fig:search_v2}. \\
+	
+	\cline{2-4} & 1.8 & L'utente seleziona i campi opzionali desiderati. &  \\
+	
+	\cline{2-4} & 1.9 &  & Lo scenario riprende dallo step 7 del Main Scenario   \\
+	
+	\textbf{Extension \# 2: La ricerca non produce risultati} & \textbf{Step n°} & \textbf{Utente} & \textbf{Sistema} \\
+	
+	\cline{2-4} & 2.5 & & Mostra un avviso ``La ricerca non ha prodotto risultati''. L'utente può decidere di ripetere la ricerca oppure concludere il caso d'uso. \\
+	
+	\textbf{Extension \# 3: L'utente non seleziona un indirizzo o un punto dalla mappa} & \textbf{Step n°} & \textbf{Utente} & \textbf{Sistema} \\
+		\cline{2-4} & 3.5 & L'utente preme su ``Cerca'' senza aver specificato una posizione attorno alla quale cercare gli annunci. &  \\
+	
+		\cline{2-4} & 3.6 & & Mostra un avviso ``Seleziona una posizione sulla mappa o cerca un indirizzo per procedere.''. L'utente può decidere di ripetere la ricerca oppure concludere il caso d'uso. \\
 \end{longtblr}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/homepage_unauth_user.png}
+	\captionof{figure}{Homepage per un utente non autenticato}\label{fig:homepage_v1}
+\end{center}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/normal_search_page.png}
+	\captionof{figure}{Pagina per la ricerca di base}\label{fig:search_v1}
+\end{center}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/advanced_search_page.png}
+	\captionof{figure}{Pagina per la ricerca di base}\label{fig:search_v2}
+\end{center}
+
+
 \subsection{Caricamento di un annuncio immobiliare}
 
 
@@ -303,27 +349,56 @@ I requisiti identificati sono stati analizzati e formalizzati tenendo conto dell
 	\textbf{Precontions} & \SetCell[c=3]{l} {Un annuncio può essere creato da un agente immobiliare \\ 
 		o un gestore di un'agenzia immobiliare precedentemente autenticato.}  \\
 	
-	\textbf{Success End Condition} & \SetCell[c=3]{l} L’annuncio è presente nel database ed è aggiunto tra gli annunci dell’agenzia \\
+	\textbf{Success End Condition} & \SetCell[c=3]{l} {L’annuncio viene aggiunto al database e visibile nella pagina degli annunci listati \\ dall'agente, oltre che raggiungibile mediante la pagina di ricerca} \\
 	
 	\textbf{Failed End Condition} & \SetCell[c=3]{l} L’annuncio non viene inserito   \\
 	
 	\textbf{Primary Actor} & \SetCell[c=3]{l} Agente immobiliare o gestore di un'agenzia immobiliare  \\
 	
-	\textbf{Trigger} & \SetCell[c=3]{l} Viene cliccata la CTA ``Add new Listing'' dalla schermata \ref{mock:requests} o dalla schermata \ref{mock:listings}  \\
+	\textbf{Trigger} & \SetCell[c=3]{l} Viene cliccata la CTA ``Aggiungi annuncio'' dalla schermata \ref{fig:listings_management}  \\
 	
 	\textbf{Main Scenario} & \textbf{Step n°} & \textbf{Agente} & \textbf{Sistema} \\
-	\cline{2-4} & 1 &  Clicca sulla CTA ``Add new listing'' nella  schermata \ref{mock:requests} o dalla schermata \ref{mock:listings} &  \\
-	\cline{2-4} & 2 & & Apre schermata \ref{mock:add_listing} \\
-	\cline{2-4} & 3 & Compila i campi di input testuali, seleziona le opzioni dai menu a tendina e carica almeno un'immagine & \\
-	\cline{2-4} & 4 & Preme ``Publish listing'' & \\
-	\cline{2-4} & 5 & & Valida il form, inserisce il nuovo annuncio nel database e lo aggiunge alla lista degli annunci dell'agente. \\
-	\cline{2-4} & 6 & & Aggiorna la schermata \ref{mock:listings} \\
-	\textbf{Extension \#1: Caricare almeno una foto} & \textbf{Step n°} & \textbf{Agente} & \textbf{Sistema} \\
-	\cline{2-4} & 3.1 & & Mostra la schermata \ref{mock:dialog_in_caso_di_immagini_non_caricate} \\
-	\cline{2-4} & 4.1 & Preme "Ok" & \\
-	\cline{2-4} & 5.1 & & Mostra la schermata \ref{mock:add_listing} e il caso d'uso riprende al punto 3 del main scenario\\	
+	\cline{2-4} & 1 &  Clicca sulla CTA ``Aggiungi annuncio'' nella  schermata \ref{fig:listings_management} &  \\
+	\cline{2-4} & 2 & & Apre schermata \ref{fig:listings_form} \\
+	\cline{2-4} & 3 & Aggiunge titolo dell'annuncio & \\
+	\cline{2-4} & 4 & Aggiunge descrizione dell'annuncio & \\
+	\cline{2-4} & 5 & Aggiunge tipologia dell'annuncio, se vendita oppure affitto & \\
+	\cline{2-4} & 6 & Aggiunge prezzo dell'annuncio & \\
+	\cline{2-4} & 7 & Aggiunge immagini dell'immobile & \\
+	\cline{2-4} & 8 & Inserisce indirizzo e preme ``Cerca'' & \\
+	\cline{2-4} & 9 & & Chiama servizio esterno Nominatim per prelevare coordinate dell'indirizzo \\
+	\cline{2-4} & 10 & & Mostra marker sulla mappa interattiva per indicare la posizione dell'immobile\\
+	\cline{2-4} & 11 & Preme ``Salva'' & \\
+	\cline{2-4} & 12 & & Valida il form. \\
+	\cline{2-4} & 13 & & Salva l'annuncio nel database. \\
+	\cline{2-4} & 14 & & Reindirizza l'utente alla pagina \ref{fig:listings_management} mostrando una nuova card per l'annuncio appena creato. Fine del caso d'uso. \\
+	\textbf{Extension \#1: Utente preme ``Salva'' senza aver caricato una foto} & \textbf{Step n°} & \textbf{Agente} & \textbf{Sistema} \\
+	\cline{2-4} & 1.13 & & Mostra messaggio di errore ``Caricare almeno un'immagine'' \\
+	\textbf{Extension \#2: Utente preme salva senza aver compilato campi obbligatori} & \textbf{Step n°} & \textbf{Agente} & \textbf{Sistema} \\
+	\cline{2-4} & 2.12 & & Mostra messaggio di errore ``Compila campi obbligatori'' \\
+	\textbf{Extension \#3: Utente preme ``Annulla''} & \textbf{Step n°} & \textbf{Agente} & \textbf{Sistema} \\
+	\cline{2-4} & 3.2 & & Mostra messaggio di conferma \\
+	\cline{2-4} & 3.3 & Preme ``Conferma'' & \\
+	\cline{2-4} & 3.4 & & Reindirizza l'utente alla pagina \ref{fig:listings_management} senza aggiungere l'annuncio. \\
 \end{longtblr}
 
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/addlistinghomepage.png}
+	\captionof{figure}{Pagina per la gestione degli annunci immobiliari}\label{fig:listings_management}
+\end{center}
+
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/addlistingform.png}
+	\captionof{figure}{Pagina per l'aggiunta per un nuovo annuncio immobiliare}\label{fig:listings_form}
+\end{center}
+
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/listing_management_populated.png}
+	\captionof{figure}{Pagina con la card aggiornata}\label{fig:listings_management_with_card}
+\end{center}
 \subsection{Aggiunta di un agente immobiliare}
 \begin{longtblr}{
 		width = \linewidth,
@@ -332,24 +407,58 @@ I requisiti identificati sono stati analizzati e formalizzati tenendo conto dell
 		vlines,
 	}
 	\textbf{Use Case \#3} & \SetCell[c=3]{l} Aggiunta di un nuovo agente immobiliare \\
+	
 	\textbf{Goal in Context} & \SetCell[c=3]{l} Il gestore di un'agenzia immobiliare vuole aggiungere un nuovo agente \\
-	\textbf{Preconditions} & \SetCell[c=3]{l}  L’utente è autenticato come amministratore ed ha accesso alla sezione collaboratori \\
-	\textbf{Success End Condition} & \SetCell[c=3]{l} Il collaboratore viene registrato nel sistema ed è visibile nell’elenco utenti \\
-	\textbf{Failed End Condition} & \SetCell[c=3]{l} Non viene inserito alcun nuovo utente \\
+	
+	\textbf{Preconditions} & \SetCell[c=3]{l}  L’utente possiede ruolo \texttt{ROLE\_ADMIN} oppure \texttt{ROLE\_ADMIN\_ASSISTANT} \\
+	
+	\textbf{Success End Condition} & \SetCell[c=3]{l} Il collaboratore viene associato all'agenzia \\
+	
+	\textbf{Failed End Condition} & \SetCell[c=3]{l} Non viene inserita l'associazione utente-agenzia. \\
+	
 	\textbf{Primary Actor} & \SetCell[c=3]{l} Gestore di una agenzia immobiliare  \\
-	\textbf{Trigger} & \SetCell[c=3]{l} L'amministratore, dalla dashboard, schermata \ref{mock:dashboard_admin}, clicca su ``Aggiungi collaboratore'' \\
+	
+	\textbf{Trigger} & \SetCell[c=3]{l} L'amministratore, dalla schermata \ref{fig:dashboard_admin}, clicca su ``Aggiungi collaboratore'' \\
+	
 	\textbf{Main Scenario} & \textbf{Step n°} & \textbf{Agente} & \textbf{Sistema} \\
-	\cline{2-3} & 1 & Clicca su ``Aggiungi collaboratore'' &  \\
-	\cline{2-3} & 2 & & Carica schermata \ref{mock:add_agent}  \\
-	\cline{2-3} & 3 & Inserisce i dettagli personali dell'agente immobiliare e carica una sua foto profilo &  \\
-	\cline{2-3} & 4 & Preme su ``Create Agent Profile''  \\
-	\cline{2-3} & 5 & & Valida i campi \\
-	\cline{2-3} & 6 & & Chiude schermata e mostra all'amministratore la schermata \ref{mock:dashboard_admin} \\
-	\cline{2-3} & 7 & & Mostra la schermata \ref{mock:added_agent} \\
-	\cline{2-3} & 8 & Preme "Ok" &  \\
-	\cline{2-3} & 9 & & Invia una email all'agente con un codice di attivazione e l'invito a modificare la propria password  \\
-	\cline{2-3} & 10 & & Il sistema aggiunge un account relativo all'agente con gli opportuni permessi nel database e con una password predefinita. Collega l'agente all'agenzia immobiliare. Fine del caso d'uso \\
+	
+	\cline{2-4} & 1 & Clicca su ``Aggiungi collaboratore'' &  \\
+	
+	\cline{2-4} & 2 & & Carica schermata \ref{fig:add_agent}  \\
+	
+	\cline{2-4} & 3 & Inserisce nome, cognome ed email dell'agente che intende inserire. &  \\
+	
+	\cline{2-4} & 4 & Preme su ``Salva''  & \\
+	
+	\cline{2-4} & 5 & & Valida i campi \\
+	
+	\cline{2-4} & 6 & & Mostra messaggio di successo\\
+	
+	\cline{2-4} & 7 & & Reindirizza l'utente alla schermata \ref{fig:dashboard_admin} \\
+	
+	\cline{2-4} & 8 & & {Il sistema aggiunge un account relativo all'agente con gli opportuni permessi nel database e con una password predefinita. Collega l'agente all'agenzia immobiliare }\\
+
+	\cline{2-4} & 9 & & Invia una email all'agente con un codice di attivazione e l'invito a modificare la propria password  \\
+	
+	\textbf{Extension \#1: Email agente già presente} & \textbf{Step n°} & \textbf{Agente} & \textbf{Sistema} \\
+	
+	\cline{2-4} & 1.5 & & Il sistema individua l'utente associato alla email inserita \\
+	
+	\cline{2-4} & 1.6 & & Assegna ruolo \texttt{ROLE\_AGENT} all'utente e lo associa all'agenzia dell'utente che lo ha inserito \\
+	
+	\cline{2-4} & 1.7 & & Invia una email all'utente promosso al ruolo di agente per comunicare la promozione\\
 \end{longtblr}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/agents_management.png}
+	\captionof{figure}{Dashboard gestione agenti immobiliari}\label{fig:dashboard_admin}
+\end{center}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/agent_add.png}
+	\captionof{figure}{Form aggiunta agenti immobiliari}\label{fig:add_agent}
+\end{center}
+
 \subsection{Promozione di un agente immobiliare}
 
 \begin{longtblr}{
@@ -364,16 +473,22 @@ I requisiti identificati sono stati analizzati e formalizzati tenendo conto dell
 	\textbf{Success End Condition} & \SetCell[c=3]{l} Il collaboratore viene registrato nel sistema ed è visibile nell’elenco utenti \\
 	\textbf{Failed End Condition} & \SetCell[c=3]{l} Non viene inserito alcun nuovo utente \\
 	\textbf{Primary Actor} & \SetCell[c=3]{l} Gestore di una agenzia immobiliare  \\
-	\textbf{Trigger} & \SetCell[c=3]{l} L'amministratore, dalla dashboard, schermata \ref{mock:dashboard_admin}, clicca su ``Aggiungi collaboratore'' \\
+	\textbf{Trigger} & \SetCell[c=3]{l} L'amministratore, dalla dashboard \ref{fig:dashboard_admin}, clicca su ``Promuovi'' \\
 	\textbf{Main Scenario} & \textbf{Step n°} & \textbf{Agente} & \textbf{Sistema} \\
-	\cline{2-3} & 1 & Clicca su ``Aggiungi collaboratore'' &  \\
-	\cline{2-3} & 2 & & Carica schermata \ref{mock:add_agent}  \\
-	\cline{2-3} & 3 & Inserisce i dettagli personali dell'agente immobiliare e carica una sua foto profilo &  \\
-	\cline{2-3} & 4 & Preme su ``Create Agent Profile''  \\
-	\cline{2-3} & 5 & & Valida i campi \\
-	\cline{2-3} & 6 & & Chiude schermata e mostra all'amministratore la schermata \ref{mock:dashboard_admin} \\
-	\cline{2-3} & 7 & & Mostra la schermata \ref{mock:added_agent} \\
-	\cline{2-3} & 8 & Preme "Ok" &  \\
-	\cline{2-3} & 9 & & Invia una email all'agente con un codice di attivazione e l'invito a modificare la propria password  \\
-	\cline{2-3} & 10 & & Il sistema aggiunge un account relativo all'agente con gli opportuni permessi nel database e con una password predefinita. Collega l'agente all'agenzia immobiliare. Fine del caso d'uso \\
+	\cline{2-3} & 1 & Seleziona la card dell'agente e clicca su ``Promuovi'' &  \\
+	\cline{2-3} & 2 & & Mostra schermata di conferma. \\
+	\cline{2-3} & 3 & Clicca ``Conferma'' &  \\
+	\cline{2-3} & 4 & & Assegna ruolo \texttt{ROLE\_ADMIN\_ASSISTANT} all'agente  \\
+	\cline{2-3} & 5 & & Invia email all'agente promosso per comunicargli della promozione \\
+	\cline{2-3} & 6 & & Aggiorna la card dell'agente promosso. \\
 \end{longtblr}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/promote_modal.png}
+	\captionof{figure}{Finestra modale per conferma promozione}\label{fig:promote_modal}
+\end{center}
+
+\begin{center}
+	\includegraphics[width=\linewidth]{res/Mockups/agent_promoted.png}
+	\captionof{figure}{Card agente aggiornata col nuovo ruolo}\label{fig:promoted_Agent}
+\end{center}

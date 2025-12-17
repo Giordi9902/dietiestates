@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ProfileService } from '../../services/services';
 import { Router } from '@angular/router';
@@ -10,10 +10,19 @@ import { Router } from '@angular/router';
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
-export class Profile {
+export class Profile implements OnInit {
   constructor(private profileService: ProfileService, private router: Router) {}
 
-  model = {
+  activeTab: 'details' | 'password' = 'details';
+
+  detailsModel: any = {
+    firstname: '',
+    lastname: '',
+    email: '',
+    birthdate: '',
+  };
+
+  passwordModel = {
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
@@ -23,18 +32,44 @@ export class Profile {
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
-  passwordsMatch(): boolean {
-    return this.model.newPassword === this.model.confirmPassword;
+  ngOnInit() {
+    this.loadProfileDetails();
   }
 
-  reset(form: any) {
-    form.resetForm();
-    this.model = { currentPassword: '', newPassword: '', confirmPassword: '' };
+  loadProfileDetails() {
+    this.profileService.profileDetails().subscribe({
+      next: (data: any) => {
+        this.detailsModel = {
+          firstname: data.firstname,
+          lastname: data.lastname,
+          email: data.email,
+          birthdate: data.dateOfBirth,
+        };
+      },
+      error: (err) => {
+        console.error('Failed to load profile details', err);
+      },
+    });
+  }
+
+  setActiveTab(tab: 'details' | 'password') {
+    this.activeTab = tab;
     this.successMessage = null;
     this.errorMessage = null;
   }
 
-  onSubmit(form: any) {
+  passwordsMatch(): boolean {
+    return this.passwordModel.newPassword === this.passwordModel.confirmPassword;
+  }
+
+  resetPasswordForm(form: any) {
+    form.resetForm();
+    this.passwordModel = { currentPassword: '', newPassword: '', confirmPassword: '' };
+    this.successMessage = null;
+    this.errorMessage = null;
+  }
+
+  onPasswordSubmit(form: any) {
     this.successMessage = null;
     this.errorMessage = null;
     if (!form.valid) {
@@ -48,8 +83,8 @@ export class Profile {
     this.profileService
       .changeMyPassword({
         body: {
-          oldPassword: this.model.currentPassword,
-          newPassword: this.model.newPassword,
+          oldPassword: this.passwordModel.currentPassword,
+          newPassword: this.passwordModel.newPassword,
         },
       })
       .subscribe({
@@ -57,12 +92,31 @@ export class Profile {
           this.loading = false;
           form.resetForm();
           this.successMessage = 'Password aggiornata correttamente';
-          this.model = { currentPassword: '', newPassword: '', confirmPassword: '' };
+          this.passwordModel = { currentPassword: '', newPassword: '', confirmPassword: '' };
         },
         error: (err) => {
           this.loading = false;
           this.errorMessage = err?.error?.message;
         },
       });
+  }
+
+  onDetailsSubmit(form: any) {
+    this.successMessage = null;
+    this.errorMessage = null;
+    if (!form.valid) {
+      return;
+    }
+    this.loading = true;
+    this.profileService.updateProfile({ body: this.detailsModel }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.successMessage = 'Profilo aggiornato correttamente';
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err?.error?.message || "Errore durante l'aggiornamento del profilo";
+      },
+    });
   }
 }

@@ -31,6 +31,7 @@ export class Search implements OnInit, AfterViewInit {
   marker: L.Marker | null = null;
   circle: L.Circle | null = null;
 
+  showAdvancedFilters = false;
   currentPage = 0;
   pageSize = 10;
   totalPages = 0;
@@ -120,10 +121,23 @@ export class Search implements OnInit, AfterViewInit {
     this.map?.fitBounds(this.circle.getBounds());
   }
 
+  toggleAdvancedFilters(): void {
+    this.showAdvancedFilters = !this.showAdvancedFilters;
+    setTimeout(() => {
+      this.map?.invalidateSize();
+    }, 0);
+  }
+
   onSearch(resetPage = true): void {
     if (resetPage) {
       this.currentPage = 0;
     }
+
+    if (!this.searchForm.value.lat || !this.searchForm.value.lng) {
+      this.error = 'Seleziona una posizione sulla mappa o cerca un indirizzo per procedere.';
+      return;
+    }
+
     this.loading = true;
     this.error = null;
     const searchParams: ListingSearchRequest = this.searchForm.value;

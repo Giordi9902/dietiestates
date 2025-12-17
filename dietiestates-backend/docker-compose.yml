@@ -9,6 +9,7 @@ services:
       PGDATA: ${PGDATA}
     volumes:
       - "postgres_data:${PGDATA}"
+      - "./sql:/docker-entrypoint-initdb.d"
     ports:
       - 5433:5432
     networks:
