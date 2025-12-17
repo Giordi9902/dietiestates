@@ -1,0 +1,35 @@
+# Ignora file generati da LaTeX
+# File temporanei e ausiliari
+*.aux
+*.bbl
+*.blg
+*.brf
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.run.xml
+*.bcf
+*.lol
+# Output di compilazione
+*.pdf
+*.dvi
+*.ps
+# Cartelle e file di lavoro
+_minted*
+minted-*
+build/
+out/
+# File temporanei generici
+*.gz
+*.tmp
+*.swp
+*.swo
+
