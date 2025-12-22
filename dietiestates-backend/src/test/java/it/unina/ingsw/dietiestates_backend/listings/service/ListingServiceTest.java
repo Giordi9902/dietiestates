@@ -159,5 +159,35 @@ class ListingServiceTest {
 			verify(listingRepository, times(1)).save(mockListing);
 			verify(listingImageService, times(1)).saveImage(any(MultipartFile.class), any(Listing.class));
 		}
+
+		@Test
+		@DisplayName("Lancia Eccezione se il DTO di richiesta è nullo")
+		void createListing_nullRequest_throwsException() {
+			// GIVEN
+			List<MultipartFile> images = List.of(mock(MultipartFile.class));
+
+			// WHEN & THEN
+			assertThrows(NullPointerException.class,
+					() -> listingService.createListing(null, images));
+
+			// VERIFY
+			verifyNoInteractions(userRepository, listingRepository, listingMapper, listingImageService);
+		}
+
+		@Test
+		@DisplayName("Lancia Eccezione se non c'è utente autenticato")
+		void createListing_noAuthenticatedUser_throwsException() {
+			// GIVEN
+			List<MultipartFile> images = List.of(mock(MultipartFile.class));
+			// SecurityContext is cleared by tearDown(), so no user is authenticated
+
+			// WHEN & THEN
+			assertThrows(IllegalStateException.class,
+					() -> listingService.createListing(validRequest, images));
+
+			// VERIFY
+			verify(listingRepository, never()).save(any(Listing.class));
+			verify(listingImageService, never()).saveImage(any(), any());
+		}
 	}
 }

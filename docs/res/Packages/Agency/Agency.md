@@ -1,65 +1,46 @@
 classDiagram
-direction BT
+direction TB
 class AdminController {
   - AdminService adminService
-  + promoteToAdmin(Integer) ResponseEntity~Void~
   + getAgentsByAgency(Pageable) ResponseEntity~Page~AgentResponse~~
-  + deleteAgent(Integer) ResponseEntity~Void~
   + createAgent(CreateAgentRequest) ResponseEntity~Void~
+  + deleteAgent(Integer) ResponseEntity~Void~
+  + promoteToAdmin(Integer) ResponseEntity~Void~
 }
 class AdminService {
-  - AgencyRepository agencyRepository
   - RoleRepository roleRepository
+  - AgencyRepository agencyRepository
   - UserRepository userRepository
-  - EmailService emailService
   - AgentCreationService agentCreationService
+  - EmailService emailService
   + getAgentsByAgency(Pageable) Page~AgentResponse~
-  + promote(Integer) void
   + deleteAgent(Integer) void
   - findAdminAgency() Agency
+  + promote(Integer) void
   + createAgent(CreateAgentRequest) void
   - getRoleByName(String) Role
 }
 class Agency {
+  - String name
   - String email
+  - String phoneNumber
   - List~User~ agents
   - Integer id
-  - String phoneNumber
-  - String name
+  + getEmail() String
   + getId() Integer
   + getName() String
   + builder() AgencyBuilder
   + getPhoneNumber() String
-  + getEmail() String
   + getAgents() List~User~
+  + setAgents(List~User~) void
   + setId(Integer) void
   + setName(String) void
   + setPhoneNumber(String) void
-  + setAgents(List~User~) void
   + setEmail(String) void
 }
 class AgencyController {
   - AgencyService agencyService
   + getMyAgencyDetails(Authentication) ResponseEntity~AgencyDetailsResponse~
-}
-class AgencyDetailsResponse {
-  - String name
-  - String phoneNumber
-  - Integer id
-  - String email
-  + toString() String
-  + equals(Object) boolean
-  + builder() AgencyDetailsResponseBuilder
-  # canEqual(Object) boolean
-  + hashCode() int
-  + getId() Integer
-  + getName() String
-  + setName(String) void
-  + getPhoneNumber() String
-  + getEmail() String
-  + setEmail(String) void
-  + setId(Integer) void
-  + setPhoneNumber(String) void
 }
 class AgencyRepository {
 <<Interface>>
@@ -70,58 +51,19 @@ class AgencyService {
   + getMyAgencyDetails(Authentication) AgencyDetailsResponse
 }
 class AgentCreationService {
-  - OtpService otpService
-  - EmailService emailService
-  - RoleRepository roleRepository
   - UserRepository userRepository
+  - EmailService emailService
   - PasswordEncoder passwordEncoder
-  - assignRoles(User, List~Role~) void
-  - getRoleByName(String) Role
-  + createAgent(CreateAgentRequest, Agency) void
-  - notifyAgentRoleAdded(User) void
-  - createAgentEntity(CreateAgentRequest) User
-  - initializeRolesIfNeeded(User) void
+  - RoleRepository roleRepository
+  - OtpService otpService
   - createAgentFromScratch(CreateAgentRequest, Agency) void
   - addAgentRoleToExistingUser(User, Agency) void
-}
-class AgentResponse {
-  - List~Role~ roles
-  - String email
-  - String username
-  - String lastName
-  - Integer agencyId
-  - String agencyName
-  - Integer id
-  - String firstName
-  + setId(Integer) void
-  + getId() Integer
-  + setEmail(String) void
-  + setRoles(List~Role~) void
-  + setUsername(String) void
-  + getEmail() String
-  + setFirstName(String) void
-  + getUsername() String
-  + getFirstName() String
-  + getLastName() String
-  + getAgencyId() Integer
-  + getAgencyName() String
-  + setAgencyId(Integer) void
-  + getRoles() List~Role~
-  + builder() AgentResponseBuilder
-  + setLastName(String) void
-  + setAgencyName(String) void
-}
-class CreateAgentRequest {
-  - String firstname
-  - String lastname
-  - String email
-  + getFirstname() String
-  + getLastname() String
-  + getEmail() String
-  + setFirstname(String) void
-  + setLastname(String) void
-  + setEmail(String) void
-  + builder() CreateAgentRequestBuilder
+  - getRoleByName(String) Role
+  - createAgentEntity(CreateAgentRequest) User
+  - assignRoles(User, List~Role~) void
+  + createAgent(CreateAgentRequest, Agency) void
+  - notifyAgentRoleAdded(User) void
+  - initializeRolesIfNeeded(User) void
 }
 
 AdminController "1" *--> "adminService 1" AdminService 

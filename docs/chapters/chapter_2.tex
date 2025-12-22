@@ -226,15 +226,13 @@ In questa sezione si documenta la struttura delle classi e dei moduli del backen
 
 Questa separazione facilita testabilità, responsabilità chiare e limiti per l'evoluzione del sistema.
 
-\subsection{Package diagram (panoramica)}
-
 \begin{center}
 	\includegraphics[width=\linewidth]{res/Package_Diagram.png}
 	\captionof{figure}{Package Diagram}
 \end{center}
 
 \subsection{Sommario dei package e classi principali}
-Di seguito le descrizioni per package presenti nel backend. Per ciascun package c'è un breve elenco delle classi di interesse (Controller, Service, Model, DTO, Repository).
+Di seguito le descrizioni per package principali presenti nel backend. Per ciascun package c'è un breve elenco delle classi di interesse (Controller, Service, Model, DTO, Repository).
 
 \subsubsection{Package \texttt{auth}}
 \begin{itemize}
@@ -252,7 +250,7 @@ Di seguito le descrizioni per package presenti nel backend. Per ciascun package 
 \end{itemize}
 
 \begin{center}
-	\includegraphics[width=\linewidth]{res/Packages/Authentication/Authentication.png}
+	\includegraphics[scale=.05]{res/Packages/Authentication/Authentication.png}
 \end{center}
 
 
@@ -266,19 +264,9 @@ Di seguito le descrizioni per package presenti nel backend. Per ciascun package 
 \end{itemize}
 
 \begin{center}
-	\includegraphics[width=\linewidth]{res/Packages/Listings/Listings.png}
+	\includegraphics[scale=.05]{res/Packages/Listings/Listings.png}
 \end{center}
 
-\subsubsection{Package \texttt{file}}
-\begin{itemize}
-\item Interfaccia: \texttt{ImageStorageService} — contratto per storage oggetti.
-\item Implementazione: \texttt{S3ImageStorageService} — upload, delete, presign, bulk delete.
-\item Config: \texttt{S3Config} — creazione client AmazonS3 tramite credenziali/region.
-\end{itemize}
-
-\begin{center}
-	\includegraphics[width=\linewidth]{res/Packages/File/File.png}
-\end{center}
 
 \subsubsection{Package \texttt{agency}}
 \begin{itemize}
@@ -291,29 +279,6 @@ Di seguito le descrizioni per package presenti nel backend. Per ciascun package 
 \begin{center}
 	\includegraphics[width=\linewidth]{res/Packages/Agency/Agency_CD.png}
 \end{center}
-
-\subsubsection{Package \texttt{email}}
-\begin{itemize}
-\item Service: \texttt{EmailService} — invio email di notifica (account activation, promozione agente, ecc.).
-\item Templates: risorse HTML in \texttt{resources/templates}.
-\end{itemize}
-
-
-\begin{center}
-	\includegraphics[width=\linewidth]{res/Packages/Email/Email.png}
-\end{center}
-
-\subsubsection{Package \texttt{security}}
-\begin{itemize}
-\item Componenti: \begin{itemize}
-	\item \texttt{AuthFilter}, 
-	\item \texttt{JwtService}, 
-	\item \texttt{CustomUserDetailsService}, 
-	\item \texttt{SecurityFilterConfig}, 
-	\item \texttt{JsonAuthenticationEntryPoint},
-	\item \texttt{JsonAccessDeniedHandler}.
-\end{itemize}
-\end{itemize}
 
 
 \section{Diagrammi di sequenza}

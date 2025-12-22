@@ -103,15 +103,40 @@ class GeometryServiceTest {
 	}
 
 	@Test
-	void createPoint_SpecialDoubleValues_ThrowsException() {
-		// Longitudine NaN
-		assertThrows(IllegalArgumentException.class,
-				() -> geometryService.createPoint(Double.NaN, 10.0),
-				"JTS dovrebbe lanciare IllegalArgumentException per NaN.");
+	@org.junit.jupiter.api.DisplayName("Should throw IllegalArgumentException for special double values")
+	void createPoint_SpecialDoubleValues_ThrowsIllegalArgumentException() {
+		// GIVEN
+		double validCoordinate = 10.0;
 
-		// Latitudine Infinita
+		// THEN
+		// Test 1: Longitudine NaN
 		assertThrows(IllegalArgumentException.class,
-				() -> geometryService.createPoint(10.0, Double.POSITIVE_INFINITY),
-				"JTS dovrebbe lanciare IllegalArgumentException per Infinity.");
+				() -> geometryService.createPoint(Double.NaN, validCoordinate),
+				"Deve lanciare IllegalArgumentException per longitudine NaN.");
+
+		// Test 2: Latitudine NaN
+		assertThrows(IllegalArgumentException.class,
+				() -> geometryService.createPoint(validCoordinate, Double.NaN),
+				"Deve lanciare IllegalArgumentException per latitudine NaN.");
+
+		// Test 3: Longitudine Infinita Positiva
+		assertThrows(IllegalArgumentException.class,
+				() -> geometryService.createPoint(Double.POSITIVE_INFINITY, validCoordinate),
+				"Deve lanciare IllegalArgumentException per longitudine infinita positiva.");
+
+		// Test 4: Latitudine Infinita Positiva
+		assertThrows(IllegalArgumentException.class,
+				() -> geometryService.createPoint(validCoordinate, Double.POSITIVE_INFINITY),
+				"Deve lanciare IllegalArgumentException per latitudine infinita positiva.");
+
+		// Test 5: Longitudine Infinita Negativa
+		assertThrows(IllegalArgumentException.class,
+				() -> geometryService.createPoint(Double.NEGATIVE_INFINITY, validCoordinate),
+				"Deve lanciare IllegalArgumentException per longitudine infinita negativa.");
+
+		// Test 6: Latitudine Infinita Negativa
+		assertThrows(IllegalArgumentException.class,
+				() -> geometryService.createPoint(validCoordinate, Double.NEGATIVE_INFINITY),
+				"Deve lanciare IllegalArgumentException per latitudine infinita negativa.");
 	}
 }

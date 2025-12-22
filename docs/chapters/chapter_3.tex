@@ -1,5 +1,202 @@
 \chapter{Testing e valutazione dell'usabilità}
 \section{Unit testing}
+\subsection{Il metodo \texttt{updatePassword}}
+Il metodo \texttt{updatePassword} nella classe \texttt{UserService} è responsabile dell'aggiornamento della password di un utente. La logica prevede diversi controlli di validazione prima di procedere con la modifica: verifica che l'utente sia autenticato, che la vecchia password sia corretta, e che la nuova password sia valida e diversa da quella precedente.
+
+Per garantire l'affidabilità e la correttezza di questo metodo, è stata progettata una suite di test di unità utilizzando il framework JUnit 5 e la libreria Mockito. Le strategie di test adottate sono una combinazione di tecniche di black-box e white-box.
+
+\subsubsection{Strategie di Progettazione dei Test}
+
+\paragraph{Black-Box Testing (Partizionamento in Classi di Equivalenza)}
+L'approccio black-box si concentra sulla verifica della funzionalità del metodo senza conoscere la sua implementazione interna. Abbiamo utilizzato la tecnica del partizionamento in classi di equivalenza per suddividere i dati di input in gruppi che dovrebbero essere elaborati allo stesso modo.
+
+Sono state individuate le seguenti classi di equivalenza per gli input del metodo:
+\begin{itemize}
+    \item \textbf{Utente corrente (\texttt{currentUser}):}
+    \begin{itemize}
+        \item \textit{Valida:} L'utente è un oggetto valido e non nullo.
+        \item \textit{Non valida:} L'utente è \texttt{null} (simulando una richiesta non autenticata).
+    \end{itemize}
+    \item \textbf{Esistenza dell'utente nel database:}
+    \begin{itemize}
+        \item \textit{Valida:} L'utente esiste nel repository.
+        \item \textit{Non valida:} L'utente non viene trovato nel repository.
+    \end{itemize}
+    \item \textbf{Vecchia password (\texttt{oldPassword}):}
+    \begin{itemize}
+        \item \textit{Valida:} La password corrisponde a quella memorizzata.
+        \item \textit{Non valida:} La password non corrisponde.
+    \end{itemize}
+    \item \textbf{Nuova password (\texttt{newPassword}):}
+    \begin{itemize}
+        \item \textit{Valida:} Stringa non vuota, non blank e diversa dalla vecchia password.
+        \item \textit{Non valida (blank):} Stringa vuota, contenente solo spazi, o nulla.
+        \item \textit{Non valida (identica):} Uguale alla vecchia password.
+    \end{itemize}
+\end{itemize}
+
+I test sono stati creati per coprire almeno un rappresentante di ciascuna classe di equivalenza, sia valida che non valida, per assicurare che il sistema gestisca correttamente tutti gli scenari di input.
+
+\paragraph{White-Box Testing (Copertura Strutturale)}
+L'approccio white-box si basa sulla struttura interna del codice per derivare i casi di test. L'obiettivo è stato quello di ottenere una copertura elevata delle diramazioni (branch coverage), assicurando che ogni percorso decisionale all'interno del metodo fosse testato.
+
+Ogni blocco condizionale (\texttt{if}) nel metodo \texttt{updatePassword} è stato coperto da uno specifico caso di test:
+\begin{itemize}
+    \item Caso in cui l'utente è \texttt{null} è testato da:\\ \hi{updatePassword\_currentUserIsNull\_throwsBadCredentialsException}.
+    \item Il ramo in cui l'utente non viene trovato è testato da:\\ \hi{updatePassword\_userNotFoundInRepository\_throwsUsernameNotFoundException}.
+    \item Il ramo in cui la vecchia password è errata è coperto da:\\ \hi{updatePassword\_oldPasswordIncorrect\_throwsBadCredentialsException}.
+    \item La condizione di password blank è testata da:\\ \hi{updatePassword\_newPasswordIsBlank\_throwsBadRequestException}.
+    \item Il caso in cui la nuova password è uguale alla vecchia è testato da:\\ \hi{updatePassword\_newPasswordIsSame\_throwsBadRequestException}.
+    \item Il caso in cui tutti i controlli passano è verificato da:\\ \hi{updatePassword\_success}.
+\end{itemize}
+
+\subsection{Il metodo \texttt{createPoint}}
+Il metodo \texttt{createPoint} in \texttt{GeometryService} ha il compito di creare un oggetto geometrico \texttt{Point} a partire da coordinate di longitudine e latitudine. La sua responsabilità principale è validare che le coordinate di input siano numeriche e finite prima di delegare la creazione del punto alla libreria JTS (Java Topology Suite).
+
+La progettazione dei test di unità per questo metodo si è basata su diverse tecniche per garantirne la robustezza e la correttezza.
+
+\subsubsection{Strategie di Progettazione dei Test}
+
+\paragraph{Black-Box Testing (Partizionamento in Classi di Equivalenza e Analisi dei Valori Limite)}
+Le coordinate (longitudine e latitudine) sono state analizzate per identificare classi di input e valori limite significativi.
+\begin{itemize}
+    \item \textbf{Classi di Equivalenza:}
+    \begin{itemize}
+        \item \textit{Numeri finiti validi:} Include valori positivi, negativi e zero. Questi input dovrebbero portare alla creazione con successo di un oggetto \texttt{Point}. I test:\\
+        \begin{itemize}
+        \item \hi{createPoint\_ValidCoordinates},
+        \item \hi{createPoint\_NegativeCoordinates},
+        \item \hi{createPoint\_ZeroCoordinates}
+        \end{itemize}
+        coprono questa classe.
+        \item \textit{Valori speciali non finiti:} Include \texttt{Double.NaN}, \texttt{Double.POSITIVE\_INFINITY}, e \texttt{Double.NEGATIVE\_INFINITY}. Questi input dovrebbero sollevare un'eccezione, come verificato in:
+        \begin{itemize}
+        	\item \hi{createPoint\_SpecialDoubleValues\_ThrowsException}
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Analisi dei Valori Limite:}
+    \begin{itemize}
+        \item Sono stati testati i valori limite convenzionali per le coordinate geografiche (es. -180, 90) in
+        \begin{itemize}
+        	\item \hi{createPoint\_BoundaryCoordinates}
+        \end{itemize}
+        per assicurare che vengano gestiti correttamente.
+        \item È stato incluso anche un test per valori finiti ma fuori dal range standard (es. 200.0) in
+        \begin{itemize}
+        	\item  \hi{createPoint\_OutOfRangeCoordinates}
+        \end{itemize}
+        per confermare il comportamento atteso (la libreria JTS crea il punto senza sollevare eccezioni).
+    \end{itemize}
+\end{itemize}
+
+\paragraph{White-Box Testing (Copertura delle Condizioni)}
+L'analisi white-box si è concentrata sulla struttura interna del metodo. Esso contiene un'unica istruzione \texttt{if} con una condizione composta da quattro parti:
+\begin{verbatim}
+if (Double.isNaN(lng) || Double.isInfinite(lng) ||
+    Double.isNaN(lat) || Double.isInfinite(lat)) { ... }
+\end{verbatim}
+L'obiettivo è stato ottenere la \textbf{copertura delle condizioni (Condition Coverage)}, assicurando che ogni singola sotto-condizione venisse valutata sia a \texttt{true} che a \texttt{false}.
+\begin{itemize}
+    \item Il percorso in cui la condizione è \texttt{false} (input valido) è coperto dalla maggior parte dei test, che verificano la creazione del punto.
+    \item Il percorso in cui la condizione è \texttt{true} (input non valido) è coperto dal test:
+    \begin{itemize}
+    	\item \hi{createPoint\_SpecialDoubleValues\_ThrowsException}.
+    \end{itemize}
+
+\end{itemize}
+\subsection{Il metodo \texttt{saveImage}}
+\subsubsection{Strategie di Progettazione dei Test}
+La progettazione dei test di unità per il metodo \texttt{saveImage} della classe \texttt{ListingImageService} si è focalizzata sulla verifica delle interazioni con i servizi esterni (storage di file e database) e sulla corretta gestione della logica di business per l'ordinamento delle immagini. Sono state applicate principalmente tecniche di black-box, simulate attraverso l'uso di mock.
+
+\paragraph{Black-Box Testing (Partizionamento in Classi di Equivalenza)}
+Sono state identificate le seguenti classi di equivalenza basate sugli input, sullo stato del sistema e sugli esiti delle dipendenze:
+\begin{itemize}
+    \item \textbf{Argomenti di input (\texttt{file}, \texttt{listing}):}
+    \begin{itemize}
+        \item \textit{Validi:} Gli argomenti sono oggetti non nulli.
+        \item \textit{Non validi (file nullo):} L'argomento \texttt{file} è \texttt{null}. Questo caso è coperto da:
+        \begin{itemize}
+        	\item \hi{saveImage\_nullFile\_throwsException}
+        \end{itemize}
+        \item \textit{Non validi (listing nullo):} L'argomento \texttt{listing} è \texttt{null}. Questo caso è coperto da:
+        \begin{itemize}
+        	\item \hi{saveImage\_nullListing\_throwsException}
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Stato dell'annuncio (Listing):}
+    \begin{itemize}
+        \item \textit{Annuncio senza immagini esistenti:} L'operazione di salvataggio deve assegnare all'immagine un \texttt{sortOrder} pari a 1. Questo scenario è coperto dal test:
+        \begin{itemize}
+        	\item \hi{saveImage\_firstImageForListing\_success}
+        \end{itemize}
+        \item \textit{Annuncio con immagini esistenti:} Il \texttt{sortOrder} della nuova immagine deve essere calcolato come il massimo valore esistente incrementato di uno. Questo è verificato dal test:
+        \begin{itemize}
+        	\item \hi{saveImage\_withExistingImages\_success}
+        \end{itemize}
+    \end{itemize}
+    \item \textbf{Esito del caricamento del file su S3:}
+    \begin{itemize}
+        \item \textit{Successo:} Il servizio di storage (\texttt{S3ImageStorageService}) restituisce un URL valido. Questo è il caso base per i test di successo.
+        \item \textit{Fallimento:} Il servizio di storage solleva un'eccezione. Questo scenario è coperto da:
+        \begin{itemize}
+        	\item \hi{saveImage\_s3UploadFails\_throwsException}
+        \end{itemize} che verifica la corretta propagazione dell'errore.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{White-Box Testing (Copertura Strutturale)}
+L'approccio white-box garantisce che i principali percorsi logici ed eccezionali del metodo siano testati.
+\begin{itemize}
+    \item \textbf{Copertura delle Decisioni:} La principale struttura condizionale, \texttt{(maxSortOrder != null)}, è coperta nei suoi esiti \texttt{true} e \texttt{false} rispettivamente da \hi{saveImage\_withExistingImages\_success} e \hi{saveImage\_firstImageForListing\_success}.
+    \item \textbf{Gestione delle Eccezioni:} I test assicurano che i percorsi di fallimento vengano gestiti correttamente, prevenendo l'esecuzione di codice che altererebbe lo stato del sistema in modo inconsistente.
+    \begin{itemize}
+        \item \hi{saveImage\_s3UploadFails\_throwsException}: verifica che un fallimento nello storage non porti a operazioni sul database.
+        \item \hi{saveImage\_nullListing\_throwsException}: verifica che un input nullo per il listing causi un'eccezione immediata (\texttt{NullPointerException}) prima di qualsiasi interazione con i servizi esterni.
+        \item \hi{saveImage\_nullFile\_throwsException}: verifica che la chiamata con un file nullo propaghi l'eccezione sollevata dal servizio di storage.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Il metodo \texttt{createListing}}
+\subsubsection{Strategie di Progettazione dei Test}
+Il metodo \texttt{createListing} nella classe \texttt{ListingService} gestisce la logica di creazione di un nuovo annuncio immobiliare. Le sue responsabilità includono la validazione del contesto di sicurezza (l'utente deve essere un agente autenticato), la mappatura dei dati di input in un'entità, il salvataggio dell'entità nel database e il caricamento delle immagini associate.
+
+La strategia di test combina un approccio black-box per validare gli scenari di input e di stato del sistema, e un approccio white-box per garantire che i percorsi critici e le gestioni delle eccezioni siano coperti.
+
+\paragraph{Black-Box Testing (Partizionamento in Classi di Equivalenza)}
+Sono state identificate le seguenti classi di equivalenza per gli input e lo stato del sistema:
+\begin{itemize}
+    \item \textbf{Stato di Autenticazione dell'Utente:}
+    \begin{itemize}
+        \item \textit{Utente autenticato e presente nel database:} Questo è lo scenario di successo, coperto dal test 
+        \begin{itemize}
+        	\item \hi{createListing\_validRequestAndImages\_success}.
+        \end{itemize}
+        \item \textit{Utente autenticato ma non trovato nel database:} Questo input non valido dovrebbe impedire la creazione dell'annuncio. È coperto da \hi{createListing\_authenticatedUserNotFound\_throwsException}, che verifica il lancio di \texttt{IllegalStateException}.
+    \end{itemize}
+    \item \textbf{Lista delle Immagini (\texttt{images}):}
+    \begin{itemize}
+        \item \textit{Lista valida e non vuota:} Caso di successo coperto da \hi{createListing\_validRequestAndImages\_success}.
+        \item \textit{Lista nulla:} Input non valido coperto da \hi{createListing\_nullImages\_throwsException}, che si aspetta un'\texttt{IllegalArgumentException}.
+        \item \textit{Lista vuota:} Input non valido coperto da \hi{createListing\_emptyImages\_throwsException}, che si aspetta anch'esso un'\texttt{IllegalArgumentException}.
+    \end{itemize}
+    \item \textbf{Esito del Salvataggio delle Immagini:}
+    \begin{itemize}
+        \item \textit{Successo:} Tutte le immagini vengono salvate correttamente dal \texttt{ListingImageService}.
+        \item \textit{Fallimento:} Il salvataggio di un'immagine fallisce, sollevando un'eccezione. Questo scenario, coperto da:
+        \begin{itemize}
+        	\item \hi{createListing\_imageUploadFails\_shouldRollback}
+        \end{itemize} è cruciale per testare la natura transazionale del metodo. Il test verifica che l'eccezione si propaghi, implicando un rollback della creazione dell'annuncio.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{White-Box Testing (Copertura Strutturale)}
+L'analisi white-box si concentra sulla copertura dei percorsi decisionali e di gestione degli errori all'interno del metodo e dei suoi collaboratori privati.
+\begin{itemize}
+    \item \textbf{Copertura dei Rami (Branch Coverage):} I test coprono i rami principali. Ad esempio, la logica nel metodo privato \texttt{getAgent} viene testata per i casi in cui l'utente viene trovato o meno. Il metodo \texttt{uploadImages} viene testato per i casi di lista nulla, vuota o valida.
+    \item \textbf{Gestione delle Eccezioni:} La suite di test verifica che il sistema si comporti correttamente in caso di fallimento. I test si assicurano che le eccezioni vengano sollevate e propagate come atteso e che non vengano eseguite operazioni di persistenza parziali (es. creazione dell'annuncio senza che l'utente esista).
+\end{itemize}
+
+
 \section{Tecniche di valutazione dell'usabilità}
 \subsection{Expert reviews}
 \subsection{Esperimenti con utenti reali}

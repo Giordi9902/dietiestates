@@ -152,6 +152,24 @@ class UserServiceTest {
 		}
 
 		@Test
+		@DisplayName("Should fail: new password is null")
+		void updatePassword_newPasswordIsNull_throwsBadRequestException() {
+			// GIVEN
+			ChangePasswordRequest request = new ChangePasswordRequest("oldPass", null);
+
+			when(userRepository.findById(userid)).thenReturn(Optional.of(mockUser));
+			when(passwordEncoder.matches("oldPass", HASHED_PASSWORD)).thenReturn(true);
+
+			// WHEN & THEN
+			BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+				userService.updatePassword(mockUser, request);
+			});
+
+			assertEquals("New password must not be blank", exception.getMessage());
+			verify(userRepository, never()).save(any());
+		}
+
+		@Test
 		@DisplayName("Should fail - New password same as the old one")
 		void updatePassword_newPasswordIsSame_throwsBadRequestException() {
 			// GIVEN

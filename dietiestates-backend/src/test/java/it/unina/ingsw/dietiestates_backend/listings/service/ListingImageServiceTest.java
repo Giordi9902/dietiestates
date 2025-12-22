@@ -41,7 +41,6 @@ class ListingImageServiceTest {
     void setUp() {
         mockFile = mock(MultipartFile.class);
         mockListing = mock(Listing.class);
-        when(mockListing.getId()).thenReturn(1);
     }
 	@Nested
 	@DisplayName("Save image testing")
@@ -50,6 +49,7 @@ class ListingImageServiceTest {
 		@DisplayName("Salva immagine per un listing senza immagini esistenti")
 		void saveImage_firstImageForListing_success() {
 			// GIVEN
+			when(mockListing.getId()).thenReturn(1);
 			String imageUrl = "http://example.com/image.jpg";
 			when(mockListing.getImages()).thenReturn(new ArrayList<>());
 			when(s3ImageStorageService.storeImage(mockFile, mockListing.getId())).thenReturn(imageUrl);
@@ -76,6 +76,7 @@ class ListingImageServiceTest {
 		@DisplayName("Salva immagine per un listing con immagini esistenti")
 		void saveImage_withExistingImages_success() {
 			// GIVEN
+			when(mockListing.getId()).thenReturn(1);
 			String imageUrl = "http://example.com/new_image.jpg";
 			int maxSortOrder = 3;
 			when(mockListing.getImages()).thenReturn(new ArrayList<>());
@@ -99,12 +100,39 @@ class ListingImageServiceTest {
 		@DisplayName("Lancia eccezione se il caricamento su S3 fallisce")
 		void saveImage_s3UploadFails_throwsException() {
 			// GIVEN
+			when(mockListing.getId()).thenReturn(1);
 			when(s3ImageStorageService.storeImage(mockFile, mockListing.getId())).thenThrow(new RuntimeException("S3 upload failed"));
 			// WHEN & THEN
 			assertThrows(RuntimeException.class, () -> listingImageService.saveImage(mockFile, mockListing));
 			// THEN
 			verify(listingImageRepository, never()).findMaxSortOrderByListingId(anyInt());
 			verify(listingImageRepository, never()).save(any(ListingImage.class));
+		}
+
+		@Test
+		@DisplayName("Lancia eccezione se il listing è nullo")
+		void saveImage_nullListing_throwsException() {
+			// WHEN & THEN
+			assertThrows(NullPointerException.class, () -> listingImageService.saveImage(mockFile, null));
+
+			// THEN
+			verifyNoInteractions(s3ImageStorageService);
+			verifyNoInteractions(listingImageRepository);
+		}
+
+		@Test
+		@DisplayName("Lancia eccezione se il file è nullo")
+		void saveImage_nullFile_throwsException() {
+			// GIVEN
+			when(mockListing.getId()).thenReturn(1);
+			when(s3ImageStorageService.storeImage(null, mockListing.getId())).thenThrow(new IllegalArgumentException("File must not be null"));
+
+			// WHEN & THEN
+			assertThrows(IllegalArgumentException.class, () -> listingImageService.saveImage(null, mockListing));
+
+			// THEN
+			verifyNoInteractions(listingImageRepository);
+			verify(s3ImageStorageService, times(1)).storeImage(null, mockListing.getId());
 		}
 	}
 }
