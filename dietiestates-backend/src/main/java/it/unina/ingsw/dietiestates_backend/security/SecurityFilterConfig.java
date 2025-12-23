@@ -35,6 +35,10 @@ public class SecurityFilterConfig {
 		http
 				.csrf(csrf->csrf.disable())
 				.cors(Customizer.withDefaults())
+				.exceptionHandling(exception -> exception
+						.authenticationEntryPoint(new JsonAuthenticationEntryPoint())
+						.accessDeniedHandler(new JsonAccessDeniedHandler())
+				)
 				.authorizeHttpRequests(req->req.requestMatchers(
 								"/auth/**",
 								"/login/**",

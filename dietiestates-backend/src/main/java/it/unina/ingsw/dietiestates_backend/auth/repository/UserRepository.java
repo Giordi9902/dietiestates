@@ -14,6 +14,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 
 	Page<User> findAllByAgencyId(Integer agencyId, Pageable pageable);
 
-	@Query(value="SELECT revoke_multiple_agency_roles_and_clear_agency(:agentId)")
+	@Query(value="SELECT revoke_agent(:agentId)")
 	void revokeAgent(@Param("agentId") Integer agentId);
 }
