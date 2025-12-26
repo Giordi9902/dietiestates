@@ -1,6 +1,8 @@
 package it.unina.ingsw.dietiestates_backend.listings.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -10,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class GeometryServiceTest {
 	private GeometryFactory geometryFactory;
 	private GeometryService geometryService;
-
+	private final double VALID_COORD = 10.0;
+	
 	@BeforeEach
 	void setUp(){
 		geometryFactory = new GeometryFactory();
@@ -95,48 +98,61 @@ class GeometryServiceTest {
 		Point resultPoint = geometryService.createPoint(invalidLng, invalidLat);
 
 		// THEN
-		// JTS crea il punto anche se fuori range. Verifichiamo solo la creazione e lo SRID.
 		assertNotNull(resultPoint);
 		assertEquals(invalidLng, resultPoint.getX(), 0.00001);
 		assertEquals(invalidLat, resultPoint.getY(), 0.00001);
 		assertEquals(4326, resultPoint.getSRID(), "L'SRID deve essere 4326 anche con coordinate invalide.");
 	}
 
-	@Test
-	@org.junit.jupiter.api.DisplayName("Should throw IllegalArgumentException for special double values")
-	void createPoint_SpecialDoubleValues_ThrowsIllegalArgumentException() {
-		// GIVEN
-		double validCoordinate = 10.0;
+	@Nested
+	@DisplayName("When Longitude is invalid")
+	class LongitudeTests {
 
-		// THEN
-		// Test 1: Longitudine NaN
-		assertThrows(IllegalArgumentException.class,
-				() -> geometryService.createPoint(Double.NaN, validCoordinate),
-				"Deve lanciare IllegalArgumentException per longitudine NaN.");
+		@Test
+		@DisplayName("should throw exception for NaN")
+		void shouldThrowExceptionForNaN() {
+			assertThrows(IllegalArgumentException.class,
+					() -> geometryService.createPoint(Double.NaN, VALID_COORD));
+		}
 
-		// Test 2: Latitudine NaN
-		assertThrows(IllegalArgumentException.class,
-				() -> geometryService.createPoint(validCoordinate, Double.NaN),
-				"Deve lanciare IllegalArgumentException per latitudine NaN.");
+		@Test
+		@DisplayName("should throw exception for Positive Infinity")
+		void shouldThrowExceptionForPositiveInfinity() {
+			assertThrows(IllegalArgumentException.class,
+					() -> geometryService.createPoint(Double.POSITIVE_INFINITY, VALID_COORD));
+		}
 
-		// Test 3: Longitudine Infinita Positiva
-		assertThrows(IllegalArgumentException.class,
-				() -> geometryService.createPoint(Double.POSITIVE_INFINITY, validCoordinate),
-				"Deve lanciare IllegalArgumentException per longitudine infinita positiva.");
+		@Test
+		@DisplayName("should throw exception for Negative Infinity")
+		void shouldThrowExceptionForNegativeInfinity() {
+			assertThrows(IllegalArgumentException.class,
+					() -> geometryService.createPoint(Double.NEGATIVE_INFINITY, VALID_COORD));
+		}
+	}
 
-		// Test 4: Latitudine Infinita Positiva
-		assertThrows(IllegalArgumentException.class,
-				() -> geometryService.createPoint(validCoordinate, Double.POSITIVE_INFINITY),
-				"Deve lanciare IllegalArgumentException per latitudine infinita positiva.");
+	@Nested
+	@DisplayName("When Latitude is invalid")
+	class LatitudeTests {
 
-		// Test 5: Longitudine Infinita Negativa
-		assertThrows(IllegalArgumentException.class,
-				() -> geometryService.createPoint(Double.NEGATIVE_INFINITY, validCoordinate),
-				"Deve lanciare IllegalArgumentException per longitudine infinita negativa.");
+		@Test
+		@DisplayName("should throw exception for NaN")
+		void shouldThrowExceptionForNaN() {
+			assertThrows(IllegalArgumentException.class,
+					() -> geometryService.createPoint(VALID_COORD, Double.NaN));
+		}
 
-		// Test 6: Latitudine Infinita Negativa
-		assertThrows(IllegalArgumentException.class,
-				() -> geometryService.createPoint(validCoordinate, Double.NEGATIVE_INFINITY),
-				"Deve lanciare IllegalArgumentException per latitudine infinita negativa.");
+		@Test
+		@DisplayName("should throw exception for Positive Infinity")
+		void shouldThrowExceptionForPositiveInfinity() {
+			assertThrows(IllegalArgumentException.class,
+					() -> geometryService.createPoint(VALID_COORD, Double.POSITIVE_INFINITY));
+		}
+
+		@Test
+		@DisplayName("should throw exception for Negative Infinity")
+		void shouldThrowExceptionForNegativeInfinity() {
+			assertThrows(IllegalArgumentException.class,
+					() -> geometryService.createPoint(VALID_COORD, Double.NEGATIVE_INFINITY));
+		}
 	}
 }

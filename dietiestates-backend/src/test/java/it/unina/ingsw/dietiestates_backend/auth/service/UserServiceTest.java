@@ -26,12 +26,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-	@Mock
-	private UserRepository userRepository;
-	@Mock
-	private PasswordEncoder passwordEncoder;
-	@Mock
-	private EmailService emailService;
+	@Mock private UserRepository userRepository;
+	@Mock private PasswordEncoder passwordEncoder;
+	@Mock private EmailService emailService;
 
 	@InjectMocks
 	private UserService userService;

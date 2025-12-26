@@ -29,13 +29,10 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ListingServiceTest {
-	@Mock
-	private ListingRepository listingRepository;
+	@Mock private ListingRepository listingRepository;
 	@Mock private ListingImageService listingImageService;
 	@Mock private UserRepository userRepository;
 	@Mock private ListingMapper listingMapper;
-	@Mock private GeometryFactory geometryFactory;
-	@Mock private ListingSearchRepositoryImpl listingSearchRepository;
 
 	@InjectMocks
 	private ListingService listingService;

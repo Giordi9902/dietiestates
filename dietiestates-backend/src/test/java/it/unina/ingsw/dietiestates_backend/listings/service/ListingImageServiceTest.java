@@ -25,15 +25,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ListingImageServiceTest {
 
-    @Mock
-    private S3ImageStorageService s3ImageStorageService;
-
-    @Mock
-    private ListingImageRepository listingImageRepository;
+    @Mock private S3ImageStorageService s3ImageStorageService;
+    @Mock private ListingImageRepository listingImageRepository;
 
     @InjectMocks
     private ListingImageService listingImageService;
-
     private MultipartFile mockFile;
     private Listing mockListing;
 
@@ -42,9 +38,11 @@ class ListingImageServiceTest {
         mockFile = mock(MultipartFile.class);
         mockListing = mock(Listing.class);
     }
+
 	@Nested
 	@DisplayName("Save image testing")
 	class SaveImage {
+
 		@Test
 		@DisplayName("Salva immagine per un listing senza immagini esistenti")
 		void saveImage_firstImageForListing_success() {
@@ -73,8 +71,9 @@ class ListingImageServiceTest {
 		}
 
 		@Test
-		@DisplayName("Salva immagine per un listing con immagini esistenti")
+		@DisplayName("Aggiunge nuova immagine ad un listing con altre immagini preesistenti")
 		void saveImage_withExistingImages_success() {
+
 			// GIVEN
 			when(mockListing.getId()).thenReturn(1);
 			String imageUrl = "http://example.com/new_image.jpg";
@@ -83,8 +82,10 @@ class ListingImageServiceTest {
 			when(s3ImageStorageService.storeImage(mockFile, mockListing.getId())).thenReturn(imageUrl);
 			when(listingImageRepository.findMaxSortOrderByListingId(mockListing.getId())).thenReturn(maxSortOrder);
 			when(listingImageRepository.save(any(ListingImage.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
 			// WHEN
 			ListingImage savedImage = listingImageService.saveImage(mockFile, mockListing);
+
 			// THEN
 			ArgumentCaptor<ListingImage> imageCaptor = ArgumentCaptor.forClass(ListingImage.class);
 			verify(listingImageRepository).save(imageCaptor.capture());
@@ -92,6 +93,8 @@ class ListingImageServiceTest {
 			assertEquals(imageUrl, savedImage.getUrl());
 			assertEquals(maxSortOrder + 1, capturedImage.getSortOrder());
 			assertEquals(mockListing, capturedImage.getListing());
+
+			// VERIFY
 			verify(s3ImageStorageService, times(1)).storeImage(mockFile, mockListing.getId());
 			verify(listingImageRepository, times(1)).findMaxSortOrderByListingId(mockListing.getId());
 		}
