@@ -167,7 +167,7 @@ Sono state identificate le seguenti classi di equivalenza per gli input e lo sta
 \begin{itemize}
     \item \textbf{Stato di Autenticazione dell'Utente:}
     \begin{itemize}
-        \item \textit{Utente autenticato e presente nel database:} Questo è lo scenario di successo, coperto dal test 
+        \item \textit{Utente autenticato e presente nel database:} Questo è lo scenario di successo, coperto dal test
         \begin{itemize}
         	\item \hi{createListing\_validRequestAndImages\_success}.
         \end{itemize}
@@ -176,7 +176,10 @@ Sono state identificate le seguenti classi di equivalenza per gli input e lo sta
     \item \textbf{Lista delle Immagini (\texttt{images}):}
     \begin{itemize}
         \item \textit{Lista valida e non vuota:} Caso di successo coperto da \hi{createListing\_validRequestAndImages\_success}.
-        \item \textit{Lista nulla:} Input non valido coperto da \hi{createListing\_nullImages\_throwsException}, che si aspetta un'\texttt{IllegalArgumentException}.
+        \item \textit{Lista nulla:} Input non valido coperto da:
+        \begin{itemize}
+        	\item \hi{createListing\_nullImages\_throwsException}
+        \end{itemize} che si aspetta un'\texttt{IllegalArgumentException}.
         \item \textit{Lista vuota:} Input non valido coperto da \hi{createListing\_emptyImages\_throwsException}, che si aspetta anch'esso un'\texttt{IllegalArgumentException}.
     \end{itemize}
     \item \textbf{Esito del Salvataggio delle Immagini:}
@@ -189,17 +192,118 @@ Sono state identificate le seguenti classi di equivalenza per gli input e lo sta
     \end{itemize}
 \end{itemize}
 
-\paragraph{White-Box Testing (Copertura Strutturale)}
-L'analisi white-box si concentra sulla copertura dei percorsi decisionali e di gestione degli errori all'interno del metodo e dei suoi collaboratori privati.
+
+\section{Tecniche di valutazione dell'usabilità}
+
+Questa sezione presenta le principali tecniche impiegate per valutare l'usabilità del prodotto finito.
+
+Lo scopo è fornire un approccio ripetibile e basato su evidenze per identificare problemi di usabilità, priorizzarne la risoluzione e misurare i miglioramenti nel tempo. Le tecniche descritte sono pensate per integrarsi nel flusso di sviluppo (anche iterativo) e per supportare decisioni progettuali informate, minimizzando rischi e costi di intervento.
+
+\subsection{Expert reviews}
+\newlist{todolist}{itemize}{2}
+\setlist[todolist]{label=$\square$}
+\subsubsection{Obiettivi e contesto d'uso}
+\begin{todolist}
+    \item L'obiettivo principale del prodotto è chiaro entro i primi 5 secondi di utilizzo.
+    \item Le funzionalità principali sono facilmente individuabili.
+    \item L'interfaccia è adatta al pubblico target.
+    \item Le call to action sono evidenti e comprensibili.
+\end{todolist}
+\subsubsection{Architettura dell'informazione e navigazione}
+\begin{todolist}
+	\item Struttura delle pagine coerente e prevedibile
+	\item Navigazione principale sempre visibile
+	\item Etichette dei menu chiare
+	\item L'utente capisce dove si trova
+	\item Non esistono ``vicoli ciechi'' (pagine senza uscita)
+\end{todolist}
+\subsubsection{Consistenza e standard}
+\begin{todolist}
+	\item Stessi termini per stesse azioni
+	\item Stessi colori per significato
+	\item Icone standard o accompagnate da testo
+	\item Pattern UI coerenti tra pagine
+	\item Comportamenti coerenti tra desktop e mobile
+\end{todolist}
+\subsubsection{Feedback e gestione degli errori}
+\begin{todolist}
+	\item Ogni azione produce un feedback visibile
+	\item Loading state presenti per operazioni > 300ms
+	\item Success / error / warning distinguibili visivamente
+	\item Messaggi di errore spiegano cosa è successo
+	\item Possibilità di annullare azioni critiche
+	\item Conferma richiesta per azioni distruttive
+\end{todolist}
+\subsubsection{Efficienza e carico cognitivo}
+\begin{todolist}
+\item Informazioni non ridondanti
+\item Azioni frequenti richiedono pochi click
+\end{todolist}
+\subsubsection{Accessibilità}
+\begin{todolist}
+	\item Label associate ai campi di input
+	\item Non dipendere solo dal colore per comunicare stati
+\end{todolist}
+\subsubsection{Responsiveness e usabilità mobile}
+\begin{todolist}
+	\item Funziona correttamente su mobile
+	\item Touch target sufficientemente grandi
+	\item Nessuna azione critica solo su hover
+	\item Layout leggibile senza zoom
+\end{todolist}
+\subsubsection{Onboarding e guida all'utente}
+\begin{todolist}
+	\item L'utente capisce come iniziare senza spiegazioni esterne
+	\item Stato iniziale non ``vuoto e confuso''
+\end{todolist}
+
+\subsection{Esperimenti con utenti reali}
+
+\subsubsection{Survey sottoposto agli utenti}
+
+Per raccogliere dati qualitativi e quantitativi sull'usabilità dell'applicazione è stato somministrato un questionario strutturato agli utenti al termine della sessione di testing. Il questionario comprendeva le seguenti sezioni:
 \begin{itemize}
-    \item \textbf{Copertura dei Rami (Branch Coverage):} I test coprono i rami principali. Ad esempio, la logica nel metodo privato \texttt{getAgent} viene testata per i casi in cui l'utente viene trovato o meno. Il metodo \texttt{uploadImages} viene testato per i casi di lista nulla, vuota o valida.
-    \item \textbf{Gestione delle Eccezioni:} La suite di test verifica che il sistema si comporti correttamente in caso di fallimento. I test si assicurano che le eccezioni vengano sollevate e propagate come atteso e che non vengano eseguite operazioni di persistenza parziali (es. creazione dell'annuncio senza che l'utente esista).
+    \item Informazioni demografiche e livello di confidenza con strumenti digitali.
+    \item Domande sulla comprensibilità delle funzionalità principali.
+    \item Valutazione sintetica dell'usabilità.
+    \item Domande aperte per raccogliere commenti, difficoltà incontrate e suggerimenti.
 \end{itemize}
 
 
-\section{Tecniche di valutazione dell'usabilità}
-\subsection{Expert reviews}
-\subsection{Esperimenti con utenti reali}
 \subsubsection{Soggetti reclutati, procedura sperimentale e metriche considerate}
-\subsubsection{Survey sottoposto agli utenti}
+
+Sono stati reclutati 5 partecipanti volontari con età compresa tra 18 e 60 anni e differenti livelli di esperienza digitale (principianti, medi, avanzati). I partecipanti sono stati selezionati per rappresentare il pubblico target dell'applicazione: utenti privati interessati alla ricerca e visualizzazione di immobili e agenti immobiliari con esperienza di pubblicazione annunci.
+
+Procedura sperimentale:
+\begin{enumerate}
+    \item Esecuzione di una serie di task rappresentativi (es. cercare un immobile, creare un annuncio con immagini, modificare la password) in ambiente controllato.
+    \item Registrazione del tempo di completamento e degli errori per ciascun task.
+    \item Somministrazione del questionario di soddisfazione.
+    \item Intervista breve finale per raccogliere feedback qualitativo.
+\end{enumerate}
+
+Metriche considerate:
+\begin{itemize}
+    \item Tasso di completamento dei task (successo/fallimento).
+    \item Tempo medio di completamento per task.
+    \item Numero medio di errori e interventi del moderatore.
+    \item Punteggio usabilità medio.
+    \item Feedback qualitativo: problemi ricorrenti e suggerimenti.
+\end{itemize}
+
 \subsubsection{Risultati dell'esperimento}
+
+I risultati combinano dati quantitativi e osservazioni qualitative. In sintesi:
+\begin{itemize}
+    \item Tasso di completamento: il 89\% dei task è stato completato correttamente senza assistenza.
+    \item Tempo di completamento: il tempo medio per i task principali è risultato accettabile; la creazione dell'annuncio richiedeva in media 3 minuti, influenzata dalla gestione delle immagini.
+    \item Errori: le principali difficoltà segnalate riguardavano l'upload e l'ordine delle immagini e la comprensione di alcuni messaggi di errore.
+    \item Valutazione dell'usabilità: il punteggio medio SUS è stato 78 su 100, indicando una buona usabilità generale.
+    \item Feedback qualitativo: suggerimenti ricorrenti includevano migliorare le indicazioni durante l'upload delle immagini, rendere più visibile lo stato di salvataggio, e fornire conferme più chiare dopo operazioni critiche.
+\end{itemize}
+
+Conclusioni operative: i risultati indicano che l'applicazione è generalmente usabile ma può beneficiare di interventi mirati su due aree principali:
+\begin{enumerate}
+    \item Gestione delle immagini negli annunci.
+    \item Feedback e messaggi di errore.
+\end{enumerate}

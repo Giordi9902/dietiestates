@@ -79,7 +79,7 @@ Per garantire un'autenticazione sicura e scalabile, il sistema utilizza JSON Web
 Accanto agli access token, il sistema implementa anche l'uso di refresh token. I refresh token sono token a lunga durata che consentono agli utenti di ottenere nuovi access token senza dover effettuare nuovamente il login. Quando un access token scade, l'applicazione può utilizzare il refresh token per richiedere un nuovo access token all'IdP, migliorando l'esperienza utente e mantenendo la sicurezza delle sessioni.
 
 \begin{center}
-    \includegraphics[width=0.75\textwidth]{res/security.png}
+    \includegraphics[width=\textwidth]{res/security.png}
 \end{center}
 
 \subsection{Frontend}
@@ -88,9 +88,7 @@ Accanto agli access token, il sistema implementa anche l'uso di refresh token. I
 
     \item \textbf{TypeScript:} Superset di JavaScript che introduce la tipizzazione statica. Il suo utilizzo migliora la robustezza del codice, previene errori comuni in fase di sviluppo e aumenta la manutenibilità a lungo termine del progetto.
 
-    \item \textbf{OpenAPI Generator:} Strumento fondamentale per l'integrazione tra frontend e backend. A partire dalla specifica OpenAPI (precedentemente nota come Swagger) esposta dal backend, questo strumento genera automaticamente un client API TypeScript completo e type-safe. Questo approccio riduce drasticamente il rischio di disallineamenti e è un pilastro per lo sviluppo contract-first.
-
-    \item \textbf{HTML5 e CSS3:} Standard web utilizzati per la strutturazione semantica delle pagine e per la loro stilizzazione, garantendo compatibilità con i browser moderni e la possibilità di implementare design responsive.
+    \item \textbf{OpenAPI Generator:} Strumento fondamentale per l'integrazione tra frontend e backend. A partire dalla specifica OpenAPI esposta dal backend, questo strumento genera automaticamente un client API TypeScript completo e type-safe. Questo approccio riduce drasticamente il rischio di disallineamenti e è un pilastro per lo sviluppo contract-first.
 \end{itemize}
 
 \section{Design dell'Interfaccia Utente (UI)}

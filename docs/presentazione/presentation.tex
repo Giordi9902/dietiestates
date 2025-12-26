@@ -197,27 +197,69 @@
 
 \begin{frame}{Backend Design: Monolite Modulare (DDD)}
     \begin{block}{Approccio}
-        Il backend è un \textbf{monolite modulare} strutturato secondo i principi del \textbf{Domain-Driven Design (DDD)}.
+        Il backend è un \textbf{monolite modulare} progettato secondo i principi del \textbf{Domain-Driven Design (DDD)}.
         \begin{itemize}
-            \item Ogni package Java rappresenta un \textbf{Bounded Context} con responsabilità ben definite.
-            \item Questo approccio favorisce la manutenibilità e la futura evoluzione verso microservizi.
+            \item Ogni package Java è un \textbf{Bounded Context} con responsabilità chiare e confini ben definiti.
+            \item Favorisce separazione di responsabilità: Domain, Repository, Service, Controller, DTO/Mapper.
         \end{itemize}
     \end{block}
     \begin{block}{Bounded Contexts Principali}
         \begin{itemize}
-            \item \texttt{auth}: Gestione utenti, ruoli e autenticazione.
-            \item \texttt{listings}: Cuore del dominio, gestione annunci immobiliari.
-            \item \texttt{agency}: Logica per agenzie e gestione collaboratori.
-            \item \texttt{file}: Servizio di supporto per lo storage su S3.
-            \item \texttt{email}: Servizio di supporto per le notifiche.
-            \item \texttt{security}: Infrastruttura per la sicurezza (JWT, filtri).
+            \item \texttt{auth}: gestione utenti, ruoli, refresh token e OTP.
+            \item \texttt{listings}: dominio degli annunci, ricerche geospaziali e immagini.
+            \item \texttt{agency}: gestione agenzie e promozione agenti.
+            \item \texttt{file}/\texttt{storage}: integrazione con S3 per contenuti binari.
+            \item \texttt{email}: notifiche e template.
+            \item \texttt{security}: filtri, JWT e integrazione OIDC.
         \end{itemize}
     \end{block}
 \end{frame}
 
-% ==================================================
+\begin{frame}{Scelte di Persistenza e Schema DB}
+    \begin{itemize}
+        \item Database relazionale: \textbf{PostgreSQL} per consistenza, transazioni e maturità.
+        \item Geodati: estensione \textbf{PostGIS} — campi \texttt{geometry(Point,4326)} e calcoli geodetici con \texttt{geography} per distanze in metri.
+        \item Indici spaziali GIST su \texttt{listing.coordinate} per ricerche per prossimità performanti.
+        \item Separazione dati binari/metadati: file su S3, metadati (URL, sort\_order, timestamps) in \texttt{listing\_image}.
+        \item Funzioni/stored procedures per operazioni atomiche (es. revoke\_agent, get\_listings\_by\_agent).
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Motivazioni per PostGIS e Query Geospaziali}
+    \begin{itemize}
+        \item PostGIS offre operatori comprovati: \texttt{ST\_DWithin}, \texttt{ST\_Distance}, \texttt{ST\_Transform} e funzioni di estrazione \texttt{ST\_X}/\texttt{ST\_Y}.
+        \item Indici GIST riducono rapidamente lo spazio di ricerca prima dei calcoli costosi.
+        \item Utilizzo di \texttt{geography} per calcoli in metri e accuratezza geodetica.
+        \item Query ottimizzate restituendo anche \texttt{thumbnail\_url} e coordinate per la UI.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Design e Pattern Architetturali}
+    \begin{itemize}
+        \item \textbf{Factory Pattern} per OIDC/OAuth2 user info: \texttt{OAuth2UserInfoFactory} isola mapping provider-specific.
+        \item \textbf{Security Filter Chain}: pipeline di filtri Spring Security con filtro custom (es. \texttt{AuthFilter}) per validazione JWT e popolamento del \texttt{SecurityContext}.
+        \item Uso di DTO/Mapper per separare API contract da model di dominio e facilitare test.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Sicurezza: OIDC, JWT e Refresh Tokens}
+    \begin{itemize}
+        \item Autenticazione delegata a provider OIDC (es. Google) per sicurezza e UX unificata.
+        \item Access token: \textbf{JWT} stateless per autorizzare richieste API.
+        \item Refresh token: persistiti e gestiti per rinnovare access token senza re-login.
+        \item Policy di autorizzazione basate sui ruoli (ROLE\_ADMIN, ROLE\_AGENT, ROLE\_USER) definite nella \texttt{SecurityFilterChain}.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Frontend: Contract-First e Strumenti}
+    \begin{itemize}
+        \item SPA con \textbf{Angular} e TypeScript per UX reattiva e component-based design.
+        \item \textbf{OpenAPI Generator} per generare client TypeScript type-safe dal contratto backend: riduce disallineamenti e velocizza integrazione.
+        \item Design responsive mobile-first con componenti riutilizzabili (cards, form, map view).
+    \end{itemize}
+\end{frame}
+
 \section{Approfondimenti Tecnici}
-% ==================================================
 
 \begin{frame}[fragile]{Deep Dive: Ricerca Geospaziale con PostGIS}
     \begin{block}{Problema}
@@ -250,7 +292,7 @@ WHERE ST_DWithin(
             \item \textbf{Autenticazione via Provider Esterni:} Supporto a \textbf{OpenID Connect (OIDC)} (es. Google) tramite il pattern \textit{OAuth2UserInfoFactory}.
             \item \textbf{Autorizzazione:} Gestita tramite una \texttt{SecurityFilterChain} che protegge gli endpoint in base ai ruoli (\texttt{ADMIN}, \texttt{AGENT}, \texttt{USER}).
         \end{itemize}
-    \end{block}                              
+    \end{block}
 \end{frame}
 
 \begin{frame}{Deep Dive: Gestione delle Immagini}
@@ -265,7 +307,6 @@ WHERE ST_DWithin(
         \begin{itemize}
             \item Il database rimane leggero e performante.
             \item Lo storage degli asset può scalare indipendentemente.
-            \item Si sfruttano le CDN e le feature di S3 per una consegna rapida delle immagini.
         \end{itemize}
     \end{alertblock}
 \end{frame}
