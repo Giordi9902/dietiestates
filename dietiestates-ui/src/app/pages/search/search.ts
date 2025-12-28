@@ -91,6 +91,7 @@ export class Search implements OnInit, AfterViewInit {
 
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       this.updateMarkerAndCircle(e.latlng);
+      this.reverseGeocode(e.latlng);
     });
   }
 
@@ -219,6 +220,26 @@ export class Search implements OnInit, AfterViewInit {
           const latlng = new L.LatLng(data[0].lat, data[0].lon);
           this.updateMarkerAndCircle(latlng);
           this.map?.setView(latlng, 15);
+        } else {
+          this.error = 'Address not found.';
+        }
+      });
+  }
+
+  reverseGeocode(latlng: L.LatLng): void {
+    this.http
+      .get<any>(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}`
+      )
+      .pipe(
+        catchError((err) => {
+          this.error = 'Could not reverse geocode. Please try again.';
+          return throwError(() => err);
+        })
+      )
+      .subscribe((data) => {
+        if (data && data.display_name) {
+          this.searchForm.patchValue({ address: data.display_name });
         } else {
           this.error = 'Address not found.';
         }

@@ -35,6 +35,21 @@
                 </select>
               </div>
 
+              <div class="col-12">
+                <label for="radius" class="form-label"
+                  >Raggio di ricerca: {{ searchForm.value.radiusKm }} km</label
+                >
+                <input
+                  type="range"
+                  class="form-range"
+                  min="1"
+                  max="50"
+                  id="radius"
+                  formControlName="radiusKm"
+                  (input)="onRadiusChange()"
+                />
+              </div>
+
               @if (showAdvancedFilters) {
               <div class="col-12">
                 <label class="form-label">Prezzo (€)</label>
@@ -98,21 +113,6 @@
                   <option [value]="c">{{ c }}</option>
                   }
                 </select>
-              </div>
-
-              <div class="col-12">
-                <label for="radius" class="form-label"
-                  >Raggio di ricerca: {{ searchForm.value.radiusKm }} km</label
-                >
-                <input
-                  type="range"
-                  class="form-range"
-                  min="1"
-                  max="50"
-                  id="radius"
-                  formControlName="radiusKm"
-                  (input)="onRadiusChange()"
-                />
               </div>
               }
 

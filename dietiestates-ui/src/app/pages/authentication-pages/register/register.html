@@ -6,15 +6,15 @@
           <h3 class="text-center mb-3">Registrati</h3>
           <p class="text-center text-muted mb-4">Crea il tuo account per iniziare</p>
 
-          @if(errorMsg.length>0){
+          @if (errorMsg.length > 0) {
           <div class="alert alert-danger" role="alert">
-            @for(error of errorMsg; track $index){
+            @for (error of errorMsg; track errorMsg) {
             <p class="mb-1">{{ error }}</p>
             }
           </div>
           }
 
-          <form>
+          <form #registerForm="ngForm" novalidate>
             <div class="form-floating mb-3">
               <input
                 [(ngModel)]="registrationRequest.firstname"
@@ -24,8 +24,16 @@
                 name="firstname"
                 placeholder="Mario"
                 required
+                #firstname="ngModel"
               />
               <label for="firstname">Nome</label>
+              @if (firstname.invalid && (firstname.dirty || firstname.touched)) {
+              <div class="text-danger small mt-1">
+                @if (firstname.errors?.['required']) {
+                <span>Il nome è obbligatorio.</span>
+                }
+              </div>
+              }
             </div>
 
             <div class="form-floating mb-3">
@@ -37,8 +45,16 @@
                 name="lastname"
                 placeholder="Rossi"
                 required
+                #lastname="ngModel"
               />
               <label for="lastname">Cognome</label>
+              @if (lastname.invalid && (lastname.dirty || lastname.touched)) {
+              <div class="text-danger small mt-1">
+                @if (lastname.errors?.['required']) {
+                <span>Il cognome è obbligatorio.</span>
+                }
+              </div>
+              }
             </div>
 
             <div class="form-floating mb-3">
@@ -50,8 +66,19 @@
                 name="email"
                 placeholder="name@example.com"
                 required
+                email
+                #email="ngModel"
               />
               <label for="email">Email</label>
+              @if (email.invalid && (email.dirty || email.touched)) {
+              <div class="text-danger small mt-1">
+                @if (email.errors?.['required']) {
+                <span>L'email è obbligatoria.</span>
+                } @if (email.errors?.['email']) {
+                <span>Formato email non valido.</span>
+                }
+              </div>
+              }
             </div>
 
             <div class="form-floating mb-3">
@@ -63,22 +90,40 @@
                 name="password"
                 placeholder="password"
                 required
+                minlength="8"
+                #password="ngModel"
               />
               <label for="password">Password</label>
+              @if (password.invalid && (password.dirty || password.touched)) {
+              <div class="text-danger small mt-1">
+                @if (password.errors?.['required']) {
+                <span>La password è obbligatoria.</span>
+                } @if (password.errors?.['minlength']) {
+                <span>La password deve essere di almeno 8 caratteri.</span>
+                }
+              </div>
+              }
             </div>
 
             <div class="d-grid gap-2">
-              <div class="form-check mb-2">
+              <div class="form-check mb-2 d-flex flex-row align-items-center" style="gap: 0.5rem">
                 <input
                   [(ngModel)]="acceptedPrivacy"
-                  class="form-check-input"
+                  class="form-check-input m-0"
                   type="checkbox"
                   id="privacyCheck"
                   name="privacyCheck"
+                  style="margin-top: 0"
                 />
-                <label class="form-check-label" for="privacyCheck">
+                <label
+                  class="form-check-label mb-0 flex-grow-1"
+                  for="privacyCheck"
+                  style="cursor: pointer"
+                >
                   Confermo di aver letto l'
-                  <a routerLink="/privacy" target="_blank">Informativa sulla Privacy</a>
+                  <a routerLink="/privacy" target="_blank" class="btn btn-link p-0 align-baseline"
+                    >Informativa sulla Privacy</a
+                  >
                 </label>
               </div>
 
@@ -86,7 +131,7 @@
                 type="button"
                 (click)="register()"
                 class="btn btn-success btn-lg"
-                [disabled]="!acceptedPrivacy"
+                [disabled]="!acceptedPrivacy || !registerForm.valid"
               >
                 <i class="bi bi-person-plus me-2" aria-hidden="true"></i>Registrati
               </button>

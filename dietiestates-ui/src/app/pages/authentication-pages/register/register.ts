@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RegistrationRequest } from '../../../services/models';
+import { ApiError, Violation } from '../../../services/models/error';
 import { Router } from '@angular/router';
 import { AuthenticationService } from '../../../services/services';
 
@@ -38,7 +39,20 @@ export class Register {
           this.router.navigate(['activate']);
         },
         error: (err) => {
-          this.errorMsg = err.error.validationErrors;
+          const apiError: ApiError = err.error;
+          console.log('ApiError:', apiError);
+          if (
+            apiError &&
+            apiError.violations &&
+            Array.isArray(apiError.violations) &&
+            apiError.violations.length > 0
+          ) {
+            this.errorMsg = apiError.violations.map((v: Violation) => v.message);
+          } else if (apiError && apiError.message) {
+            this.errorMsg = [apiError.message];
+          } else {
+            this.errorMsg = ['Errore durante la registrazione. Riprova più tardi.'];
+          }
         },
       });
   }
