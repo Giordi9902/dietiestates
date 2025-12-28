@@ -3,10 +3,32 @@ services:
     container_name: mail-dev-dietiestates
     image: maildev/maildev
     ports:
-      - 1080:1080
+      - "1080:1080"
       - "${MAIL_PORT}:1025"
     restart: unless-stopped
+    networks:
+      - dietiestates_network
+
+  dietiestates-backend:
+    container_name: dietiestates-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - MAIL_HOST=mail-dev
+    depends_on:
+      - mail-dev
+    restart: on-failure
+    networks:
+      - dietiestates_network
 
 networks:
   dietiestates_network:
     driver: bridge
+
+volumes:
+  postgres_data:
