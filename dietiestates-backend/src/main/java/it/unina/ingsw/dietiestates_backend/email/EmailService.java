@@ -29,8 +29,7 @@ public class EmailService {
 	@Value("${application.mailing.frontend.activation-url}")
 	private String activationUrl;
 
-	@Async
-	void sendUsingTemplate(String to, String subject, String templateName, Map<String,Object> variables) throws MessagingException {
+	private void sendUsingTemplate(String to, String subject, String templateName, Map<String,Object> variables) throws MessagingException {
 		JavaMailSender mailSender = mailSenderProvider.getObject();
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(
@@ -51,6 +50,7 @@ public class EmailService {
 		mailSender.send(mimeMessage);
 	}
 
+	@Async
 	public void sendActivationEmail(User user, String activationCode) throws MessagingException{
 		Map<String,Object> properties = new HashMap<>();
 		properties.put("username", user.getUsername());
@@ -59,6 +59,7 @@ public class EmailService {
 		sendUsingTemplate(user.getEmail(), "Activate your DietiEstates account", EmailTemplateName.ACTIVATE_ACCOUNT.getTemplateName(), properties);
 	}
 
+	@Async
 	public void sendAgentCreatedEmail(User user, String randomPassword, String otp) throws MessagingException {
 		Map<String,Object> properties = new HashMap<>();
 		properties.put("username", user.getUsername());
@@ -68,6 +69,7 @@ public class EmailService {
 		sendUsingTemplate(user.getEmail(), "Your Agent Account has been Created", EmailTemplateName.AGENT_CREATED.getTemplateName(), properties);
 	}
 
+	@Async
 	public void sendAgentPromotedEmail(User user) throws MessagingException {
 		Map<String,Object> properties = new HashMap<>();
 		properties.put("username", user.getUsername());
@@ -76,12 +78,14 @@ public class EmailService {
 				EmailTemplateName.AGENT_PROMOTED.getTemplateName(), properties);
 	}
 
+	@Async
 	public void sendPasswordChangedNotification(User user) throws MessagingException {
 		Map<String,Object> properties = new HashMap<>();
 		properties.put("username", user.getUsername());
 		sendUsingTemplate(user.getEmail(), "Your Password Has Been Changed", EmailTemplateName.PASSWORD_CHANGED.getTemplateName(), properties);
 	}
 
+	@Async
 	public void sendAgentRoleAdded(User newAgent) throws MessagingException {
 		Map<String,Object> properties = new HashMap<>();
 		properties.put("username",newAgent.getUsername());

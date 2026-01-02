@@ -21,6 +21,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -147,7 +148,8 @@ public class ListingService {
 		});
 	}
 
-	private void uploadImages(Listing listing, List<MultipartFile> images){
+	@Async
+	void uploadImages(Listing listing, List<MultipartFile> images){
 		if (images == null || images.isEmpty()) throw new IllegalArgumentException("images cannot be null or empty");
 		log.info("Uploading {} images for listing id={}", images.size(), listing.getId());
 		for (MultipartFile image : images) {
