@@ -4,10 +4,10 @@ In questo capitolo vengono illustrate in dettaglio le scelte architetturali, le 
 
 \section{Architettura del Sistema}
 \label{sec:architettura_del_sistema}
-Il sistema è stato progettato seguendo un'architettura multi-tier, specificamente un'architettura a tre livelli (Three-Tier Architecture), che separa nettamente la logica di presentazione, la logica di business e la gestione dei dati. Questo approccio favorisce la modularità, il disaccoppiamento tra i componenti e la possibilità di sviluppare, manutenere e scalare i singoli livelli in modo indipendente.
+Il sistema è stato progettato seguendo un'architettura multi-tier, specificamente un'architettura a tre livelli, che separa nettamente la logica di presentazione, la logica di business e la gestione dei dati. Questo approccio favorisce la modularità, il disaccoppiamento tra i componenti e la possibilità di sviluppare, manutenere e scalare i singoli livelli in modo indipendente.
 
 \subsection{Livello di Presentazione (Presentation Tier)}
-Il livello di presentazione è costituito da un'applicazione web di tipo Single-Page Application (SPA), sviluppata con il framework Angular. Questa applicazione viene eseguita interamente nel browser dell'utente e ha la responsabilità di renderizzare l'interfaccia grafica, gestire le interazioni dell'utente e comunicare con il livello di business tramite chiamate API. La scelta di una SPA permette di offrire un'esperienza utente fluida e reattiva, simile a quella di un'applicazione desktop, minimizzando i tempi di attesa grazie al caricamento asincrono dei dati.
+Il livello di presentazione è costituito da un'applicazione web di tipo Single-Page Application (SPA), sviluppata con il framework \textbf{Angular}. Questa applicazione viene eseguita interamente nel browser dell'utente e ha la responsabilità di renderizzare l'interfaccia grafica, gestire le interazioni dell'utente e comunicare con il livello di business tramite chiamate API. La scelta di una SPA permette di offrire un'esperienza utente fluida e reattiva, simile a quella di un'applicazione desktop, minimizzando i tempi di attesa grazie al caricamento asincrono dei dati.
 
 \subsection{Livello di Business (Application Tier)}
 Il cuore del sistema risiede nel livello di business, un'applicazione backend sviluppata in Java utilizzando il framework Spring Boot. Questo livello espone un'interfaccia RESTful API sicura, attraverso la quale il client può accedere alle funzionalità del sistema. Le responsabilità di questo tier includono:
@@ -223,7 +223,7 @@ La connettività con S3 è incapsulata in una classe di configurazione (vedi \te
 Questa integrazione fornisce un modello scalabile, sicuro e robusto per la gestione delle immagini, capace di mantenere la coerenza tra storage e metadati relazionali.
 
 
-\begin{lstlisting}[language=SQL, caption={Schema DDL}]
+\begin{lstlisting}[language=SQL]
 -- Estensioni
 CREATE EXTENSION IF NOT EXISTS postgis;
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
