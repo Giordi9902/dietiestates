@@ -1,5 +1,6 @@
-package it.unina.ingsw.dietiestates_backend.security;
+package it.unina.ingsw.dietiestates_backend.config;
 
+import it.unina.ingsw.dietiestates_backend.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.PrecisionModel;
@@ -18,8 +19,6 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.Collections;
-
-import static org.springframework.http.HttpHeaders.ORIGIN;
 
 @Configuration
 @RequiredArgsConstructor

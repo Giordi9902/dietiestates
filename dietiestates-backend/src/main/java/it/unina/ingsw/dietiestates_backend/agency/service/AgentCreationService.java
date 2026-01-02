@@ -8,6 +8,7 @@ import it.unina.ingsw.dietiestates_backend.auth.model.User;
 import it.unina.ingsw.dietiestates_backend.auth.repository.RoleRepository;
 import it.unina.ingsw.dietiestates_backend.auth.repository.UserRepository;
 import it.unina.ingsw.dietiestates_backend.auth.service.OtpService;
+import it.unina.ingsw.dietiestates_backend.config.Costants;
 import it.unina.ingsw.dietiestates_backend.email.EmailService;
 import it.unina.ingsw.dietiestates_backend.errors.exception.UserIsAlreadyAgentException;
 import jakarta.mail.MessagingException;
@@ -43,8 +44,8 @@ public class AgentCreationService {
     }
 
     private void createAgentFromScratch(CreateAgentRequest request, Agency agency) throws MessagingException {
-        Role agentRole = getRoleByName("ROLE_AGENT");
-        Role userRole = getRoleByName("ROLE_USER");
+        Role agentRole = getRoleByName(Costants.ROLE_AGENT);
+        Role userRole = getRoleByName(Costants.ROLE_USER);
         User agent = createAgentEntity(request);
         initializeRolesIfNeeded(agent);
         String rawPassword = generateRandomPassword();
@@ -58,9 +59,9 @@ public class AgentCreationService {
     }
 
     private void addAgentRoleToExistingUser(User newAgent, Agency agency) throws MessagingException {
-        Role agentRole = getRoleByName("ROLE_AGENT");
+        Role agentRole = getRoleByName(Costants.ROLE_AGENT);
 
-        boolean isAlreadyAgent = newAgent.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_AGENT"));
+        boolean isAlreadyAgent = newAgent.getRoles().stream().anyMatch(role -> role.getName().equals(Costants.ROLE_AGENT));
 
         if (isAlreadyAgent) {
             if (newAgent.getAgency() != null && !newAgent.getAgency().getId().equals(agency.getId())) {

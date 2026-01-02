@@ -9,6 +9,7 @@ import it.unina.ingsw.dietiestates_backend.auth.model.Role;
 import it.unina.ingsw.dietiestates_backend.auth.model.User;
 import it.unina.ingsw.dietiestates_backend.auth.repository.RoleRepository;
 import it.unina.ingsw.dietiestates_backend.auth.repository.UserRepository;
+import it.unina.ingsw.dietiestates_backend.config.Costants;
 import it.unina.ingsw.dietiestates_backend.email.EmailService;
 import it.unina.ingsw.dietiestates_backend.errors.exception.AgentWithAdminRoleException;
 import it.unina.ingsw.dietiestates_backend.errors.exception.CannotRevokeAdminException;
@@ -58,7 +59,7 @@ public class AdminService {
 
     public void promote(Integer agentId) throws MessagingException {
         User agent = userRepository.findById(agentId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        var adminAssistantRole = getRoleByName("ROLE_ADMIN_ASSISTANT");
+        var adminAssistantRole = getRoleByName(Costants.ROLE_ADMIN_ASSISTANT);
 
         if(agent.getRoles().contains(adminAssistantRole)){
             throw new AgentWithAdminRoleException("L'agente possiede già il ruolo di assistente amministratore");
@@ -73,7 +74,7 @@ public class AdminService {
 
     public void deleteAgent(Integer agentId) {
         User agent = userRepository.findById(agentId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        var adminRole = getRoleByName("ROLE_ADMIN");
+        var adminRole = getRoleByName(Costants.ROLE_ADMIN);
         if(agent.getRoles().contains(adminRole)){
             throw new CannotRevokeAdminException("You cannot revoke admin privileges to another administrator!");
         }
