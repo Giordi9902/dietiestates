@@ -36,6 +36,46 @@ Per l'ambiente di produzione, il sistema adotta servizi cloud gestiti per garant
     \label{fig:architettura_rds_s3}
 \end{center}
 
+\subsection{Build del progetto}
+Il processo di build e messa in esecuzione del backend è stato progettato per essere ripetibile, portabile e pronto al deploy in ambienti cloud come AWS EC2. La strategia adottata combina la build del pacchetto applicativo Java (JAR) tramite Maven con la containerizzazione tramite Docker, e l'orchestrazione locale tramite Docker Compose.
+
+\paragraph{Motivazioni della containerizzazione}
+L'uso di Docker per il backend abilita diversi benefici chiave:
+\begin{itemize}
+    \item \textbf{Replicabilità e coerenza:} l'immagine Docker incapsula runtime, dipendenze e configurazioni, eliminando il classico \textit{“funziona sul mio PC”}.
+    \item \textbf{Portabilità:} la stessa immagine può essere eseguita in locale, su EC2 o in un cluster orchestrato, senza variazioni di ambiente.
+    \item \textbf{Immutabilità e versionamento:} le immagini sono versionate (tag), favorendo rollback e tracciabilità nei pipeline CI/CD.
+    \item \textbf{Sicurezza e isolamento:} i container isolano processi e risorse; le configurazioni sensibili transitano via variabili d'ambiente e/o file esterni.
+    \item \textbf{Scalabilità operativa:} deployment semplificati, aggiornamenti atomici (pull + restart), integrazione naturale con registri di immagini (es. Amazon ECR).
+\end{itemize}
+
+\paragraph{Script di avvio \texttt{startup.sh}}
+Lo script \hi{startup.sh} automatizza le due fasi principali:
+\begin{itemize}
+    \item \textbf{Build Maven:} \texttt{mvn clean package -DskipTests} produce il JAR dell'app, ripulendo artefatti precedenti. L'opzione \texttt{-DskipTests} velocizza la build in contesti di sviluppo.
+    \item \textbf{Avvio dei servizi:} \texttt{docker compose up -d --build --remove-orphans} costruisce l'immagine del backend a partire dal Dockerfile e avvia i servizi definiti in Compose in modalità detatched.
+\end{itemize}
+Questo consente, con un singolo comando, di ottenere un JAR aggiornato e un container backend pronto, affiancato dagli eventuali servizi di sviluppo.
+
+\paragraph{Dockerfile del backend}
+Il file \hi{Dockerfile} definisce come impacchettare l'app Spring Boot in un'immagine eseguibile:
+\begin{itemize}
+    \item \textbf{Base image:} \texttt{eclipse-temurin:21-jdk-alpine} fornisce OpenJDK 21 su Alpine Linux, riducendo dimensione e tempi di pull.
+    \item \textbf{Build arg:} \texttt{ARG JAR\_FILE=target/DietiEstates25-Backend-App.jar} permette di parametrizzare il percorso del JAR (utile in CI).
+    \item \textbf{Packaging:} \texttt{COPY \${JAR\_FILE} app.jar} inserisce il JAR nell'immagine in un path standard.
+    \item \textbf{Networking:} \texttt{EXPOSE 8080} documenta la porta applicativa.
+    \item \textbf{Entrypoint:} \texttt{ENTRYPOINT ["java", "-jar", "/app.jar"]} esegue l'app come processo principale del container.
+\end{itemize}
+Questa impostazione favorisce semplicità (un unico artefatto) e chiarezza operativa, con un runtime Java aggiornato e supportato.
+
+\paragraph{Docker Compose per sviluppo}
+Il file \hi{docker-compose.yml} orchestra i servizi utili allo sviluppo locale:
+\begin{itemize}
+    \item \textbf{\textit{mail-dev}:} servizio basato su \texttt{maildev/maildev}, espone interfaccia web su 1080 e SMTP su 1025 (mappato da \texttt{\${MAIL\_PORT}}). Consente di testare template email senza recapito reale.
+    \item \textbf{\textit{dietiestates-backend}:} costruisce l'immagine dal Dockerfile, espone 8080, carica variabili da file \texttt{.env} e imposta \texttt{MAIL\_HOST=mail-dev} per puntare al servizio SMTP di sviluppo. \texttt{depends\_on} garantisce l'ordine di avvio.
+    \item \textbf{Networking:} i servizi condividono la rete \texttt{dietiestates\_network} per la risoluzione DNS interna.
+\end{itemize}
+
 \section{Tecnologie Adottate}
 \label{sec:tecnologie_adottate}
 La selezione delle tecnologie è stata guidata da criteri di maturità, supporto della comunità, produttività e aderenza agli standard di mercato.
@@ -47,6 +87,15 @@ La selezione delle tecnologie è stata guidata da criteri di maturità, supporto
     \item \textbf{JPA/Hibernate:} Standard per la persistenza dei dati in Java. Hibernate, come implementazione JPA, gestisce la mappatura degli oggetti Java alle tabelle del database, semplificando le operazioni CRUD e le query complesse.
     \item \textbf{Maven:} Strumento di build automation e gestione delle dipendenze, utilizzato per definire la struttura del progetto, compilare il codice sorgente e gestire le librerie di terze parti.
     \item \textbf{Docker:} Piattaforma di containerizzazione utilizzata tramite Docker Compose per definire e orchestrare l'ambiente di sviluppo e produzione, garantendo coerenza e replicabilità tra le diverse macchine e semplificando il deployment.
+\end{itemize}
+
+\subsection{Frontend}
+\begin{itemize}
+	\item \textbf{Angular:} Framework client-side basato su TypeScript, sviluppato da Google. È stato scelto per la sua architettura a componenti, che promuove la riusabilità del codice, e per il suo potente sistema di dependency injection, che facilita la scrittura di codice modulare e testabile.
+
+	\item \textbf{TypeScript:} Superset di JavaScript che introduce la tipizzazione statica. Il suo utilizzo migliora la robustezza del codice, previene errori comuni in fase di sviluppo e aumenta la manutenibilità a lungo termine del progetto.
+
+	\item \textbf{OpenAPI Generator:} Strumento fondamentale per l'integrazione tra frontend e backend. A partire dalla specifica OpenAPI esposta dal backend, questo strumento genera automaticamente un client API TypeScript completo e type-safe. Questo approccio riduce drasticamente il rischio di disallineamenti e è un pilastro per lo sviluppo contract-first.
 \end{itemize}
 
 \subsection{Approfondimento: Sicurezza con Spring Security e OpenID Connect}
@@ -94,15 +143,6 @@ Accanto agli access token, il sistema implementa anche l'uso di refresh token. I
 \begin{center}
     \includegraphics[width=\textwidth]{res/security.png}
 \end{center}
-
-\subsection{Frontend}
-\begin{itemize}
-    \item \textbf{Angular:} Framework client-side basato su TypeScript, sviluppato da Google. È stato scelto per la sua architettura a componenti, che promuove la riusabilità del codice, e per il suo potente sistema di dependency injection, che facilita la scrittura di codice modulare e testabile.
-
-    \item \textbf{TypeScript:} Superset di JavaScript che introduce la tipizzazione statica. Il suo utilizzo migliora la robustezza del codice, previene errori comuni in fase di sviluppo e aumenta la manutenibilità a lungo termine del progetto.
-
-    \item \textbf{OpenAPI Generator:} Strumento fondamentale per l'integrazione tra frontend e backend. A partire dalla specifica OpenAPI esposta dal backend, questo strumento genera automaticamente un client API TypeScript completo e type-safe. Questo approccio riduce drasticamente il rischio di disallineamenti e è un pilastro per lo sviluppo contract-first.
-\end{itemize}
 
 \section{Design dell'Interfaccia Utente (UI)}
 \label{sec:design_dell_interfaccia_utente_ui}
