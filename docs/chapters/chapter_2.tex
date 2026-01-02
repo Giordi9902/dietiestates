@@ -10,18 +10,31 @@ Il sistema è stato progettato seguendo un'architettura multi-tier, specificamen
 Il livello di presentazione è costituito da un'applicazione web di tipo Single-Page Application (SPA), sviluppata con il framework Angular. Questa applicazione viene eseguita interamente nel browser dell'utente e ha la responsabilità di renderizzare l'interfaccia grafica, gestire le interazioni dell'utente e comunicare con il livello di business tramite chiamate API. La scelta di una SPA permette di offrire un'esperienza utente fluida e reattiva, simile a quella di un'applicazione desktop, minimizzando i tempi di attesa grazie al caricamento asincrono dei dati.
 
 \subsection{Livello di Business (Application Tier)}
-Il cuore del sistema risiede nel livello di business, un'applicazione backend sviluppata in Java utilizzando il framework Spring Boot. Questo livello espone un'interfaccia RESTful API sicura, attraverso la quale il client (l'applicazione Angular) può accedere alle funzionalità del sistema. Le responsabilità di questo tier includono:
+Il cuore del sistema risiede nel livello di business, un'applicazione backend sviluppata in Java utilizzando il framework Spring Boot. Questo livello espone un'interfaccia RESTful API sicura, attraverso la quale il client può accedere alle funzionalità del sistema. Le responsabilità di questo tier includono:
 \begin{itemize}
     \item \textbf{Gestione della Logica di Business:} Implementazione di tutte le logiche applicative, come la gestione degli annunci immobiliari, la gestione degli utenti e dei loro ruoli.
     \item \textbf{Autenticazione e Autorizzazione:} messa in sicurezza degli endpoint dell'API tramite Spring Security, gestendo l'autenticazione degli utenti (login) e l'autorizzazione basata sui ruoli (utente, agente, amministratore).
     \item \textbf{Comunicazione con il Livello Dati:} Interazione con il database PostgreSQL per il salvataggio e il recupero persistente delle informazioni.
+    \item \textbf{Invio e Test Email (sviluppo):} in ambiente di development l'applicazione invia i messaggi SMTP verso il servizio \textit{MailDev}, che intercetta e rende disponibili le email su un'interfaccia web locale senza recapito reale. Questo consente di verificare contenuti, link e template (es. attivazione account, reset/cambio password) in modo sicuro e ripetibile; in produzione può essere configurato un provider SMTP reale.
 \end{itemize}
-La comunicazione tra il Presentation Tier e l'Application Tier avviene tramite il protocollo HTTP/S, con scambio di dati in formato JSON (JavaScript Object Notation), uno standard leggero e facilmente interpretabile da entrambi i sistemi.
 
 \subsection{Livello Dati (Data Tier)}
-Il livello dati è responsabile della persistenza delle informazioni. È costituito da un database relazionale (ad esempio PostgreSQL) che memorizza tutti i dati dell'applicazione, come le anagrafiche degli utenti, i dettagli degli immobili e le agenzie immobiliari con i loro agenti.
+Il livello dati è responsabile della persistenza delle informazioni. È costituito da un database relazionale PostgreSQL che memorizza tutti i dati dell'applicazione, come le anagrafiche degli utenti, i dettagli degli immobili e le agenzie immobiliari con i loro agenti.
 
 L'accesso a questo livello è gestito esclusivamente dall'Application Tier, che si avvale di un Object-Relational Mapper (ORM) come Hibernate, tramite l'astrazione offerta da Spring Data JPA. L'uso di un ORM astrae la complessità del linguaggio SQL, permettendo agli sviluppatori di interagire con il database attraverso oggetti Java (Entity), migliorando la manutenibilità e la portabilità del codice.
+
+\subsection{Servizi Cloud di Infrastruttura (RDS, S3)}
+Per l'ambiente di produzione, il sistema adotta servizi cloud gestiti per garantire disponibilità, sicurezza e scalabilità dei componenti di persistenza e storage. In particolare:
+\begin{itemize}
+    \item \textbf{Amazon RDS (PostgreSQL):} il database relazionale è eseguito su Amazon RDS, che offre alta disponibilità, backup automatizzati, aggiornamenti gestiti e funzionalità di monitoring, riducendo l'onere operativo e migliorando l'affidabilità del Data Tier.
+    \item \textbf{Amazon S3:} lo storage delle immagini è affidato a Amazon S3, che gestisce in modo scalabile i contenuti binari (upload, versioning, politiche di accesso) mantenendo i metadati nel database applicativo. Questo approccio separa nettamente i contenuti statici dalla persistenza relazionale e si integra con i servizi del livello di business.
+\end{itemize}
+
+\begin{center}
+    \includegraphics[width=\linewidth]{res/Architettura_3Layer.png}
+    \captionof{figure}{Architettura a tre livelli con integrazione RDS e S3}
+    \label{fig:architettura_rds_s3}
+\end{center}
 
 \section{Tecnologie Adottate}
 \label{sec:tecnologie_adottate}
@@ -209,6 +222,162 @@ La connettività con S3 è incapsulata in una classe di configurazione (vedi \te
 
 Questa integrazione fornisce un modello scalabile, sicuro e robusto per la gestione delle immagini, capace di mantenere la coerenza tra storage e metadati relazionali.
 
+
+\begin{lstlisting}[language=SQL, caption={Schema DDL}]
+-- Estensioni
+CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+
+-- 1. Tabella AGENCIES
+CREATE TABLE agencies (
+    id INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    name VARCHAR(255) NOT NULL CONSTRAINT unique_agency_name UNIQUE,
+    email VARCHAR(255),
+    phone_number VARCHAR(255)
+);
+
+-- 2. Tabella ROLE
+CREATE TABLE role (
+    id INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    name VARCHAR(255) CONSTRAINT unique_role_names UNIQUE,
+    created_date TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_modified_date TIMESTAMP
+);
+
+-- 3. Tabella USERS
+CREATE TABLE users (
+    id INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    firstname VARCHAR(255),
+    lastname VARCHAR(255),
+    email VARCHAR(255) CONSTRAINT unique_email_for_user UNIQUE,
+    password VARCHAR(255),
+    date_of_birth DATE,
+    enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    account_locked BOOLEAN NOT NULL DEFAULT FALSE,
+    provider VARCHAR(255) CONSTRAINT users_provider_check CHECK (provider IN ('local', 'google', 'github')),
+    agency_id INTEGER REFERENCES agencies(id),
+    created_date TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_modified_date TIMESTAMP
+);
+
+-- 4. Tabella USERS_ROLES (Many-to-Many)
+CREATE TABLE users_roles (
+    users_id INTEGER NOT NULL REFERENCES users(id),
+    roles_id INTEGER NOT NULL REFERENCES role(id),
+    PRIMARY KEY (users_id, roles_id)
+);
+
+-- 5. Tabella LISTING
+CREATE TABLE listing (
+    listing_id INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    title VARCHAR(255),
+    description TEXT,
+    address VARCHAR(255),
+    price NUMERIC(38,2),
+    area DOUBLE PRECISION,
+    rooms INTEGER,
+    bathrooms INTEGER,
+    floor INTEGER,
+    energy_class VARCHAR(10) CONSTRAINT listing_energy_class_check CHECK (energy_class IN ('A4','A3','A2','A1','B','C','D','E','F','G')),
+    listing_operation VARCHAR(50) CONSTRAINT listing_listing_operation_check CHECK (listing_operation IN ('SALE', 'RENT')),
+    has_balcony BOOLEAN DEFAULT FALSE,
+    has_elevator BOOLEAN DEFAULT FALSE,
+    has_garden BOOLEAN DEFAULT FALSE,
+    has_parking BOOLEAN DEFAULT FALSE,
+    coordinate GEOMETRY(Point, 4326),
+    listed_by_agent_id INTEGER REFERENCES users(id),
+    created_date TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_modified_date TIMESTAMP
+);
+
+-- 6. Tabella LISTING_IMAGE
+CREATE TABLE listing_image (
+    image_id INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    url VARCHAR(255),
+    sort_order INTEGER DEFAULT 0,
+    listing_id INTEGER NOT NULL REFERENCES listing(listing_id),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- 7. Tabella OTP_TOKEN
+CREATE TABLE otp_token (
+    id INTEGER GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    token VARCHAR(255),
+    user_id INTEGER NOT NULL REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    expires_at TIMESTAMP,
+    validated_at TIMESTAMP
+);
+
+-- 8. Tabella REFRESH_TOKENS
+CREATE TABLE refresh_tokens (
+    id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+    token VARCHAR(512) NOT NULL CONSTRAINT unique_token UNIQUE,
+    username VARCHAR(255) NOT NULL,
+    revoked BOOLEAN NOT NULL DEFAULT FALSE,
+    expiry_date TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indice Spaziale
+CREATE INDEX idx_geom_listing ON listing USING GIST(coordinate);
+
+---
+-- DATI INIZIALI
+---
+INSERT INTO agencies (email, name, phone_number) VALUES
+('info@immobiliaresole.it', 'Immobiliare Sole', '+39 06 5589123'),
+('contatti@casabellaagency.it', 'Casa Bella Agency', '+39 02 4478211'),
+('support@domusre.it', 'Domus Real Estate', '+39 011 6734521'),
+('info@primacasa.it', 'PrimaCasa Immobiliare', '+39 081 7753344'),
+('agenzia@trovocasa24.it', 'TrovoCasa24', '+39 055 9234112'),
+('info@eliteimmobili.it', 'Elite Immobili', '+39 070 4459100'),
+('contatti@mediterraneare.it', 'Mediterranea Real Estate', '+39 090 3321187'),
+('info@residenzealfa.it', 'Residenze Alfa', '+39 041 7723456'),
+('support@goldhouseagency.it', 'Gold House Agency', '+39 030 2299912'),
+('info@urbanlivingre.it', 'Urban Living RE', '+39 051 9832211');
+
+---
+-- FUNZIONI E PROCEDURE
+---
+
+-- Procedura Revoke Agent
+CREATE OR REPLACE FUNCTION revoke_agent(user_id_in INTEGER)
+RETURNS VOID AS $$
+BEGIN
+    DELETE FROM users_roles
+    WHERE users_id = user_id_in
+    AND roles_id IN (SELECT id FROM role WHERE name IN ('ROLE_AGENT', 'ROLE_ADMIN_ASSISTANT'));
+
+    UPDATE users
+    SET agency_id = NULL, last_modified_date = NOW()
+    WHERE id = user_id_in;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Funzione Recupero Listing
+CREATE OR REPLACE FUNCTION get_listings_by_agent(p_agent_id INT)
+RETURNS TABLE (
+    listing_id INT, title VARCHAR, description TEXT, address VARCHAR,
+    rooms INT, bathrooms INT, price NUMERIC, listingOperation VARCHAR,
+    area DOUBLE PRECISION, energy_class VARCHAR, longitude DOUBLE PRECISION,
+    latitude DOUBLE PRECISION, thumbnail_url VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        l.listing_id, l.title, l.description, l.address,
+        l.rooms, l.bathrooms, l.price, l.listing_operation,
+        l.area, l.energy_class,
+        ST_X(l.coordinate), ST_Y(l.coordinate),
+        (SELECT url FROM listing_image li WHERE li.listing_id = l.listing_id
+         ORDER BY COALESCE(li.sort_order, 0) ASC LIMIT 1)
+    FROM listing l
+    WHERE l.listed_by_agent_id = p_agent_id;
+END;
+$$ LANGUAGE plpgsql;
+\end{lstlisting}
+
 \newpage
 
 \section{Diagramma delle classi di design}
@@ -238,10 +407,10 @@ Di seguito le descrizioni per package principali presenti nel backend. Per ciasc
 \item  Service: \texttt{AuthenticationService}, \texttt{UserService}, \texttt{RefreshTokenService}, \texttt{OtpService} — orchestrano autenticazione, gestione token e operazioni utente.
 \item  Model: \texttt{User}, \texttt{Role}, \texttt{RefreshToken}, \texttt{OtpToken}.
 \item  DTO: \begin{itemize}
-	\item \texttt{AuthenticationRequest}, 
-	\item \texttt{AuthenticationResponse}, 
-	\item \texttt{RegistrationRequest}, 
-	\item \texttt{UpdateProfileRequest}, 
+	\item \texttt{AuthenticationRequest},
+	\item \texttt{AuthenticationResponse},
+	\item \texttt{RegistrationRequest},
+	\item \texttt{UpdateProfileRequest},
 	\item \texttt{UserDetailsResponse}.
 \end{itemize}
 \item  Repository: \texttt{UserRepository}, \texttt{RoleRepository}, \texttt{RefreshTokenRepository}, \texttt{OtpTokenRepository}.
@@ -278,6 +447,7 @@ Di seguito le descrizioni per package principali presenti nel backend. Per ciasc
 	\includegraphics[width=\linewidth]{res/Packages/Agency/Agency_CD.png}
 \end{center}
 
+\pagebreak
 
 \section{Diagrammi di sequenza}
 
