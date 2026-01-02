@@ -2,8 +2,8 @@ package it.unina.ingsw.dietiestates_backend.auth.service;
 
 import it.unina.ingsw.dietiestates_backend.auth.dto.AuthenticationRequest;
 import it.unina.ingsw.dietiestates_backend.auth.dto.AuthenticationResponse;
-import it.unina.ingsw.dietiestates_backend.auth.dto.RegistrationRequest;
 import it.unina.ingsw.dietiestates_backend.auth.dto.RefreshTokenRequest;
+import it.unina.ingsw.dietiestates_backend.auth.dto.RegistrationRequest;
 import it.unina.ingsw.dietiestates_backend.auth.model.OtpToken;
 import it.unina.ingsw.dietiestates_backend.auth.model.RefreshToken;
 import it.unina.ingsw.dietiestates_backend.auth.model.User;

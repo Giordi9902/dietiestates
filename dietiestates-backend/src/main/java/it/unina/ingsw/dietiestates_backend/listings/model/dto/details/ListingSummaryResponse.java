@@ -1,6 +1,5 @@
 package it.unina.ingsw.dietiestates_backend.listings.model.dto.details;
 
-import it.unina.ingsw.dietiestates_backend.listings.model.enums.ListingOperation;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

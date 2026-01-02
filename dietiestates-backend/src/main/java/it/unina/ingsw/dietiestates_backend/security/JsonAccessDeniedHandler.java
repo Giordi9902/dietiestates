@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 public class JsonAccessDeniedHandler implements AccessDeniedHandler {

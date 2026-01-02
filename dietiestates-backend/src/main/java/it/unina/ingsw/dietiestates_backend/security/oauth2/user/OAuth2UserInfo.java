@@ -2,7 +2,6 @@ package it.unina.ingsw.dietiestates_backend.security.oauth2.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Map;
 

@@ -1,6 +1,5 @@
 package it.unina.ingsw.dietiestates_backend.auth.service;
 
-import it.unina.ingsw.dietiestates_backend.auth.controller.UserController;
 import it.unina.ingsw.dietiestates_backend.auth.dto.ChangePasswordRequest;
 import it.unina.ingsw.dietiestates_backend.auth.dto.UpdateProfileRequest;
 import it.unina.ingsw.dietiestates_backend.auth.dto.UserDetailsResponse;
@@ -10,7 +9,6 @@ import it.unina.ingsw.dietiestates_backend.email.EmailService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

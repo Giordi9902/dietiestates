@@ -3,7 +3,6 @@ package it.unina.ingsw.dietiestates_backend.listings.service.mapper;
 import it.unina.ingsw.dietiestates_backend.listings.model.Listing;
 import it.unina.ingsw.dietiestates_backend.listings.model.dto.creational.CreateListingRequest;
 import it.unina.ingsw.dietiestates_backend.listings.model.dto.details.ListingDetailsResponse;
-import it.unina.ingsw.dietiestates_backend.listings.model.dto.details.ListingSummaryResponse;
 import it.unina.ingsw.dietiestates_backend.listings.service.GeometryService;
 import it.unina.ingsw.dietiestates_backend.listings.service.ListingImageService;
 import lombok.RequiredArgsConstructor;

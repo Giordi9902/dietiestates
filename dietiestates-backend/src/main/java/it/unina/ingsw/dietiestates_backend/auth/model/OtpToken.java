@@ -2,6 +2,7 @@ package it.unina.ingsw.dietiestates_backend.auth.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Getter
