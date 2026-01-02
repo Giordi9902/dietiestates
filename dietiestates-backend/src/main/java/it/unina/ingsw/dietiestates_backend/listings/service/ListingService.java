@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -110,23 +111,134 @@ public class ListingService {
 	}
 
 	private void applyUpdateFields(Listing listing, UpdateListingRequest request) {
-		if (request.getTitle() != null) listing.setTitle(request.getTitle());
-		if (request.getDescription() != null) listing.setDescription(request.getDescription());
-		if (request.getAddress() != null) listing.setAddress(request.getAddress());
-		if (request.getArea() != null) listing.setArea(request.getArea());
-		if (request.getFloor() != null) listing.setFloor(request.getFloor());
-		if (request.getRooms() != null) listing.setRooms(request.getRooms());
-		if (request.getBathrooms() != null) listing.setBathrooms(request.getBathrooms());
-		if (request.getEnergyClass() != null) listing.setEnergyClass(request.getEnergyClass());
-		if (request.getHasElevator() != null) listing.setHasElevator(request.getHasElevator());
-		if (request.getHasParking() != null) listing.setHasParking(request.getHasParking());
-		if (request.getHasGarden() != null) listing.setHasGarden(request.getHasGarden());
-		if (request.getHasBalcony() != null) listing.setHasBalcony(request.getHasBalcony());
+		updateTitle(listing, request);
+		updateDescription(listing, request);
+		updateAddress(listing, request);
+		updateArea(listing, request);
+		updatePrice(listing, request);
+		updateOperation(listing, request);
+		updateFloor(listing, request);
+		updateRooms(listing, request);
+		updateBathrooms(listing, request);
+		updateEnergyClass(listing, request);
+		updateHasElevator(listing, request);
+		updateHasParking(listing, request);
+		updateHasGarden(listing, request);
+		updateHasBalcony(listing, request);
+		updateCoordinates(listing, request);
+	}
 
+	private void updateTitle(Listing listing, UpdateListingRequest request) {
+		if (request.getTitle() != null && !Objects.equals(listing.getTitle(), request.getTitle())) {
+			log.info("Updating title: '{}' -> '{}'", listing.getTitle(), request.getTitle());
+			listing.setTitle(request.getTitle());
+		}
+	}
+
+	private void updateDescription(Listing listing, UpdateListingRequest request) {
+		if (request.getDescription() != null && !Objects.equals(listing.getDescription(), request.getDescription())) {
+			log.info("Updating description: '{}' -> '{}'", listing.getDescription(), request.getDescription());
+			listing.setDescription(request.getDescription());
+		}
+	}
+
+	private void updateAddress(Listing listing, UpdateListingRequest request) {
+		if (request.getAddress() != null && !Objects.equals(listing.getAddress(), request.getAddress())) {
+			log.info("Updating address: '{}' -> '{}'", listing.getAddress(), request.getAddress());
+			listing.setAddress(request.getAddress());
+		}
+	}
+
+	private void updateArea(Listing listing, UpdateListingRequest request) {
+		if (request.getArea() != null && !Objects.equals(listing.getArea(), request.getArea())) {
+			log.info("Updating area: {} -> {}", listing.getArea(), request.getArea());
+			listing.setArea(request.getArea());
+		}
+	}
+
+	private void updatePrice(Listing listing, UpdateListingRequest request) {
+		if (request.getPrice() != null && !Objects.equals(listing.getPrice(), request.getPrice())) {
+			log.info("Updating price: {} -> {}", listing.getPrice(), request.getPrice());
+			listing.setPrice(request.getPrice());
+		}
+	}
+
+	private void updateOperation(Listing listing, UpdateListingRequest request) {
+		if (request.getListingOperation() != null && !Objects.equals(listing.getListingOperation(), request.getListingOperation())) {
+			log.info("Updating operation: {} -> {}", listing.getListingOperation(), request.getListingOperation());
+			listing.setListingOperation(request.getListingOperation());
+		}
+	}
+
+	private void updateFloor(Listing listing, UpdateListingRequest request) {
+		if (request.getFloor() != null && !Objects.equals(listing.getFloor(), request.getFloor())) {
+			log.info("Updating floor: {} -> {}", listing.getFloor(), request.getFloor());
+			listing.setFloor(request.getFloor());
+		}
+	}
+
+	private void updateRooms(Listing listing, UpdateListingRequest request) {
+		if (request.getRooms() != null && !Objects.equals(listing.getRooms(), request.getRooms())) {
+			log.info("Updating rooms: {} -> {}", listing.getRooms(), request.getRooms());
+			listing.setRooms(request.getRooms());
+		}
+	}
+
+	private void updateBathrooms(Listing listing, UpdateListingRequest request) {
+		if (request.getBathrooms() != null && !Objects.equals(listing.getBathrooms(), request.getBathrooms())) {
+			log.info("Updating bathrooms: {} -> {}", listing.getBathrooms(), request.getBathrooms());
+			listing.setBathrooms(request.getBathrooms());
+		}
+	}
+
+	private void updateEnergyClass(Listing listing, UpdateListingRequest request) {
+		if (request.getEnergyClass() != null && !Objects.equals(listing.getEnergyClass(), request.getEnergyClass())) {
+			log.info("Updating energyClass: {} -> {}", listing.getEnergyClass(), request.getEnergyClass());
+			listing.setEnergyClass(request.getEnergyClass());
+		}
+	}
+
+	private void updateHasElevator(Listing listing, UpdateListingRequest request) {
+		if (request.getHasElevator() != null && !Objects.equals(listing.getHasElevator(), request.getHasElevator())) {
+			log.info("Updating hasElevator: {} -> {}", listing.getHasElevator(), request.getHasElevator());
+			listing.setHasElevator(request.getHasElevator());
+		}
+	}
+
+	private void updateHasParking(Listing listing, UpdateListingRequest request) {
+		if (request.getHasParking() != null && !Objects.equals(listing.getHasParking(), request.getHasParking())) {
+			log.info("Updating hasParking: {} -> {}", listing.getHasParking(), request.getHasParking());
+			listing.setHasParking(request.getHasParking());
+		}
+	}
+
+	private void updateHasGarden(Listing listing, UpdateListingRequest request) {
+		if (request.getHasGarden() != null && !Objects.equals(listing.getHasGarden(), request.getHasGarden())) {
+			log.info("Updating hasGarden: {} -> {}", listing.getHasGarden(), request.getHasGarden());
+			listing.setHasGarden(request.getHasGarden());
+		}
+	}
+
+	private void updateHasBalcony(Listing listing, UpdateListingRequest request) {
+		if (request.getHasBalcony() != null && !Objects.equals(listing.getHasBalcony(), request.getHasBalcony())) {
+			log.info("Updating hasBalcony: {} -> {}", listing.getHasBalcony(), request.getHasBalcony());
+			listing.setHasBalcony(request.getHasBalcony());
+		}
+	}
+
+	private void updateCoordinates(Listing listing, UpdateListingRequest request) {
 		if (request.getLng() != null && request.getLat() != null) {
-			Point point = geometryFactory.createPoint(new Coordinate(request.getLng(), request.getLat()));
-			point.setSRID(4326);
-			listing.setCoordinate(point);
+			Point prev = listing.getCoordinate();
+			boolean changed = prev == null
+				|| Double.compare(prev.getX(), request.getLng()) != 0
+				|| Double.compare(prev.getY(), request.getLat()) != 0;
+			if (changed) {
+				String prevCoord = prev != null ? ("lat=" + prev.getY() + ", lng=" + prev.getX()) : "null";
+				log.info("Updating coordinate: {} -> lat={}, lng={}", prevCoord, request.getLat(), request.getLng());
+				Point point = geometryFactory.createPoint(new Coordinate(request.getLng(), request.getLat()));
+				point.setSRID(4326);
+				listing.setCoordinate(point);
+			}
 		}
 	}
 

@@ -1,22 +1,40 @@
+.header-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
 .card-img-top {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
   object-fit: cover;
-  height: 200px;
+  max-height: 200px;
 }
 
 .placeholder-thumb {
-  height: 200px;
+  aspect-ratio: 16/9;
+  min-height: 140px;
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.75rem 1rem;
 }
 
 .info-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+  min-width: 0;
+}
+
+.info-item i {
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
+.info-item > div {
+  min-width: 0;
 }
 
 .info-item .label {
@@ -27,10 +45,57 @@
 
 .info-item .value {
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-@media (min-width: 992px) {
+/* Prevent long titles/addresses from overflowing */
+.card-title,
+.card-subtitle {
+  overflow: visible;
+  white-space: normal;
+  min-width: 0;
+  word-break: break-word;
+}
+
+.card-subtitle.d-flex {
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.card-subtitle .truncate {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Wrap action buttons on narrow viewports */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.actions .btn {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Allow flex content to shrink properly inside card */
+.card-body {
+  min-height: 0;
+}
+
+@media (min-width: 1200px) {
   .info-grid {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .info-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ListingsService } from '../../../../services/services/listings.service';
 import { ListingDetailsResponse } from '../../../../services/models/listing-details-response';
 import { UpdateListingRequest } from '../../../../services/models/update-listing-request';
@@ -11,7 +11,7 @@ import * as L from 'leaflet';
 @Component({
   selector: 'app-update-listing',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, CurrencyPipe],
   templateUrl: './update-listing.html',
   styleUrl: './update-listing.css',
 })

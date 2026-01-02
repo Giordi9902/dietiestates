@@ -27,8 +27,9 @@ public class ListingSecurityService {
 		String userEmail = auth.getName();
 		User user = userRepository.findByEmail(userEmail).orElseThrow(()->new UsernameNotFoundException("User not " +
 				"found with this email"));
+        boolean isAdmin = hasRole(user,"ROLE_ADMIN");
 		boolean isAgent = hasRole(user,"ROLE_AGENT");
-		if(!isAgent)return false;
+		if(!(isAdmin || isAgent)) return false;
 
 		Optional<Integer> listedByAgentId = listingRepository.findAgentIdByListingId(listingId);
 		if (listedByAgentId.isEmpty()) {

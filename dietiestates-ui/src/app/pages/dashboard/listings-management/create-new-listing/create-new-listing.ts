@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { ListingsService } from '../../../../services/services/listings.service';
 import { CreateListingRequest } from '../../../../services/models/create-listing-request';
 import { Router } from '@angular/router';
@@ -6,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-create-new-listing',
-  imports: [FormsModule],
+  imports: [FormsModule, CurrencyPipe],
   templateUrl: './create-new-listing.html',
   styleUrl: './create-new-listing.css',
 })

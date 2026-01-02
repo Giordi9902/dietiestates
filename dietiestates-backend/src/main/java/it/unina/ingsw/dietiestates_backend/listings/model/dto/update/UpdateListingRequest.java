@@ -28,7 +28,7 @@ public class UpdateListingRequest {
 	private Integer bathrooms;
 	private String address;
 	private Double area;
-    private ListingOperation operation;
+    private ListingOperation listingOperation;
 	private EnergyClass energyClass;
     private Boolean hasElevator;
     private Boolean hasParking;

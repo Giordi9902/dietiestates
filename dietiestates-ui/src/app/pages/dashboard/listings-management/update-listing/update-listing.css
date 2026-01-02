@@ -4,3 +4,15 @@
   border-radius: 0.375rem;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
+
+/* Stabilizza l'altezza del testo di aiuto sotto il prezzo per evitare salti */
+.hint {
+  min-height: 1.25rem;
+}
+
+/* Migliora il wrapping dei controlli su schermi stretti */
+@media (max-width: 576px) {
+  .input-group > .form-control {
+    min-width: 0;
+  }
+}

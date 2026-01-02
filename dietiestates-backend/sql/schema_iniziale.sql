@@ -150,7 +150,7 @@ CREATE TABLE public.listing (
     bathrooms integer,
     coordinate public.geometry(Point,4326),
     created_date timestamp(6) without time zone NOT NULL,
-    description character varying(255),
+    description character TEXT,
     energy_class character varying(255),
     floor integer,
     has_balcony boolean,
@@ -537,7 +537,7 @@ CREATE OR REPLACE FUNCTION get_listings_by_agent(p_agent_id INT)
     RETURNS TABLE (
                       listing_id INT,
                       title VARCHAR,
-                      description varchar,
+                      description text,
                       address VARCHAR,
                       rooms INT,
                       bathrooms INT,

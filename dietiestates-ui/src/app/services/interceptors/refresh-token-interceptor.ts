@@ -36,10 +36,10 @@ export const refreshTokenInterceptor: HttpInterceptorFn = (req, next) => {
           isRefreshing = true;
           refreshTokenSubject.next(null);
 
-          return authService.refresh({ body: { refreshToken } as any }).pipe(
+          return authService.refresh({ body: { refresh_token: refreshToken } }).pipe(
             switchMap((res: any) => {
-              const newAccess = res?.accessToken ?? res?.access_token ?? res?.token ?? null;
-              const newRefresh = res?.refreshToken ?? res?.refresh_token ?? null;
+              const newAccess = res?.jwt_token ?? null;
+              const newRefresh = res?.refresh_token ?? null;
               tokenService.access_token = newAccess;
               tokenService.refresh_token = newRefresh;
               isRefreshing = false;
