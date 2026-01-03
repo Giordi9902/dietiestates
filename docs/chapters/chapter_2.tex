@@ -44,7 +44,6 @@ L'uso di Docker per il backend abilita diversi benefici chiave:
 \begin{itemize}
     \item \textbf{Replicabilità e coerenza:} l'immagine Docker incapsula runtime, dipendenze e configurazioni, eliminando il classico \textit{“funziona sul mio PC”}.
     \item \textbf{Portabilità:} la stessa immagine può essere eseguita in locale, su EC2 o in un cluster orchestrato, senza variazioni di ambiente.
-    \item \textbf{Immutabilità e versionamento:} le immagini sono versionate (tag), favorendo rollback e tracciabilità nei pipeline CI/CD.
     \item \textbf{Sicurezza e isolamento:} i container isolano processi e risorse; le configurazioni sensibili transitano via variabili d'ambiente e/o file esterni.
     \item \textbf{Scalabilità operativa:} deployment semplificati, aggiornamenti atomici (pull + restart), integrazione naturale con registri di immagini (es. Amazon ECR).
 \end{itemize}
@@ -102,9 +101,7 @@ La selezione delle tecnologie è stata guidata da criteri di maturità, supporto
 
 Oltre alle scelte architetturali di alto livello, sono stati adottati specifici pattern di progettazione e configurazioni di sicurezza avanzate per garantire la robustezza, la manutenibilità e la sicurezza del sistema.
 
-Per garantire un elevato livello di sicurezza nell'accesso alle risorse del sistema, è stato adottato Spring Security in combinazione con il protocollo OpenID Connect (OIDC). Questa scelta consente di implementare un sistema di autenticazione e autorizzazione robusto e scalabile, sfruttando le funzionalità offerte da provider di identità esterni.
-
-Spring Security fornisce un framework completo per la gestione della sicurezza delle applicazioni Java, offrendo funzionalità come l'autenticazione degli utenti, l'autorizzazione basata sui ruoli e la protezione contro le vulnerabilità comuni (es. CSRF, XSS). Integrando OIDC, il sistema può delegare l'autenticazione a un Identity Provider (IdP) esterno, che gestisce in modo sicuro le credenziali degli utenti e fornisce token di accesso standardizzati. Questo approccio presenta diversi vantaggi:
+Per garantire un elevato livello di sicurezza nell'accesso alle risorse del sistema, è stato adottato \textbf{Spring Security} in combinazione con il protocollo OpenID Connect (OIDC). Questa scelta consente di implementare un sistema di autenticazione e autorizzazione robusto e scalabile, sfruttando le funzionalità offerte da provider di identità esterni. Questo approccio presenta diversi vantaggi:
 \begin{itemize}
     \item \textbf{Sicurezza Migliorata:} La gestione delle credenziali è affidata a un provider specializzato, riducendo il rischio di vulnerabilità legate alla gestione interna delle password.
     \item \textbf{Scalabilità:} L'utilizzo di un IdP esterno consente di scalare facilmente il sistema di autenticazione senza dover implementare soluzioni personalizzate.
@@ -112,37 +109,41 @@ Spring Security fornisce un framework completo per la gestione della sicurezza d
 \end{itemize}
 L'implementazione di Spring Security con OIDC prevede la configurazione del client OIDC all'interno dell'applicazione Spring Boot, la definizione delle regole di accesso alle risorse protette e la gestione dei token di accesso per autorizzare le richieste API.
 
-\paragraph{Il design pattern Factory per la gestione dei vari providers}
-\label{ssec:factory_pattern_oauth2}
-Per gestire l'autenticazione tramite provider esterni (es. Google) secondo i protocolli OAuth2 e OpenID Connect, è stato implementato il \textbf{Factory Pattern}. Questa scelta di design è cruciale per disaccoppiare la logica di gestione dell'autenticazione dalle implementazioni specifiche di ciascun provider.
+\gbox{Il design pattern Factory per la gestione dei vari providers}{red}{
+	
+	Per gestire l'autenticazione tramite provider esterni (es. Google) secondo i protocolli OAuth2 e OpenID Connect, è stato implementato il \textbf{Factory Pattern}. Questa scelta di design è cruciale per disaccoppiare la logica di gestione dell'autenticazione dalle implementazioni specifiche di ciascun provider.\\
 
-Il cuore di questo pattern è rappresentato dall'interfaccia \texttt{OAuth2UserInfo}, che definisce un contratto comune per l'estrazione degli attributi di un utente (come ID, nome, email) a prescindere dal provider. Per ogni provider supportato, viene creata una classe concreta (es. \texttt{GoogleOAuth2UserInfo}) che implementa questa interfaccia, sapendo come mappare la struttura dati, spesso eterogenea, restituita da quel provider.
 
-La classe \texttt{OAuth2UserInfoFactory} agisce come "fabbrica": il suo metodo principale riceve in input il nome del provider e la mappa di attributi dell'utente, e restituisce l'istanza della classe concreta appropriata. In questo modo, i servizi che gestiscono il processo di login (\texttt{CustomOAuth2UserService} e \texttt{CustomOidcUserService}) non devono contenere logica condizionale (if/else o switch) per i diversi provider. Essi interagiscono esclusivamente con l'astrazione \texttt{OAuth2UserInfo}, favorendo il riutilizzo del codice e rendendo il sistema facilmente estensibile: per supportare un nuovo provider, è sufficiente creare una nuova implementazione dell'interfaccia e aggiornare la factory, senza modificare i servizi esistenti.
+	Il cuore di questo pattern è rappresentato dall'interfaccia \texttt{OAuth2UserInfo}, che definisce un contratto comune per l'estrazione degli attributi di un utente (come ID, nome, email) a prescindere dal provider. Per ogni provider supportato, viene creata una classe concreta (es. \texttt{GoogleOAuth2UserInfo}) che implementa questa interfaccia, sapendo come mappare la struttura dati, spesso eterogenea, restituita da quel provider.\\
 
-\paragraph{Gestione della sicurezza con la Security Filter Chain}
-\label{ssec:security_filter_chain}
-La sicurezza dell'applicazione backend è gestita da Spring Security attraverso una catena di filtri (\textbf{Security Filter Chain}). Questo approccio, che implementa il pattern Chain of Responsibility, permette di applicare una serie di controlli di sicurezza a ogni richiesta HTTP in arrivo.
+	La classe \texttt{OAuth2UserInfoFactory} agisce come ``fabbrica'': il suo metodo principale riceve in input il nome del provider e la mappa di attributi dell'utente, e restituisce l'istanza della classe concreta appropriata. In questo modo, i servizi che gestiscono il processo di login (\texttt{CustomOAuth2UserService} e \texttt{CustomOidcUserService}) non devono contenere logica condizionale (if/else o switch) per i diversi provider. Essi interagiscono esclusivamente con l'astrazione \texttt{OAuth2UserInfo}, favorendo il riutilizzo del codice e rendendo il sistema facilmente estensibile: per supportare un nuovo provider, è sufficiente creare una nuova implementazione dell'interfaccia e aggiornare la factory, \textit{senza modificare i servizi esistenti}.
+}
 
-La configurazione, definita nella classe \texttt{SecurityFilterConfig}, stabilisce l'ordine e il comportamento di questi filtri. Le principali responsabilità configurate includono:
-\begin{itemize}
-    \item \textbf{Autorizzazione degli Endpoint:} Viene definita una politica di accesso granulare per i diversi percorsi dell'API. Ad esempio, gli endpoint relativi all'autenticazione (es. \texttt{/api/auth/**}) sono resi pubblici, mentre altre aree richiedono ruoli specifici (es. \texttt{/api/admin/**} richiede il ruolo di \texttt{ADMIN}).
+\gbox{Gestione della sicurezza con la Security Filter Chain}{green!75!black}{
 
-    \item \textbf{Gestione delle Sessioni:} L'applicazione è configurata per essere \textit{stateless}, ovvero non viene creata alcuna sessione utente sul server. Questa è una scelta fondamentale per le API RESTful, in quanto garantisce la scalabilità e semplifica il bilanciamento del carico. L'autenticazione di ogni richiesta è affidata a un token.
+	La sicurezza dell'applicazione backend è gestita da Spring Security attraverso una catena di filtri (\textbf{Security Filter Chain}). Questo approccio, che implementa il pattern Chain of Responsibility, permette di applicare una serie di controlli di sicurezza a ogni richiesta HTTP in arrivo.\\
 
-    \item \textbf{Integrazione OIDC e OAuth2:} La catena è configurata per intercettare e gestire i flussi di login con provider esterni, delegando il processo ai servizi specifici come \texttt{CustomOidcUserService}.
+	La configurazione, definita nella classe \texttt{SecurityFilterConfig}, stabilisce l'ordine e il comportamento di questi filtri. Le principali responsabilità configurate includono:
+	\begin{itemize}
+	    \item \textbf{Autorizzazione degli Endpoint:} Viene definita una politica di accesso granulare per i diversi percorsi dell'API.
+	
+	    \item \textbf{Gestione delle Sessioni:} L'applicazione è configurata per essere \textit{stateless}, ovvero non viene creata alcuna sessione utente sul server. Questa è una scelta fondamentale per le API RESTful, in quanto garantisce la scalabilità e semplifica il bilanciamento del carico. L'autenticazione di ogni richiesta è affidata a un token.
+	
+	    \item \textbf{Integrazione OIDC e OAuth2:} La catena è configurata per intercettare e gestire i flussi di login con provider esterni, delegando il processo ai servizi specifici come \texttt{CustomOidcUserService}.
+	
+	    \item \textbf{Filtri Personalizzati:} È stato inserito un filtro custom, \texttt{AuthFilter}, posizionato strategicamente all'interno della catena. Questo filtro ha il compito di ispezionare l'header \texttt{Authorization} di ogni richiesta, estrarre e validare il JSON Web Token (JWT) e, in caso di successo, popolare il \texttt{SecurityContext} di Spring. Questo passaggio è ciò che permette al resto dell'applicazione di identificare l'utente autenticato e i suoi ruoli per le successive richieste API.
+	\end{itemize}
+}
 
-    \item \textbf{Filtri Personalizzati:} È stato inserito un filtro custom, \texttt{AuthFilter}, posizionato strategicamente all'interno della catena. Questo filtro ha il compito di ispezionare l'header \texttt{Authorization} di ogni richiesta, estrarre e validare il JSON Web Token (JWT) e, in caso di successo, popolare il \texttt{SecurityContext} di Spring. Questo passaggio è ciò che permette al resto dell'applicazione di identificare l'utente autenticato e i suoi ruoli per le successive richieste API.
-\end{itemize}
+\gbox{Access token JWT e Refresh Tokens}{blue}{
+Per garantire un'autenticazione sicura e scalabile, il sistema utilizza JSON Web Tokens (JWT) come access token per autorizzare le richieste API. I JWT sono token compatti e auto-contenuti che trasportano informazioni sull'utente e sui suoi privilegi in modo sicuro. Quando un utente effettua il login tramite OIDC, riceve un access token JWT che deve essere incluso nelle intestazioni delle richieste API per accedere alle risorse protette. Questo approccio consente di evitare la necessità di mantenere sessioni lato server, migliorando la scalabilità dell'applicazione.\\
 
-\paragraph{Access token JWT e Refresh Tokens}
-Per garantire un'autenticazione sicura e scalabile, il sistema utilizza JSON Web Tokens (JWT) come access token per autorizzare le richieste API. I JWT sono token compatti e auto-contenuti che trasportano informazioni sull'utente e sui suoi privilegi in modo sicuro. Quando un utente effettua il login tramite OIDC, riceve un access token JWT che deve essere incluso nelle intestazioni delle richieste API per accedere alle risorse protette. Questo approccio consente di evitare la necessità di mantenere sessioni lato server, migliorando la scalabilità dell'applicazione.
-
-Accanto agli access token, il sistema implementa anche l'uso di refresh token. I refresh token sono token a lunga durata che consentono agli utenti di ottenere nuovi access token senza dover effettuare nuovamente il login. Quando un access token scade, l'applicazione può utilizzare il refresh token per richiedere un nuovo access token all'IdP, migliorando l'esperienza utente e mantenendo la sicurezza delle sessioni.
+Accanto agli access token, il sistema implementa anche l'uso di \textbf{refresh token}. I refresh token sono token a lunga durata che consentono agli utenti di ottenere nuovi access token senza dover effettuare nuovamente il login. Quando un access token scade, l'applicazione può utilizzare il refresh token per richiedere un nuovo access token all'IdP, migliorando l'esperienza utente e mantenendo la sicurezza delle sessioni.
 
 \begin{center}
     \includegraphics[width=\textwidth]{res/security.png}
 \end{center}
+}
 
 \section{Design dell'Interfaccia Utente (UI)}
 \label{sec:design_dell_interfaccia_utente_ui}
@@ -157,26 +158,32 @@ Il design dell'interfaccia utente è stato concepito per essere pulito, intuitiv
 
     \item \textbf{Feedback all'Utente:} Il sistema fornisce un feedback visivo costante per ogni azione intrapresa dall'utente. Indicatori di caricamento (spinner) durante le chiamate asincrone, messaggi di successo o di errore chiari e validazione contestuale dei form sono tutti elementi implementati per migliorare la comunicazione tra il sistema e l'utente, riducendo l'incertezza e migliorando la percezione di reattività dell'applicazione.
 \end{itemize}
-L'ispirazione per il layout e l'esperienza utente è tratta dai principali portali immobiliari moderni, cercando di adottare convenzioni già familiari agli utenti per ridurre la curva di apprendimento.
+
+\info{Scelta dell'interfaccia utente}{L'ispirazione per il layout e l'esperienza utente è tratta dai principali portali immobiliari moderni, cercando di adottare convenzioni già familiari agli utenti per ridurre la curva di apprendimento.}
 
 \section{Descrizione dello schema per la persistenza dei dati}
 
 \subsection{Panoramica e vincoli generali}
+
 Lo schema utilizza PostgreSQL come motore relazionale e sfrutta estensioni quali \texttt{postgis} per la gestione dei dati geografici. Le entità principali sono modellate tramite tabelle normalizzate con vincoli di integrità (PK, FK e UNIQUE) e check constraint per valori enumerati (es. classe energetica, tipo di operazione).
 
 Sequenze dedicate gestiscono gli identificatori delle tabelle principali (users, role, listing, listing\_image, ecc.) per garantire integrità e comportamento prevedibile nelle operazioni di insert.
 
 \subsection{Tabelle principali}
+
 \begin{itemize}
 	\item  \textbf{agencies}: rappresenta le agenzie immobiliari (id, nome, email, telefono).
-\item  \textbf{users}: anagrafica utenti con campi di stato (enabled, account\_locked), riferimento opzionale a \texttt{agency\_id} e controlli sul provider di autenticazione. Le associazioni many-to-many verso \textbf{role} sono gestite tramite la tabella di join \textbf{users\_roles}.
-\item \textbf{role}: definisce i ruoli applicativi (es. ROLE\_AGENT, ROLE\_ADMIN, ROLE\_ADMIN\_ASSISTANT) con vincolo di unicità sul nome.
-\item  \textbf{listing}: entità principale per gli annunci immobilari. Oltre agli attributi descrittivi (title, description, address, price, rooms, bathrooms, area, energy\_class, listing\_operation) include un campo spaziale \texttt{coordinate} di tipo \texttt{geometry(Point,4326)} per memorizzare la posizione geografica del bene.
-\item  \textbf{listing\_image}: immagini associate ad un annuncio (url, sort\_order, created\_at, listing\_id FK), utilizzata per gestire gallerie e miniature.
-\item  \textbf{refresh\_tokens} e \textbf{otp\_token}: tabelle per la gestione di token di autenticazione e OTP.
+	
+	\item  \textbf{users}: anagrafica utenti con campi di stato (enabled, account\_locked), riferimento opzionale a \texttt{agency\_id} e controlli sul provider di autenticazione. Le associazioni many-to-many verso \textbf{role} sono gestite tramite la tabella di join \textbf{users\_roles}.
+	
+	\item \textbf{role}: definisce i ruoli applicativi (ROLE\_AGENT, ROLE\_ADMIN, ROLE\_ADMIN\_ASSISTANT) con vincolo di unicità sul nome.
+	
+	\item  \textbf{listing}: entità principale per gli annunci immobilari. Oltre agli attributi descrittivi include un campo spaziale \texttt{coordinate} di tipo \texttt{geometry(Point,4326)} per memorizzare la posizione geografica del bene.
+	
+	\item  \textbf{listing\_image}: immagini associate ad un annuncio (url, sort\_order, created\_at, listing\_id FK), utilizzata per gestire gallerie e miniature.
+	
+	\item  \textbf{refresh\_tokens} e \textbf{otp\_token}: tabelle per la gestione di token di autenticazione e OTP.
 \end{itemize}
-
-Gli indici e i vincoli sono definiti per garantire performance e coerenza (es. UNIQUE su email degli utenti, UNIQUE su nome agenzia).
 
 \subsection{Funzioni e logica lato database}
 Nel file di schema sono presenti stored procedures/functions utili a incapsulare logiche di business che devono essere eseguite atomically lato DB:
@@ -184,7 +191,9 @@ Nel file di schema sono presenti stored procedures/functions utili a incapsulare
 \begin{itemize}
 	\item \texttt{revoke\_agent(user\_id INTEGER)}: funzione PL/pgSQL che rimuove ruoli associati a un utente (es. \texttt{ROLE\_AGENT}, \texttt{ROLE\_ADMIN\_ASSISTANT}) e azzera il campo \texttt{agency\_id} dell'utente. Questo tipo di funzione è utile per eseguire operazioni di revoca in modo trasparente e coerente, mantenendo la storia delle modifiche tramite l'aggiornamento del campo \texttt{last\_modified\_date}.
 
-\item  \texttt{get\_listings\_by\_agent(p\_agent\_id INT)}: funzione che restituisce gli annunci associati a un agente, estraendo anche coordinate (lon/lat) e la URL della prima immagine come \texttt{thumbnail\_url}. Fornisce un'interfaccia semplice e performante per le API che devono elencare gli annunci di un agente.
+    \item  \texttt{get\_listings\_by\_agent(p\_agent\_id INT)}: funzione che restituisce gli annunci associati a un agente, estraendo anche coordinate (lon/lat) e la URL della prima immagine come \texttt{thumbnail\_url}. Fornisce un'interfaccia semplice e performante per le API che devono elencare gli annunci di un agente.
+
+    \item \texttt{search\_listings\_by\_filters}: funzione per la ricerca dinamica degli annunci con filtri opzionali, paginazione e conteggio totale dei risultati; include coordinate e URL della miniatura per supporto alla UI.
 \end{itemize}
 
 Queste funzioni permettono di centralizzare controlli e operazioni ripetute, riducendo la complessità delle transazioni lato applicazione e favorendo coerenza dei dati.
@@ -195,9 +204,9 @@ PostGIS estende PostgreSQL con tipi spaziali (\texttt{geometry}, \texttt{geograp
 \begin{itemize}
 	\item \textbf{Ricchezza funzionale}: PostGIS fornisce operatori come \texttt{ST\_DWithin}, \texttt{ST\_Distance}, \texttt{ST\_Transform} e funzioni per estrarre coordinate (\texttt{ST\_X}, \texttt{ST\_Y}), fondamentali per query di ricerca per prossimità e per visualizzazione su mappe.
 
-\item  \textbf{Performance e indicizzazione}: gli indici spaziali GIST consentono ricerche molto efficienti su grandi insiemi di punti; l'uso di un indice GIST su \texttt{listing(coordinate)} permette di limitare rapidamente il numero di geometrie candidate prima di calcolare distanze precise.
-
-\item  \textbf{Precisione geografica}: PostGIS supporta SRID standard (es. 4326) e tipi \texttt{geography} per calcoli sulla superficie terrestre che considerano la curvatura della Terra, utile quando le ricerche devono essere espresse in metri.
+	\item  \textbf{Performance e indicizzazione}: gli indici spaziali GIST consentono ricerche molto efficienti su grandi insiemi di punti; l'uso di un indice GIST su \texttt{listing(coordinate)} permette di limitare rapidamente il numero di geometrie candidate prima di calcolare distanze precise.
+	
+	\item  \textbf{Precisione geografica}: PostGIS supporta SRID standard (es. 4326) e tipi \texttt{geography} per calcoli sulla superficie terrestre che considerano la curvatura della Terra, utile quando le ricerche devono essere espresse in metri.
 \end{itemize}
 
 Per questi motivi PostGIS offre il miglior compromesso tra semplicità d'uso, portata funzionale e performance per le operazioni geospaziali richieste dal prodotto.
@@ -219,7 +228,8 @@ WHERE ST_DWithin(
 Descrizione:
 \begin{itemize}
 	\item La conversione a \texttt{geography} consente di esprimere il raggio in metri con precisione geodetica.
-\item \texttt{ST\_DWithin} è efficiente quando è supportato da un indice spaziale; PostgreSQL usa l'indice GIST per escludere rapidamente le geometrie lontane.
+	
+	\item \texttt{ST\_DWithin} è efficiente quando è supportato da un indice spaziale; PostgreSQL usa l'indice GIST per escludere rapidamente le geometrie lontane.
 \end{itemize}
 
 Per ottenere distanza ordinata si può usare:
@@ -228,7 +238,6 @@ Per ottenere distanza ordinata si può usare:
 SELECT l.*, ST_Distance(
     l.coordinate::geography,
     ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography
-) AS distance_m
 FROM listing l
 WHERE ST_DWithin(l.coordinate::geography, ST_SetSRID(ST_MakePoint(:lon,:lat),4326)::geography, :radius_meters)
 ORDER BY distance_m ASC
@@ -242,8 +251,6 @@ La gestione delle immagini nel sistema segue il principio di separazione delle r
 \paragraph{Schema e metadati}
 La tabella dedicata \texttt{listing\_image} contiene i campi principali necessari:
 \begin{itemize}
-    \item \texttt{image\_id} (PK)
-    \item \texttt{created\_at} (timestamp)
     \item \texttt{sort\_order} (int) per stabilire l'ordine nella galleria
     \item \texttt{url} (varchar) che punta all'oggetto S3
     \item \texttt{listing\_id} (FK verso \texttt{listing})
@@ -252,16 +259,12 @@ Questa separazione consente operazioni transazionali sui metadati e sfrutta S3 p
 
 \paragraph{Servizi e configurazione}
 La connettività con S3 è incapsulata in una classe di configurazione (vedi \texttt{S3Config.java}) e in un servizio applicativo che implementa l'interfaccia \texttt{ImageStorageService} (implementazione fornita da \texttt{S3ImageStorageService}). Il servizio si occupa di:
+
 \begin{itemize}
     \item Validare il file (MIME type, dimensione, magic bytes) tramite \texttt{isValidImage}.
     \item Generare chiavi oggetto sicure e prevedibili (es. \texttt{listings/{listingId}/{uuid}.{ext}}) con \texttt{buildObjectKey}.
     \item Caricare oggetti su S3 (\texttt{putObject}) e restituire URL/chiave.
-    \item Eliminare singoli oggetti o tutti gli oggetti di un listing (prefisso), usando \texttt{listObjectsV2} + \texttt{deleteObjects} per cancellazioni bulk.
-    \item Generare URL pre-firmati per accesso temporaneo (\texttt{generatePresignedUrl}) e fornire helper \texttt{presignUrl} per servire immagini private.
 \end{itemize}
-
-Questa integrazione fornisce un modello scalabile, sicuro e robusto per la gestione delle immagini, capace di mantenere la coerenza tra storage e metadati relazionali.
-
 
 \begin{lstlisting}[language=SQL]
 -- Estensioni
@@ -274,7 +277,6 @@ CREATE TABLE agencies (
     name VARCHAR(255) NOT NULL CONSTRAINT unique_agency_name UNIQUE,
     email VARCHAR(255),
     phone_number VARCHAR(255)
-);
 
 -- 2. Tabella ROLE
 CREATE TABLE role (
@@ -416,6 +418,123 @@ BEGIN
     WHERE l.listed_by_agent_id = p_agent_id;
 END;
 $$ LANGUAGE plpgsql;
+
+-- Ricerca annunci con filtri dinamici, paginazione e conteggio totale
+CREATE OR REPLACE FUNCTION search_listings_by_filters(
+    op              TEXT DEFAULT NULL,
+    ec              TEXT DEFAULT NULL,
+    min_price       NUMERIC DEFAULT NULL,
+    max_price       NUMERIC DEFAULT NULL,
+    min_rooms       INT DEFAULT NULL,
+    max_rooms       INT DEFAULT NULL,
+    min_area        DOUBLE PRECISION DEFAULT NULL,
+    max_area        DOUBLE PRECISION DEFAULT NULL,
+    lng             DOUBLE PRECISION DEFAULT NULL,
+    lat             DOUBLE PRECISION DEFAULT NULL,
+    radius_km       DOUBLE PRECISION DEFAULT NULL,
+    limit_rows      INT DEFAULT 20,
+    offset_rows     BIGINT DEFAULT 0
+)
+RETURNS TABLE (
+    listing_id      INT,
+    title           VARCHAR,
+    description     TEXT,
+    address         VARCHAR,
+    rooms           INT,
+    bathrooms       INT,
+    price           NUMERIC(38,2),
+    area            DOUBLE PRECISION,
+    energy_class    VARCHAR,
+    lng_out         DOUBLE PRECISION,
+    lat_out         DOUBLE PRECISION,
+    thumbnail_url   VARCHAR,
+    listing_operation VARCHAR,
+    total_count     BIGINT
+)
+LANGUAGE plpgsql
+STABLE
+AS $$
+DECLARE
+    where_sql   TEXT := ' WHERE 1=1';
+    base_sql    TEXT := ' FROM listing l';
+    count_sql   TEXT;
+    query_sql   TEXT;
+    total       BIGINT := 0;
+BEGIN
+    -- Filtri dinamici
+    IF op IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.listing_operation = %L', op);
+    END IF;
+
+    IF ec IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.energy_class = %L', ec);
+    END IF;
+
+    IF min_price IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.price >= %L::numeric', min_price);
+    END IF;
+
+    IF max_price IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.price <= %L::numeric', max_price);
+    END IF;
+
+    IF min_rooms IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.rooms >= %L::int', min_rooms);
+    END IF;
+
+    IF max_rooms IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.rooms <= %L::int', max_rooms);
+    END IF;
+
+    IF min_area IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.area >= %L::double precision', min_area);
+    END IF;
+
+    IF max_area IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.area <= %L::double precision', max_area);
+    END IF;
+
+    IF lng IS NOT NULL AND lat IS NOT NULL AND radius_km IS NOT NULL THEN
+        where_sql := where_sql || format(
+            ' AND ST_DWithin(l.coordinate::geography, ST_SetSRID(ST_MakePoint(%L, %L), 4326)::geography, %L::double precision * 1000)',
+            lng, lat, radius_km
+        );
+    END IF;
+
+    -- Conteggio totale dei risultati
+    count_sql := 'SELECT count(*) ' || base_sql || where_sql;
+    EXECUTE count_sql INTO total;
+
+    query_sql := '
+        SELECT
+            l.listing_id,
+            l.title,
+            l.description,
+            l.address,
+            l.rooms,
+            l.bathrooms,
+            l.price,
+            l.area,
+            l.energy_class,
+            ST_X(l.coordinate) AS lng_out,
+            ST_Y(l.coordinate) AS lat_out,
+            (
+                SELECT li.url
+                FROM listing_image li
+                WHERE li.listing_id = l.listing_id
+                ORDER BY COALESCE(li.sort_order, 0) ASC
+                LIMIT 1
+            ) AS thumbnail_url,
+            l.listing_operation,
+            ' || total || '::bigint AS total_count
+        ' || base_sql || where_sql || '
+        ORDER BY l.listing_id DESC
+        LIMIT ' || limit_rows || ' OFFSET ' || offset_rows;
+
+    RETURN QUERY EXECUTE query_sql;
+END;
+$$;
+
 \end{lstlisting}
 
 \newpage
