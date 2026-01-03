@@ -22,68 +22,44 @@ public class ListingSearchRepositoryImpl implements ListingSearchRepository {
 
     @Override
     public Page<ListingSummaryResponse> searchListingsByFilters(ListingSearchRequest searchRequest, Pageable pageable) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("select l.listing_id, l.title, l.description, l.address, l.rooms, l.bathrooms, ");
-        sql.append(" l.price, l.area, l.energy_class, ST_X(l.coordinate) as lng, ST_Y(l.coordinate) as lat, ");
-        sql.append(" (select li.url from listing_image li where li.listing_id=l.listing_id order by coalesce(li.sort_order,0) asc limit 1) as thumbnail_url, ");
-        sql.append(" l.listing_operation ");
-        sql.append(" from listing l where 1=1 ");
+        String sql = "select listing_id, title, description, address, rooms, bathrooms, price, area, energy_class, " +
+            "lng_out as lng, lat_out as lat, thumbnail_url, listing_operation, total_count " +
+            "from search_listings_by_filters(" +
+            "CAST(:op AS text), " +
+            "CAST(:ec AS text), " +
+            "CAST(:minPrice AS numeric), " +
+            "CAST(:maxPrice AS numeric), " +
+            "CAST(:minRooms AS int), " +
+            "CAST(:maxRooms AS int), " +
+            "CAST(:minArea AS double precision), " +
+            "CAST(:maxArea AS double precision), " +
+            "CAST(:lng AS double precision), " +
+            "CAST(:lat AS double precision), " +
+            "CAST(:radiusKm AS double precision), " +
+            "CAST(:limit AS int), " +
+            "CAST(:offset AS bigint))";
 
         MapSqlParameterSource params = new MapSqlParameterSource();
-
-        if (searchRequest.getOperation() != null) {
-            sql.append(" and l.listing_operation = :op ");
-            params.addValue("op", searchRequest.getOperation().name());
-        }
-
-        if (searchRequest.getEnergyClass() != null) {
-            sql.append(" and l.energy_class = :ec ");
-            params.addValue("ec", searchRequest.getEnergyClass().name());
-        }
-
-        if (searchRequest.getMinPrice() != null) {
-            sql.append(" and coalesce(l.price, l.monthly_rent) >= :minPrice ");
-            params.addValue("minPrice", searchRequest.getMinPrice());
-        }
-        if (searchRequest.getMaxPrice() != null) {
-            sql.append(" and coalesce(l.price, l.monthly_rent) <= :maxPrice ");
-            params.addValue("maxPrice", searchRequest.getMaxPrice());
-        }
-
-        if (searchRequest.getMinRooms() != null) {
-            sql.append(" and l.rooms >= :minRooms ");
-            params.addValue("minRooms", searchRequest.getMinRooms());
-        }
-        if (searchRequest.getMaxRooms() != null) {
-            sql.append(" and l.rooms <= :maxRooms ");
-            params.addValue("maxRooms", searchRequest.getMaxRooms());
-        }
-
-        if (searchRequest.getMinArea() != null) {
-            sql.append(" and l.area >= :minArea ");
-            params.addValue("minArea", searchRequest.getMinArea());
-        }
-        if (searchRequest.getMaxArea() != null) {
-            sql.append(" and l.area <= :maxArea ");
-            params.addValue("maxArea", searchRequest.getMaxArea());
-        }
-
-        if (searchRequest.getLng() != null && searchRequest.getLat() != null && searchRequest.getRadiusKm() != null) {
-            sql.append(" and ST_DWithin(l.coordinate::geography, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radiusMeters) ");
-            params.addValue("lng", searchRequest.getLng());
-            params.addValue("lat", searchRequest.getLat());
-            params.addValue("radiusMeters", searchRequest.getRadiusKm() * 1000);
-        }
-
-        String countSql = "select count(*) from (" + sql + ") as q";
-        Long total = jdbcTemplate.queryForObject(countSql, params, Long.class);
-
-        sql.append(" order by l.listing_id desc ");
-        sql.append(" limit :limit offset :offset ");
+        params.addValue("op", searchRequest.getOperation() != null ? searchRequest.getOperation().name() : null);
+        params.addValue("ec", searchRequest.getEnergyClass() != null ? searchRequest.getEnergyClass().name() : null);
+        params.addValue("minPrice", searchRequest.getMinPrice());
+        params.addValue("maxPrice", searchRequest.getMaxPrice());
+        params.addValue("minRooms", searchRequest.getMinRooms());
+        params.addValue("maxRooms", searchRequest.getMaxRooms());
+        params.addValue("minArea", searchRequest.getMinArea());
+        params.addValue("maxArea", searchRequest.getMaxArea());
+        params.addValue("lng", searchRequest.getLng());
+        params.addValue("lat", searchRequest.getLat());
+        params.addValue("radiusKm", searchRequest.getRadiusKm());
         params.addValue("limit", pageable.getPageSize());
         params.addValue("offset", pageable.getOffset());
 
+        final long[] totalHolder = new long[1];
+
         RowMapper<ListingSummaryResponse> mapper = (rs, rowNum) -> {
+            if (rowNum == 0) {
+                totalHolder[0] = rs.getLong("total_count");
+            }
             ListingSummaryResponse dto = new ListingSummaryResponse();
             dto.setListing_id(rs.getInt("listing_id"));
             dto.setTitle(rs.getString("title"));
@@ -104,7 +80,8 @@ public class ListingSearchRepositoryImpl implements ListingSearchRepository {
             return dto;
         };
 
-        List<ListingSummaryResponse> items = jdbcTemplate.query(sql.toString(), params, mapper);
-        return new PageImpl<>(items, pageable, total == null ? 0 : total);
+        List<ListingSummaryResponse> items = jdbcTemplate.query(sql, params, mapper);
+        long total = items.isEmpty() ? 0 : totalHolder[0];
+        return new PageImpl<>(items, pageable, total);
     }
 }

@@ -195,6 +195,26 @@
     \end{block}
 \end{frame}
 
+\begin{frame}{Deploy e Infrastruttura: Docker, RDS e S3}
+    \begin{block}{Containerizzazione con Docker}
+        \begin{itemize}
+            \item Backend impacchettato in immagine tramite \textbf{Dockerfile} per coerenza tra ambienti.
+            \item Orchestrazione locale con \textbf{Docker Compose} per servizi di sviluppo e dipendenze.
+        \end{itemize}
+    \end{block}
+    \begin{block}{Database Gestito: Amazon RDS (PostgreSQL)}
+        \begin{itemize}
+            \item Alta disponibilità, backup automatici e monitoring gestiti dal provider.
+            \item Configurazione per ambiente tramite variabili d'ambiente e profili Spring.
+        \end{itemize}
+    \end{block}
+    \begin{block}{Storage Immagini: Amazon S3}
+        \begin{itemize}
+            \item File binari su \textbf{S3}; metadati (URL, ordine, riferimenti) in \textbf{PostgreSQL}.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
 \begin{frame}{Backend Design: Monolite Modulare (DDD)}
     \begin{block}{Approccio}
         Il backend è un \textbf{monolite modulare} progettato secondo i principi del \textbf{Domain-Driven Design (DDD)}.
@@ -296,17 +316,18 @@ WHERE ST_DWithin(
 \end{frame}
 
 \begin{frame}{Deep Dive: Gestione delle Immagini}
-    \begin{block}{Separazione delle Responsabilità}
-        Per garantire scalabilità e performance, i dati binari sono separati dai metadati.
+    \begin{block}{Integrazione S3 nel Backend}
+        Come illustrato nel frame \textit{Deploy e Infrastruttura}, le immagini risiedono su S3 con metadati in PostgreSQL. Qui gli aspetti implementativi chiave:
         \begin{itemize}
-            \item \textbf{Amazon S3:} Utilizzato come object storage per salvare i file delle immagini. È scalabile, robusto e ottimizzato per la distribuzione di contenuti.
-            \item \textbf{PostgreSQL:} Memorizza solo i metadati associati alle immagini (URL, ordine di visualizzazione, riferimento all'annuncio).
+            \item Validazione lato server (MIME, dimensione, magic bytes) prima dell'upload.
+            \item Upload su bucket dedicato e generazione di \textit{presigned URL} per accesso temporaneo.
+            \item Sincronizzazione dei metadati (URL, sort\_order, timestamps) nella tabella \texttt{listing\_image}.
         \end{itemize}
     \end{block}
-    \begin{alertblock}{Vantaggi}
+    \begin{alertblock}{Note Operative}
         \begin{itemize}
-            \item Il database rimane leggero e performante.
-            \item Lo storage degli asset può scalare indipendentemente.
+            \item Caching/TTL controllato via headers per ottimizzare la distribuzione.
+            \item Gestione dei permessi: bucket privato con accesso mediato dall'applicazione.
         \end{itemize}
     \end{alertblock}
 \end{frame}

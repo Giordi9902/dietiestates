@@ -578,3 +578,121 @@ BEGIN
             l.listed_by_agent_id = p_agent_id;
 END;
 $$ LANGUAGE plpgsql;
+
+
+-- Dynamic listings search with filters, pagination and total count
+CREATE OR REPLACE FUNCTION search_listings_by_filters(
+    op              TEXT DEFAULT NULL,
+    ec              TEXT DEFAULT NULL,
+    min_price       NUMERIC DEFAULT NULL,
+    max_price       NUMERIC DEFAULT NULL,
+    min_rooms       INT DEFAULT NULL,
+    max_rooms       INT DEFAULT NULL,
+    min_area        DOUBLE PRECISION DEFAULT NULL,
+    max_area        DOUBLE PRECISION DEFAULT NULL,
+    lng             DOUBLE PRECISION DEFAULT NULL,
+    lat             DOUBLE PRECISION DEFAULT NULL,
+    radius_km       DOUBLE PRECISION DEFAULT NULL,
+    limit_rows      INT DEFAULT 20,
+    offset_rows     BIGINT DEFAULT 0
+)
+RETURNS TABLE (
+    listing_id      INT,
+    title           VARCHAR,
+    description     TEXT,
+    address         VARCHAR,
+    rooms           INT,
+    bathrooms       INT,
+    price           NUMERIC(38,2),
+    area            DOUBLE PRECISION,
+    energy_class    VARCHAR,
+    lng_out         DOUBLE PRECISION,
+    lat_out         DOUBLE PRECISION,
+    thumbnail_url   VARCHAR,
+    listing_operation VARCHAR,
+    total_count     BIGINT
+)
+LANGUAGE plpgsql
+STABLE
+AS $$
+DECLARE
+    where_sql   TEXT := ' WHERE 1=1';
+    base_sql    TEXT := ' FROM listing l';
+    count_sql   TEXT;
+    query_sql   TEXT;
+    total       BIGINT := 0;
+BEGIN
+    -- Dynamic filters
+    IF op IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.listing_operation = %L', op);
+    END IF;
+
+    IF ec IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.energy_class = %L', ec);
+    END IF;
+
+    IF min_price IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.price >= %L::numeric', min_price);
+    END IF;
+
+    IF max_price IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.price <= %L::numeric', max_price);
+    END IF;
+
+    IF min_rooms IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.rooms >= %L::int', min_rooms);
+    END IF;
+
+    IF max_rooms IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.rooms <= %L::int', max_rooms);
+    END IF;
+
+    IF min_area IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.area >= %L::double precision', min_area);
+    END IF;
+
+    IF max_area IS NOT NULL THEN
+        where_sql := where_sql || format(' AND l.area <= %L::double precision', max_area);
+    END IF;
+
+    IF lng IS NOT NULL AND lat IS NOT NULL AND radius_km IS NOT NULL THEN
+        where_sql := where_sql || format(
+            ' AND ST_DWithin(l.coordinate::geography, ST_SetSRID(ST_MakePoint(%L, %L), 4326)::geography, %L::double precision * 1000)',
+            lng, lat, radius_km
+        );
+    END IF;
+
+    -- Total count without pagination
+    count_sql := 'SELECT count(*) ' || base_sql || where_sql;
+    EXECUTE count_sql INTO total;
+
+    -- Paged results with constant total_count per row
+    query_sql := '
+        SELECT
+            l.listing_id,
+            l.title,
+            l.description,
+            l.address,
+            l.rooms,
+            l.bathrooms,
+            l.price,
+            l.area,
+            l.energy_class,
+            ST_X(l.coordinate) AS lng_out,
+            ST_Y(l.coordinate) AS lat_out,
+            (
+                SELECT li.url
+                FROM listing_image li
+                WHERE li.listing_id = l.listing_id
+                ORDER BY COALESCE(li.sort_order, 0) ASC
+                LIMIT 1
+            ) AS thumbnail_url,
+            l.listing_operation,
+            ' || total || '::bigint AS total_count
+        ' || base_sql || where_sql || '
+        ORDER BY l.listing_id DESC
+        LIMIT ' || limit_rows || ' OFFSET ' || offset_rows;
+
+    RETURN QUERY EXECUTE query_sql;
+END;
+$$;
