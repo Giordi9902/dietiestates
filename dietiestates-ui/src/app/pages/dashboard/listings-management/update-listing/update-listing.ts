@@ -44,7 +44,6 @@ export class UpdateListing implements OnInit, AfterViewInit {
   private initialLatLng: L.LatLng | null = null;
   private mapInitialized = false;
 
-  // Workaround for broken Leaflet icon in Angular
   private defaultIcon = L.icon({
     iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
     iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -94,11 +93,11 @@ export class UpdateListing implements OnInit, AfterViewInit {
 
   private initMap(): void {
     if (document.getElementById('map-update') && !this.map) {
-      this.map = L.map('map-update').setView([40.8518, 14.2681], 13); // Default to Naples
+      this.map = L.map('map-update').setView([40.8518, 14.2681], 13);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
       this.map.on('click', this.onMapClick.bind(this));
       this.mapInitialized = true;
-      this.setInitialMapView(); // Attempt to set view now that map is ready
+      this.setInitialMapView();
     }
   }
 
@@ -113,7 +112,7 @@ export class UpdateListing implements OnInit, AfterViewInit {
 
         if (data.lat && data.lng) {
           this.initialLatLng = L.latLng(data.lat, data.lng);
-          this.setInitialMapView(); // Attempt to set view now that data is ready
+          this.setInitialMapView();
         }
       },
       error: (err) => {
@@ -127,8 +126,8 @@ export class UpdateListing implements OnInit, AfterViewInit {
     if (this.mapInitialized && this.initialLatLng && this.map) {
       this.updateMarker(this.initialLatLng);
       this.map.setView(this.initialLatLng, 15);
-      setTimeout(() => this.map?.invalidateSize(), 200); // Recalculate size
-      this.initialLatLng = null; // Don't run this again
+      setTimeout(() => this.map?.invalidateSize(), 200);
+      this.initialLatLng = null;
     }
   }
 

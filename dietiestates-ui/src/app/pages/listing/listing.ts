@@ -31,7 +31,6 @@ export class Listing implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Inizializza mappa dopo che il view è pronto
     setTimeout(() => this.initMap(), 100);
   }
 
@@ -44,7 +43,6 @@ export class Listing implements OnInit, AfterViewInit {
           this.selectedImageUrl = data.imageUrls[0];
         }
         this.loading = false;
-        // Inizializza mappa dopo aver ricevuto i dati
         setTimeout(() => this.initMap(), 100);
       },
       error: (err) => {
@@ -66,7 +64,6 @@ export class Listing implements OnInit, AfterViewInit {
     try {
       const L = (window as any).L;
       if (!L) return;
-      // Fix marker icon URLs when using Leaflet via CDN
       const defaultIcon = new L.Icon({
         iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
         iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -85,8 +82,6 @@ export class Listing implements OnInit, AfterViewInit {
       this.marker = L.marker([this.listing.lat, this.listing.lng], {
         icon: defaultIcon,
       }).addTo(this.map);
-    } catch {
-      // map not available
-    }
+    } catch {}
   }
 }

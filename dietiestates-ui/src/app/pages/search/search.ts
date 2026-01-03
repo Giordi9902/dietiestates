@@ -83,7 +83,7 @@ export class Search implements OnInit, AfterViewInit {
   }
 
   private initMap(): void {
-    this.map = L.map('map').setView([40.8518, 14.2681], 13); // Default to Naples
+    this.map = L.map('map').setView([40.8518, 14.2681], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',

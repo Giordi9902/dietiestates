@@ -49,7 +49,6 @@ export class CreateNewListing {
     const input = event.target as HTMLInputElement;
     if (!input.files) return;
     const selected = Array.from(input.files);
-    // Append new files, avoid duplicates by name+size
     const existingKeys = new Set(this.images.map((f) => `${f.name}:${f.size}`));
     selected.forEach((f) => {
       const key = `${f.name}:${f.size}`;
@@ -57,7 +56,6 @@ export class CreateNewListing {
         this.images.push(f);
       }
     });
-    // Rebuild previews to match current images
     this.imagePreviews = [];
     this.images.forEach((file) => {
       const reader = new FileReader();
@@ -123,9 +121,7 @@ export class CreateNewListing {
         this.model.address = data.display_name;
         this.addressInput = data.display_name;
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
 
   submit() {
